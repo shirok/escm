@@ -16,7 +16,7 @@ JA_FILLES = readme.ja.html install.ja.html
 $(ESCM) :
 	cd ../src/ && make
 
-doc : $(man_MANS) $(HTML_FILES) $(JA_FILES)
+doc : $(man_MANS) $(HTML_FILES)
 
 .epod.1 :
 	$(ESCM) -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" $< > $*.pod
@@ -40,7 +40,7 @@ EXTRA_DIST = helper.scm
 EXTRA_DIST += readme.escm gimmick.escm interpreter.escm install.escm
 EXTRA_DIST += aescm.epod 2aescm.epod
 EXTRA_DIST += config.scm.in
-EXTRA_DIST += $(HTML_FILES) readme.ja.html install.ja.html
+# EXTRA_DIST += $(HTML_FILES) readme.ja.html install.ja.html
 EXTRA_DIST += $(man_MANS)
 
 CLEANFILES = 

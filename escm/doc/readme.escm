@@ -24,25 +24,8 @@
     <title>README</title>
   </head>
   <body>
-<?scm (case *language*
-((ja) ?>
-    <p>この文書は <?scm:d PACKAGE?> <?scm:d VERSION?>
-の README(README.ja, doc/readme.ja.html) です。</p>
-<?scm )(else ?>
     <p>This document is README for <?scm:d PACKAGE?> <?scm:d VERSION?>
 (either README or doc/readme.html).</p>
-<?scm )) ?>
-<?scm (case *language*
-((ja) ?>
-    <p><?scm:d (string-titlecase PACKAGE)?>
-は汎用の文書にコードを埋め込むためのツールで、
-フィルタとして、スクリプトでインタプリタの替りとして、
-ハンドラCGIとして使うことができます。
-現在のヴァージョン(<?scm:d VERSION?>)はアルファ版なので、仕様の変更がいろいろありえます。
-安定版は、Scheme 汎用の <?scm:d escm ?> です。
-安定版の文書からこの版用の文書に変換する
-<a href="2aescm.html">2aescm</a> も付属します。</p>
-<?scm )(else ?>
     <p><?scm:d (string-titlecase PACKAGE)?> is a generic tool to 
 embed code in a document.
 You can use it as filer, as wrapper of an interpreter in a script,
@@ -54,16 +37,6 @@ which is a tool for Scheme.
 This package comes with a little program named
 <a href="2aescm.html">2aescm</a>.
 It is a converter from the original escm format to XMLI format.</p>
-<?scm )) ?>
-<?scm (case *language*
-((ja) ?>
-    <p><?scm:d (string-titlecase PACKAGE)?> の実体は、
-XMLプリプロセッサ命令の「外の部分」を
-コードに変換するフィルタで、
-子プロセスとして起動したインタープリタにコードを送って実行させています。
-変換規則を柔軟に変更できるので、
-お好みのスクリプト言語のお好みの実装系で使うことができます。</p>
-<?scm )(else ?>
     <p>The body of <?scm:d PACKAGE?> is a filter
 which converts part outside XML preprocessor instructions
 to code.
@@ -72,46 +45,20 @@ as child process.
 As you can change conversion rules flexibly,
 you will be able to use this tool
 with your favorite interpreter
-of your favorite scripting language.
-<?scm ))?>
+of your favorite scripting language.</p>
 
-    <h2><?scm:d (case *language*
-        ((ja) "インストール")
-        (else "Installation"))?></h2>
-<?scm (case *language*
-((ja) ?>
-    <p>Schemeの処理系 <?scm:d gauche?>をデフォルトとして使うばあいや、
-Gaucheがインストールされていず <?scm:d guile?>
-を使うばあいのインストールは簡単です。</p>
-<?scm )(else ?>
+    <h2>Installation</h2>
     <p>If you want to use <?scm:d gauche?>
 (Scheme interpreter written by Shiro Kawai,
 the author of the original escm) as default backend
 or <?scm:d guile?> when Gauche is not installed,
 type as usual:</p>
-<?scm )) ?>
     <blockquote><pre>
 ./configure
 make
 make install
 </pre>
     </blockquote>
-<?scm (case *language*
-((ja) ?>
-    <p>ただし、デフォルトの設定では
-Schemeでしか使えません。
-また Scheme でも
-別の変換規則が必要な
-<a href="http://swissnet.ai.mit.edu/~jaffer/SCM.html">SCM</a>
-を使うことができません。
-いろいろな言語で使いたいばあいは、
-configure に <em>--enable-polyglot</em>
-オプションを追加してください。
-その他、
-デフォルトの処理系の変更、
-デフォルトの言語の変更については
-INSTALL (doc/intall.html) を参照してください。</p>
-<?scm )(else ?>
     <p>With this setting, only Scheme code is preprocessed.
 You cannot use <?scm:d scm?>,
 for it requires different translation rules
@@ -122,25 +69,8 @@ See INSTALL(doc/<a href="intall.html">install.html</a>)
 for more information.
 You can change the default computer language
 and the default backend.</p>
-<?scm )) ?>
 
-    <h2><?scm:d (case *language*
-    ((ja) "環境変数")
-    (else "Environment Variables"))?></h2>
-<?scm (case *language*
-((ja) ?>
-    <p>デフォルトのインタープリタは
-環境変数 <code>ESCM_BACKEND</code>で変更することができます。
-オプションまで含めて指定してください。
-主要なSchemeの処理系については
-doc/<a href="interpreter.html">interpreter.html</a>
-にオプションの説明があります。</p>
-
-    <p>さらに<em>--enable-polyglot</em>オプション付きでコンパイルした
-場合は、環境変数 <code>ESCM_DEFAULT</code> でデフォルトの
-言語を変更することができます。</p>
-
-<?scm )(else ?>
+    <h2>Environment Variables</h2>
     <p>You can specify the backend interpreter
 by setting it with options
 to environment vairable <code>ESCM_BACKEND</code>.
@@ -151,33 +81,8 @@ doc/<a href="interpreter.html">interpreter.html</a>.</p>
     <p>If you have run <em>configure</em> with <em>--enable-polyglot</em>
 option, you can specify the default scripting languge
 with environment variable <code>ESCM_DEFAULT</code>.</p>
-<?scm )) ?>
 
     <h2>CGI</h2>
-<?scm (case *language*
-((ja) ?>
-    <p>ハンドラCGIプログラムとして、
-また、CGIスクリプトの#!行でインタプリタの替りとして使うことができます。
-ただし、
-いずれの場合でもコードの中で
-POSTメソッドによるパラメータを得ることが仕組み上できません。
-そのため<code>*escm-query-string*</code>
-(他の言語では <code>$escm_query_string</code>,
-<code>EscmQueryString</code> など)に、
-パラメータを束縛しています。
-GETメソッドのときにも束縛しています。</p>
-
-    <p>なお、ハンドラCGIとして使うばあいは、
-お使いの環境に合わせて
-/var/www/cgi-bin, /usr/local/apache/cgi-bin
-などにコピーするかハードリンクしてください。
-接尾辞 .cgi を追加する必要があるかもしれません。
-設定については
-<a href="http://httpd.apache.org/docs-2.0/handler.html">Apache のドキュメント</a>
-を参照してください。
-</p>
-
-<?scm )(else ?>
     <p>You can use this tool as handler CGI program
 or as wrapper of an interpreter in the sharp-bang line of a CGI script.
 The query string by POST method is bound to
@@ -193,24 +98,8 @@ You might have to add suffix <em>.cgi</em>.
 See
 <a href="http://httpd.apache.org/docs-2.0/handler.html">the handler
 document of Apache</a> for settings.</p>
-<?scm )) ?>
 
-    <h2><?scm:d (case *language*
-        ((ja)"言語別の設定ファイル")
-        (else "Language Configuration File"))?></h2>
-<?scm (case *language*
-((ja) ?>
-    <p><em>--enable-polyglot</em>オプション付きでコンパイルしたばあい、
-変換するときに言語別の変換規則を設定ファイルから読み込みます。
-それらは <code>$(datadir)/aescm/lang</code>
-(例えば <code>/usr/local/share/aescm/lang</code>)にインストール
-されます。
-設定ファイルを変更することで変換規則を変更できます。
-またファイルを追加することで対応できる言語や処理系を増やすことができます。
-設定ファイルの書式については
-doc/<a href="gimmick.html">gimmick.html</a> を参照してください。</p>
-
-<?scm )(else ?>
+    <h2>Language Configuration File</h2>
     <p>If you run ./configure with <em>--enable-polyglot</em>,
 the filter reads the translation rules form
 a language configuration file.
@@ -221,20 +110,8 @@ You can edit them to change translation rules.
 and backend interpreters.
 To edit or add a configuration file
 consult doc/<a href="gimmick.html">gimmick.html</a>.</p>
-<?scm ))?>
 
     <address>
-<?scm (case *language* ((ja) ?>
-この文書は <em><?scm:d *escm-input-file*?></em>
-から <?scm:d *date*?> に変換されました。
-使用した処理系は
-<?scm:d *escm-interpreter*?>
-です。
-バグレポートや感想は
-<a href="mailto:escm-devel@lists.sourceforge.net">メーリングリスト</a>か
-<?scm:d (link-mail PACKAGE_BUGREPORT)?>
-にお願いします。
-<?scm )(else ?>
 This document was converted from <em><?scm:d *escm-input-file*?></em>
 on <?scm:d *date*?>.
 The backend interpreter is <?scm:d *escm-interpreter*?>.
@@ -242,9 +119,7 @@ Please send bug reports or comments
 to
 <a href="mailto:escm-devel@lists.sourceforge.net">the mailing list</a>
 or <?scm:d (link-mail PACKAGE_BUGREPORT)?>.
-<?scm ))?>
 </address>
     <div>
-<?scm:d (sourceforge-logo)?>
 </div>
 </body></html>
