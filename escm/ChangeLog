@@ -1,3 +1,23 @@
+2004-02-17  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/fork.c (escm_redirect): Moved this function from src/misc.c.
+
+2004-02-14  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Fixed a bug on *escm-input-file*.
+	(main): Check the return value of parse_lang().
+
+2004-02-12  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Removed some options.
+
+	* src/meta_arg.c (meta_expand): Removed a hook for handler CGIs.
+
+2004-02-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Fixed a typo.
+	(main): Fixed a bug on getopt().
+
 2004-02-03  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* src/escm.c (escm_bind_query_string): Escape \" in QUERY_STRING
 	though it may not appear.

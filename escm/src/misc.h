@@ -34,6 +34,7 @@ char ** tokenize_cmd(const char *cmd);
 /* fork.c */
 FILE *escm_popen(char * const argv[]);
 int escm_pclose(FILE *fp);
+void escm_redirect(int from, int to);
 
 /* memory allocation */
 void *escm_malloc(size_t size);
@@ -41,10 +42,6 @@ void *escm_realloc(void *ptr, size_t size);
 #define XMALLOC(type, n) ((type *) escm_malloc((n) * (sizeof(type))))
 #define XREALLOC(type, p, n) ((type *) escm_realloc((p), (n) * (sizeof(type))))
 
-/* redirection */
-void escm_redirect(int from, int to);
-
 char *escm_cgi;
-
 #endif /* not MISC_H */
 /* end of misc.h */

@@ -24,15 +24,6 @@ void *realloc(void *ptr, size_t size);
 #  include <string.sh>
 #endif /* defined(HAVE_STRING_H) && defined(HAVE_STRINGS_H) */
 
-#if defined(HAVE_UNISTD_H)
-#  include <unistd.h>
-#endif /* defined(HAVE_UNISTD_H) */
-#if !defined(HAVE_DUP2)
-#  if defined(HAVE_FCNTL_H)
-#    include <fcntl.h>
-#  endif /* defined(HAVE_FCNTL_H) */
-#endif /* !defined(HAVE_DUP2) */
-
 #include <stdarg.h>
 #include <errno.h>
 
@@ -115,22 +106,6 @@ escm_realloc(void *ptr, size_t size)
   return ret;
 }
 
-/*========================================================
- * redirection
- *=======================================================*/
-void escm_redirect(int from, int to)
-{
-  int ret;
-#ifdef HAVE_DUP2
-  ret = dup2(to, from);
-#else /* not HAVE_DUP2 */
-  close(from);
-  ret = fcntl(to, F_DUPFD, from);
-#endif /* HAVE_DUP2 */
-
-  if (ret < 0) escm_error("can't redirect a file or stream");
-  /* the value itself is ignored. */
-}
 /*=======================================================
  * argv = tokenize_cmd(cmdline)
  *=======================================================*/

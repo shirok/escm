@@ -21,6 +21,11 @@
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif /* HAVE_SYS_WAIT_H */
+#if !defined(HAVE_DUP2)
+#  if defined(HAVE_FCNTL_H)
+#    include <fcntl.h>
+#  endif /* defined(HAVE_FCNTL_H) */
+#endif /* !defined(HAVE_DUP2) */
 
 #include "escm.h"
 #include "misc.h"
@@ -75,5 +80,20 @@ escm_pclose(FILE *pipe)
   wait(&status);
   if (WIFEXITED(status)) return WEXITSTATUS(status);
   else return -1;
+}
+
+void
+escm_redirect(int from, int to)
+{
+  int ret;
+#ifdef HAVE_DUP2
+  ret = dup2(to, from);
+#else /* not HAVE_DUP2 */
+  close(from);
+  ret = fcntl(to, F_DUPFD, from);
+#endif /* HAVE_DUP2 */
+
+  if (ret < 0) escm_error("can't redirect a file or stream");
+  /* the value itself is ignored. */
 }
 /* end of fork.c */
