@@ -74,8 +74,6 @@ main(int argc, char **argv)
   FILE *outp = stdout;
   int header_flag = TRUE;
   int process_flag = TRUE;
-  char *footer_file = NULL;
-  char *header_file = NULL;
   char *output_file = NULL;
 #ifdef ENABLE_POLYGLOT
   char *lang_name = NULL;
@@ -85,20 +83,16 @@ main(int argc, char **argv)
   int n_expr = 0;
   char *path_translated = NULL;
 
-#define OPTSTR "EHce:f:h:i:l:o:"
+#define OPTSTR "EHce:i:l:o:"
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
   const struct option long_opt[] = {
     { "no-eval", 0, NULL, 'E' },
     { "no-header", 0, NULL, 'H', },
-    { "classic", 0, NULL, 'c', },
     { "eval", 1, NULL, 'e', },
-    { "footer", 1, NULL, 'f', },
-    { "header", 1, NULL, 'h', },
     { "interp", 1, NULL, 'i', },
     { "language", 1, NULL, 'l', },
-    { "output", 1, NULL, 'o', },
     { "help", 0, &help_flag, TRUE, },
     { "version", 0, &help_flag, FALSE, },
     { NULL, 0, NULL, 0, }
@@ -146,15 +140,11 @@ main(int argc, char **argv)
 "\n"
 "  -E, --no-eval                convert documents into code\n"
 "  -H, --no-header              print no content header even in a CGI\n"
-"  -c, --classic                -H and error messages go to stdout\n"
 "  -e, --eval=EXPR              evaluate an expression\n"
-"  -f, --footer=FILENAME        specify the footer file\n"
-"  -h, --header=FILENAME        specify the header file\n"
 "  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
 #ifdef ENABLE_POLYGLOT
 "  -l, --language=LANG          choose the interpreter language\n"
 #endif /* ENABLE_POLYGLOT */
-"  -o, --output=FILENAME        specify the output file\n"
 "      --help                   print this message and exit\n"
 "      --version                print version information and exit\n",
 	       escm_prog);
@@ -183,12 +173,6 @@ main(int argc, char **argv)
       expr = XREALLOC(char *, expr, n_expr);
       expr[n_expr - 1] = optarg;
       break;
-    case 'f':
-      footer_file = optarg;
-      break;
-    case 'h':
-      header_file = optarg;
-      break;
     case 'i':
       interp = optarg;
       break;
@@ -205,9 +189,9 @@ main(int argc, char **argv)
       printf(_("Try `%s --help' for more information.\n"), escm_prog);
 #else /* !defined(HAVE_GETOPT_LONG) */
 # ifdef ENABLE_POLYGLOT
-      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
+      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
 # else
-      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-o OUTPUT] FILE ...\n", escm_prog);
+      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-o OUTPUT] FILE ...\n", escm_prog);
 # endif /* ENABLE_POLYGLOT */
       fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
 #endif /* defined(HAVE_GETOPT_LONG) */
@@ -251,10 +235,10 @@ main(int argc, char **argv)
   /* initialization */
   escm_init(lang, outp);
   escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
-  if (inp == NULL) {
-    escm_bind(lang, "*escm-input-file*", NULL, outp);
-  } else if (path_translated) {
+  if (path_translated) {
     escm_bind(lang, "*escm-input-file*", path_translated, outp);
+  } else if (inp == NULL) {
+    escm_bind(lang, "*escm-input-file*", NULL, outp);
   } else {
     escm_bind(lang, "*escm-input-file*", s_argv[0], outp);
   }
@@ -278,7 +262,6 @@ main(int argc, char **argv)
     fputc('\n', outp);
   }
 
-  if (header_file) proc_file_name(lang, header_file, outp);
   /* process files */
   if (path_translated) {
     if (argc > optind) escm_error(_("too many arguments"));
@@ -301,7 +284,6 @@ main(int argc, char **argv)
     if (argc > optind || s_argc != 1) escm_error(_("too many arguments"));
     escm_preproc(lang, inp, outp);
   }
-  if (footer_file) proc_file_name(lang, footer_file, outp);
 
   /* finalization */
   escm_finish(lang, outp);
