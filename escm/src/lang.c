@@ -123,6 +123,7 @@ parse_define(char *data, char **prefix, char **infix, char **suffix, int *flag)
     p = strstr(data, "variable_name");
   }
   if (p == NULL) return FALSE;
+  if (p == data) *prefix = NULL;
   *p = '\0';
   p += 13;
   *infix = p;
@@ -131,6 +132,7 @@ parse_define(char *data, char **prefix, char **infix, char **suffix, int *flag)
   *p = '\0';
   p += 5;
   *suffix = p;
+  if (!*p) *suffix = NULL;
   return TRUE;
 }
 static int
@@ -200,9 +202,6 @@ parse_lang(const char *name, const char **interp)
     case 'r': /* string */
       if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
 	escm_error("syntax error for %s", name);
-      break;
-    case 'u': /* true */
-      mylang.true = data;
       break;
     default:
       escm_error("syntax error for %s", name);

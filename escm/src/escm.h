@@ -27,7 +27,6 @@ struct escm_lang {
   char *define_infix;
   char *define_suffix;
   int use_hyphen;
-  char *true;
   char *false;
   char *init;            /* initialization code */
   char *finish;          /* finalization code */

@@ -3,8 +3,6 @@
 ;; command
 gosh -b
 ;; initialization
-;; true
-#t
 ;; false
 #f
 ;; define

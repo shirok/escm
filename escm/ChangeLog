@@ -1,3 +1,9 @@
+2003-06-30  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* doc/gimmick.escm, src/lang/*, src/lang.c, src/escm.h: Remove
+	true field.
+	* src/lang.awk, src/Makefile.am, src/escm.c: Automatically generate
+	the default language structure.
+
 2003-06-29  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* doc/gimmick.escm, doc/interpreter.escm: Updated.

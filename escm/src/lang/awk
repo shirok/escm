@@ -4,8 +4,6 @@
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# true
-1
 # false
 0
 # define

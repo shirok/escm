@@ -4,8 +4,6 @@
 python
 # initialization
 import sys
-# true
-1
 # false
 0
 # define

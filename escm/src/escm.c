@@ -17,24 +17,6 @@
 
 #define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
 
-/* the default escm_lang object.
- */
-struct escm_lang lang_scm = {
-  "scm:d", /* name */
-  "(display \"", /* literal_prefix */
-  "\")", /* literal_suffix */
-  "(display ", /* display_prefix */
-  ")", /* display_suffix */
-  "(define ", /* define_prefix */
-  " ", /* define_infix */
-  ")", /* define_suffix */
-  1, /* use_hyphen */
-  "#t", /* true */
-  "#f", /* false */
-  NULL, /* init */
-  NULL, /* finish */
-};
-
 static char * env_to_bind[] = {
   "GATEWAY_INTERFACE",
   "HTTP_ACCEPT_LANGUAGE",
@@ -80,12 +62,12 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 void
 escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
-  fputs(lang->define_prefix, outp);
+  if (lang->define_prefix) fputs(lang->define_prefix, outp);
   put_variable(lang, var, outp);
   fputs(lang->define_infix, outp);
   if (val == NULL) fputs(lang->false, outp);
   else put_string(val, outp);
-  fputs(lang->define_suffix, outp);
+  if (lang->define_suffix) fputs(lang->define_suffix, outp);
   fputc('\n', outp);
 }
 /* escm_init(&lang, outp) - initialize the backend interpreter.
