@@ -57,9 +57,13 @@ So the first line of each input file is to be skipped
 if it begins with <em>#</em>, for it may be the sharp-bang line.
 What seem to be meta-argument lines are also skipped.
 But if the input is stdin, the first line is always processed.
+The arguments and the meta-arguments in the script file or
+the file specified by <code>PATH_TRANSLATED</code> are parsed,
+but those of the other files, if any, are ignored.
 </p>
 
-    <p>This program may be used in a CGI script.
+    <p>This program may be used in a CGI script and
+can be used as an <a href="handler.html">action handler</a>.
 It is automatically judged whether it is invoked in a CGI script or not.
 If it is the case,
 a content header for HTML,
@@ -103,14 +107,30 @@ the gimmick feature. See <a href="#gimmick">below</a> for detail.</p></dd>
     <h3 id="scheme_variables">Scheme Variables</h3>
     <dl>
       <dt>*escm-input-file*</dt>
-      <dd><p>The script file.</p></dd>
+      <dd><p>The name of the file which the tool is currently processing.
+<code>#f</code> if the input is stdin.</p></dd>
       <dt>*escm-output-file*</dt>
       <dd><p>The name of the output file.
 It is <code>#f</code> if the output is stdout.</p></dd>
       <dt>*escm-interpreter*</dt>
       <dd><p>The Scheme interpreter and its arguments.</p></dd>
       <dt>*escm-version*</dt>
-      <dd>The name and the version of this project.</dd>
+      <dd><p>The name and the version of this project.</p></dd>
+      <dt>*escm-cgi*</dt>
+      <dd><p>A true if it is in a CGI, otherwise the false.</p></dd>
+    </dl>
+    <p>The following variables are defined only when it is in a CGI.</p>
+    <dl>
+      <dt>*escm-request-method*</dt>
+      <dd><p>The request method.</p></dd>
+      <dt>*escm-query-string*</dt>
+      <dd><p>The query string.</p></dd>
+      <dt>*escm-http-host*</dt>
+      <dd><p>The value of environment variable <code>HTTP_HOST</code>.</p></dd>
+      <dt>*escm-http-cookie*</dt>
+      <dd><p>The value of environment variable <code>HTTP_COOKIE</code>.</p></dd>
+      <dt>*escm-http-accept-language*</dt>
+      <dd><p>The value of environment variable <code>HTTP_ACCEPT_LANGUAGE</code>.</p></dd>
     </dl>
 
     <h3 id="environment">Environment</h3>
@@ -118,6 +138,9 @@ It is <code>#f</code> if the output is stdout.</p></dd>
       <dt><code>GATEWAY_INTERFACE</code></dt>
       <dd><p>This variable is used to check whether
 the tool is invoked in a CGI script or not.</p></dd>
+      <dt><code>PATH_TRANSLATED</code></dt>
+      <dd><p>The file to be processed when this tool is invoked as
+a handler.</p></dd>
     </dl>
 
     <h3 id="gimmick">Gimmick</h3>
@@ -171,12 +194,8 @@ and <?scm:d *escm-interpreter*?>.</p>")?>
 is an experimental version
 of <em>escm</em>.
 The stable version is <strong>escm 1.1.</strong></p></li>
-      <li><p>The current implementation of the <a href="#gimmick">gimmick</a>
-feature has many security problems.
-It is strongly recommended
-<strong>not to use this program in CGI scripts
-if the gimmick feature is enabled</strong>.
-This feature is on
+      <li><p>
+The gimmick feature is on
 if description on <code>-l</code> option
 is found in the help message shown by <code>-h</code>.
 </p></li>

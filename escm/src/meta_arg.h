@@ -5,6 +5,7 @@
 #ifndef META_ARG_H
 #define META_ARG_H
 int meta_args(int *pargc, char ***pargv);
+int meta_args_replace(int *pargc, char ***pargv, const char *filename);
 int meta_skip_shebang(FILE *fp);
 #define META_ARGS_OK 0
 #define META_ARGS_NOT -1

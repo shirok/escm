@@ -5,90 +5,43 @@
      "DTD/xhtml11-flat.dtd">
 <html>
   <head>
-    <title>The Manpage of the Action Handler</title>
+    <title>Action Handler</title>
   <?scm (load (string-append *pwd* "/config-h.scm"))
         (load (string-append *pwd* "/helper.scm"))?>
   </head>
   <body>
 <?scm (header)?>
-
     <h1>Action Handler</h1>
-    <p>This is a substitute for the manpage of
-<em><?scm:d PACKAGE?>-handler</em>.</p>
+    <address>TAGA Yoshitaka
+&lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
 
-    <ul>
-      <li><a href="#name">NAME</a></li>
-      <li><a href="#synopsis">SYNOPSIS</a></li>
-      <li><a href="#description">DESCRIPTION</a>
-<ul>
-	  <li><a href="#scheme_variables">Scheme Variables</a></li>
-	  <li><a href="#environment">Environment</a></li>
-	</ul>
-</li>
-      <li><a href="#caveats">CAVEATS</a></li>
-      <li><a href="#author">AUTHOR</a></li>
-      <li><a href="#see_also">SEE ALSO</a></li>
-    </ul>
+    <p>You can use this program as an action handler of Apache.
+A handler, either a module or a CGI, processes a type of files
+specified by their suffix or location.</p>
 
-    <h2 id="name">NAME</h2>
-    <p><strong><?scm:d PACKAGE?>-handler</strong> -- preprocess embedded Scheme code as action handler</p>
-    <h2 id="synopsis">SYNOPSIS</h2>
-    <pre>
-your-browser http://www.anywhere.any/~anybody/<em>FILE.escm</em>
-</pre>
+    <p>You should install this program manually in a CGI directory.
+To install it in another place than <code>/cgi-bin</code>,
+you may have to add a suffix, <code>.cgi</code> for example:</p>
 
-    <h2 id="description">DESCRIPTION</h2>
-    <p>This program is an action-handler version of <em><?scm:d PACKAGE?></em>.</p>
-    <p>To use this program,
-install <em><?scm:d PACKAGE?>-handler</em>
-in the <strong>cgi-bin</strong> directory.
-It will be <em>/usr/local/apache/cgi-bin</em>,
-<em>/usr/www/cgi-bin</em>, or <em>/var/www/cgi-bin</em>.
-Then add these lines to <em>httpd.conf</em> or <em>.htaccess</em>.</p>
     <blockquote>
       <pre>
-AddHandler escm-handler escm
-Action escm-handler /cgi-bin/aescm-handler
+ln ~/bin/aescm ~/public_html/cgi-bin/aescm.cgi
 </pre>
     </blockquote>
 
-    <h3 id="scheme_variables">Scheme Variables</h3>
-    <dl>
-      <dt>*escm-input-file*</dt>
-      <dd><p>The name of the input file.</p></dd>
-      <dt>*escm-output-file*</dt>
-      <dd><p>The name of the output file.
-It is <code>#f</code> if the output is stdout.</p></dd>
-      <dt>*escm-interpreter*</dt>
-      <dd><p>The Scheme interpreter and its arguments.</p></dd>
-      <dt>*escm-version*</dt>
-      <dd>The name and the version of this project.</dd>
-    </dl>
-    <h3 id="environment">Environment</h3>
-    <dl>
-      <dt><code>GATEWAY_INTERFACE</code></dt>
-      <dd><p>This variable is used to check whether
-the tool is invoked in a CGI script or not.</p></dd>
-      <dt><code>PATH_TRANSLATED</code></dt>
-      <dd><p>The name of the input file is stored in this variable.</p></dd>
-    </dl>
+    <p>
+Read <em>httpd.conf</em> to know whether
+you can override <code>FileInfo</code> directive type.
+If it is the case, add these lines to your <em>.htaccess</em>:
 
-    <h2 id="caveats">CAVEATS</h2>
-    <ul>
-      <li><p>The first line is always processed while
-the filter tool may skip it.</p></li>
-      <li><p><code>*escm-input-file*</code> is a string
-while it is a list in the filter tool.</p></li>
-    </ul>
-    <h2 id="author">AUTHOR</h2>
-    <address>
-TAGA Yoshitaka
-&lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
+    <blockquote>
+      <pre>
+AddHandler escm-handler escm
+Action escm-handler /~<em>your-id</em>/cgi-bin/aescm.cgi
+</pre>
+    </blockquote>
 
-    <h2 id="see_also">SEE ALSO</h2>
-    <ul>
-      <li><a href="filter.html">aescm</a></li>
-      <li><a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm</a></li>
-      <li>eguile</li>
+    <p>Then files suffixed with <em>.escm</em>
+are processed by this program.</p>
   </body>
 </html>

@@ -5,6 +5,7 @@
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  ***********************************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 #ifdef HAVE_CONFIG_H
@@ -24,16 +25,17 @@ struct escm_lang lang_scm = {
   "* ", /* define_infix */
   ")", /* define_suffix */
   1, /* use_hyphen */
-  "#f", /* null */
+  "#t", /* true */
+  "#f", /* false */
   NULL, /* init */
   NULL, /* finish */
 };
 
-/* escm_put_string(str, outp) - escape str and put it.
+/* put_string(str, outp) - escape str and put it.
  * This function is not used in this file, but will be useful.
  */
-void
-escm_put_string(const char *str, FILE *outp)
+static void
+put_string(const char *str, FILE *outp)
 {
   const char *p = str;
   fputc('\"', outp);
@@ -43,14 +45,12 @@ escm_put_string(const char *str, FILE *outp)
   }
   fputc('\"', outp);
 }
-/* escm_define(lang, var, val, outp) - define var to val in lang
+/* put_variable(lang, var, outp) - put var as a variable name.
  */
-void
-escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+static void
+put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 {
   const char *p;
-
-  fputs(lang->define_prefix, outp);
   for (p = var; *p; p++) {
     if (*p == '-' && !lang->use_hyphen) {
       fputc('_', outp);
@@ -58,19 +58,84 @@ escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE
       fputc(*p, outp);
     }
   }
+}
+/* escm_define(lang, var, val, outp) - define var to val in lang
+ */
+void
+escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+{
+  fputs(lang->define_prefix, outp);
+  put_variable(lang, var, outp);
   fputs(lang->define_infix, outp);
-  if (val == NULL) fputs(lang->null, outp);
-  else escm_put_string(val, outp);
+  if (val == NULL) fputs(lang->false, outp);
+  else put_string(val, outp);
+  fputs(lang->define_suffix, outp);
+  fputc('\n', outp);
+}
+/* define_bool(lang, var, val, outp) - define var to val in lang
+ */
+static void
+define_bool(struct escm_lang *lang, const char *var, int val, FILE *outp)
+{
+  fputs(lang->define_prefix, outp);
+  put_variable(lang, var, outp);
+  fputs(lang->define_infix, outp);
+  fputs((val ? lang->true : lang->false), outp);
   fputs(lang->define_suffix, outp);
   fputc('\n', outp);
 }
 
 /* escm_init(&lang, outp) - initialize the backend interpreter.
  */
+static void
+cgi_post(struct escm_lang *lang, FILE *outp)
+{
+  const char *content_length;
+  char *p;
+  long llen;
+  int len;
+  int c;
+
+  content_length = getenv("CONTENT_LENGTH");
+  if (content_length == NULL)
+    escm_define(lang, "escm-query-string", NULL, outp);
+  else {
+    fputs(lang->define_prefix, outp);
+    put_variable(lang, "escm-query-string", outp);
+    fputs(lang->define_infix, outp);
+    llen = strtol(content_length, &p, 10);
+    if (*p == '\0') {
+      fputc('\"', outp);
+      len = (int) llen;
+      while ((c = getc(stdin)) != EOF && len-- > 0) {
+	fputc(c, outp);
+      }
+      fputc('\"', outp);
+    } else {
+      fputs(lang->false, outp);
+    }
+    fputs(lang->define_suffix, outp);
+  }
+}
 void
 escm_init(struct escm_lang *lang, FILE *outp)
 {
   if (lang->init) fputs(lang->init, outp);
+  /* set useful global variables if the language is scheme. */
+  escm_define(lang, "escm-version", PACKAGE " " VERSION, outp);
+  if (!escm_is_cgi()) {
+    define_bool(lang, "escm-cgi", 0, outp);
+  } else {
+    const char *method;
+    define_bool(lang, "escm-cgi", 1, outp);
+    method = getenv("REQUEST_METHOD");
+    escm_define(lang, "escm-request-method", method, outp);
+    if (method[0] == 'P') cgi_post(lang, outp);
+    else escm_define(lang, "escm-query-string", getenv("QUERY_STRING"), outp);
+    escm_define(lang, "escm-http-host", getenv("HTTP_HOST"), outp);
+    escm_define(lang, "escm-http-cookie", getenv("HTTP_COOKIE"), outp);
+    escm_define(lang, "escm-http-accept-language", getenv("HTTP_ACCEPT_LANGUAGE"), outp);
+  }
 }
 /* escm_finish(&lang, outp) - finalize the backend interpreter.
  */

@@ -3,7 +3,9 @@
 # command
 ruby
 # initialization
-# null
+# true
+1
+# false
 0
 # define
 $variable_name = value

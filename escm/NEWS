@@ -1,4 +1,7 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.17 (2003-06-23)
+* The filter program can be used as a handler.
+
 Version 0.17 (2003-06-18)
 * Bugfixes.
 * Update documents.

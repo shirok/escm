@@ -182,8 +182,8 @@ parse_lang(const char *name, const char **interp)
     case 'i': /* initialization */
       mylang.init = data;
       break;
-    case 'l': /* nil */
-      mylang.null = data;
+    case 'l': /* false */
+      mylang.false = data;
       break;
     case 'm': /* command */
       *interp = data;
@@ -198,6 +198,9 @@ parse_lang(const char *name, const char **interp)
     case 'r': /* string */
       if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
 	escm_error("syntax error for %s", name);
+      break;
+    case 'u': /* true */
+      mylang.true = data;
       break;
     default:
       escm_error("syntax error for %s", name);

@@ -3,7 +3,9 @@
 # command
 csh
 # initialization
-# null
+# true
+true
+# false
 false
 # define
 set variable_name=value

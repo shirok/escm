@@ -27,7 +27,8 @@ struct escm_lang {
   char *define_infix;
   char *define_suffix;
   int use_hyphen;
-  char *null;
+  char *true;
+  char *false;
   char *init;            /* initialization code */
   char *finish;          /* finalization code */
 };
@@ -41,20 +42,15 @@ void escm_init(struct escm_lang *lang, FILE *outp);
 void escm_finish(struct escm_lang *lang, FILE *outp);
 /* escm_preproc(&lang, inp, outp) - the preprocessor. */
 int escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp);
-/* escm_put_string(str, outp) - escape str and put it.*/
-void escm_put_string(const char *str, FILE *outp);
 /* escm_define(lang, var, val, outp) - define var to val. */
 void escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
 /* cgi.c */
+/* escm_header(lang, outp) - send an HTML content-type header. */
+void escm_header(const struct escm_lang *lang, FILE *outp);
+
 /* escm_is_cgi() - return TRUE if invoked in a CGI script, FALSE otherwise. */
 int escm_is_cgi(void);
-/* escm_stderr2stdout() - redirect stderr to stdout. */
-int escm_stderr2stdout(void);
-/* escm_html_header() - send an HTML content-type header. */
-void escm_html_header(void);
-/* escm_html_header() - send a plain text content-type header. */
-void escm_plain_header(void);
 /* escm_error(fmt, ...) - print a warning message and exit the program. */
 void escm_error(const char *fmt, ...);
 

@@ -3,7 +3,9 @@
 ;; command
 gosh -b
 ;; initialization
-;; null
+;; true
+#t
+;; false
 #f
 ;; define
 (define *variable-name* value)

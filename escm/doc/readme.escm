@@ -56,15 +56,9 @@ by specifying <em>--enable-gimmick</em> option.
 See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
-    <h2>Action Handler</h2>
-    <p><em>This program will be a separate package.</em></p>
-    <p>You can compile an action handler version of
-<em><?scm:d PACKAGE?></em> if you run <em>configure</em> script
-with <em>--enable-handler</em> option.
-Specify as <code>--enable-handler=<em>/some/where/else/cgi-bin</em></code>
-if your site's CGI directory is not a common one.</p>
-
-    <p>See doc/<a href="handler.html">handler.html</a>.</p>
+    <p>You can also use this program as an action handler of Apache.
+You should intall it manually if you want to.
+See doc/<a href="handler.html">handler.html</a> for detail.</p>
 
     <h2>BUGS</h2>
     <p>This is an experimental version and not thoroughly tested.

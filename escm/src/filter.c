@@ -84,6 +84,8 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   inp = fopen(file, "r");
   if (inp == NULL) escm_error(NULL);
 
+  escm_define(lang, "escm-input-file", file, outp);
+
   ret = meta_skip_shebang(inp);
   if (ret == META_ARGS_SYNTAX_ERROR)
     escm_error("Syntax error while reading from %s", file);
@@ -92,7 +94,6 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
     escm_error("Syntax error while reading from %s", file);
   fclose(inp);
 }
-
 
 /* struct opt_data - structure to store options.
  */
@@ -164,42 +165,6 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
   }
 }
 
-void
-escm_cgi_put(struct escm_lang *lang, FILE *outp)
-{
-  const char *content_length;
-  const char *p;
-  long llen;
-  int len;
-  int c;
-
-  content_length = getenv("CONTENT_LENGTH");
-  if (content_length == NULL) escm_define(lang, "escm-cgi-post", "", outp);
-  else {
-    fputs(lang->define_prefix, outp);
-    for (p = "escm-cgi-post"; *p; p++) {
-      if (*p == '-' && !lang->use_hyphen) {
-	fputc('_', outp);
-      } else {
-	fputc(*p, outp);
-      }
-    }
-    fputs(lang->define_infix, outp);
-    llen = strtol(content_length, &p, 10);
-    if (*p == '\0') {
-      fputc('\"', outp);
-      len = (int) llen;
-      while ((c = getc(stdin)) != EOF && len-- > 0) {
-	fputc(c, outp);
-      }
-      fputc('\"', outp);
-    } else {
-      fputs("\"\"", outp);
-    }
-    fputs(lang->define_suffix, outp);
-  }
-}
-
 /* main function
  */
 int
@@ -211,25 +176,32 @@ main(int argc, char **argv)
     NULL, /* interpreter */
     NULL, /* outfile */
     NULL, /* langname */
-    NULL, /* *footer */
+    NULL, /* footer */
     NULL, /* expr */
     0, /* n_expr */
     TRUE, /* process */
     TRUE, /* header */
   };
   struct escm_lang *lang;
-  const char *input_file = NULL;
+  const char *path_translated = NULL;
   lang = &lang_scm;
 
-  /* redirect stderr to stdout. */
-  if (escm_is_cgi()) escm_stderr2stdout();
+  /* redirect stderr to stdout if it is invoked as CGI. */
+  if (escm_is_cgi()) {
+    if (dup2(fileno(stdout), fileno(stderr)) < 0)
+      escm_error("Can't redirect stderr to stdout.");
+    path_translated = getenv("PATH_TRANSLATED");
+  }
 
   /* expand meta-arguments if necessary */
-  ret = meta_args(&argc, &argv);
+  if (argc == 1 && path_translated) {
+    ret = meta_args_replace(&argc, &argv, path_translated);
+  } else {
+    ret = meta_args(&argc, &argv);
+  }
   if (ret == META_ARGS_ERRNO_ERROR) escm_error(NULL);
   else if (ret == META_ARGS_SYNTAX_ERROR)
     escm_error("Syntax error while parse meta argument lines");
-  if (ret >= 0) input_file = argv[1 + ret];
 
   /* process options */
   parse_opts(argc, argv, &opts);
@@ -245,11 +217,6 @@ main(int argc, char **argv)
   if (opts.langname) lang = parse_lang(opts.langname, &(opts.interpreter));
 #endif /* ESCM_LANG_DIR */
 
-  /* write out a content header. */
-  if (opts.header && escm_is_cgi()) {
-    escm_html_header();
-  }
-
   /* invoke the interpreter. */
   if (!opts.interpreter) opts.interpreter = scm_interp;
   if (opts.process) {
@@ -260,20 +227,19 @@ main(int argc, char **argv)
 
   /* initialization */
   escm_init(lang, outp);
-
-  /* set useful global variables if the language is scheme. */
-  escm_define(lang, "escm-version", PACKAGE " " VERSION, outp);
   escm_define(lang, "escm-interpreter", opts.interpreter, outp);
   escm_define(lang, "escm-output-file", opts.outfile, outp);
-  escm_define(lang, "escm-input-file",
-	      input_file ? input_file : argv[optind], outp);
-  escm_cgi_put(&lang_scm, outp);
+  escm_define(lang, "escm-input-file", NULL, outp);
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {
-    fprintf(outp, opts.expr[i]);
+    fputs(opts.expr[i], outp);
     fputc('\n', outp);
   }
+
+  /* write out a content header. */
+  if (opts.header && escm_is_cgi())
+    escm_header(lang, outp);
 
   /* process files */
   if (argc == optind) proc_file_fp(lang, stdin, outp);
@@ -282,7 +248,8 @@ main(int argc, char **argv)
       proc_file_name(lang, argv[i], outp);
     }
   }
-  if (opts.footer) proc_file_name(lang, opts.footer, outp);
+  if (opts.footer)
+    proc_file_name(lang, opts.footer, outp);
 
   /* finalization */
   escm_finish(lang, outp);

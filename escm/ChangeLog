@@ -1,3 +1,20 @@
+2003-06-23  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* version 0.18
+	
+2003-06-22  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c: Bind environment variables to Scheme variables.
+	* doc/*.escm: Update documents.
+
+2003-06-21  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/meta_arg.c: Removed code for debugging which I forgot
+	  to erase.
+	* src/lang.c, src/escm.c, src/escm.h: Add true field to struct
+	  escm_lang.
+	* src/handler.c: Removed. Merged to src/filter.c.
+	
 2003-06-20  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* src/filter.c, src/handler.c: ad hoc mechanism to acquire POSTed
 	  query strings (bound to *escm-cgi-post*)

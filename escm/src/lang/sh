@@ -3,7 +3,9 @@
 # command
 sh
 # initialization
-# null
+# true
+true
+# false
 false
 # define
 variable_name=value

@@ -1,4 +1,4 @@
-   This is README file for aescm 0.17 (README or doc/readme.html).
+   This is README file for aescm 0.18 (README or doc/readme.html).
 
    Aescm is an experimental version of escm. The stable version is still escm
    1.1.
@@ -30,16 +30,8 @@ INSTALL
    You can enable to embed other interpreter languages than Scheme by
    specifying --enable-gimmick option. See doc/gimmick.html for detail.
 
-Action Handler
-
-   This program will be a separate package.
-
-   You can compile an action handler version of aescm if you run configure
-   script with --enable-handler option. Specify as
-   --enable-handler=/some/where/else/cgi-bin if your site's CGI directory is
-   not a common one.
-
-   See doc/handler.html.
+   You can also use this program as an action handler of Apache. You should
+   intall it manually if you want to. See doc/handler.html for detail.
 
 BUGS
 
@@ -51,5 +43,5 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Tue Jun 17 00:47:54 2003. The
+   This file was converted from readme.escm on Mon Jun 23 01:08:48 2003. The
    backend is /usr/bin/gosh -b.

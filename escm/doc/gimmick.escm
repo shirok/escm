@@ -69,7 +69,9 @@ This is for <em>Awk</em>.
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# null
+# true
+1
+# false
 0
 # define
 variable_name = value;
@@ -105,13 +107,14 @@ Following lines are data themselves.</p>
       <li><a href="#command">command</a></li>
       <li><a href="#define">define</a></li>
       <li><a href="#expression">expression</a></li>
+      <li><a href="#false">false</a></li>
       <li><a href="#finalization">finalization</a></li>
       <li><a href="#initialization">initialization</a></li>
-      <li><a href="#null">null</a></li>
       <li><a href="#string">string</a></li>
+      <li><a href="#true">true</a></li>
     </ul>
 
-    <h4>command</h4>
+    <h4 id="command">command</h4>
     <p>
 The interpreter and its arguments.
 See <a href="interpreter.html">the document of Scheme interpreters</a>
@@ -120,37 +123,39 @@ But in most cases, your interpreter will need no arguments,
 for it may be wise enough to switch to a batch mode
 if stdin is a pipe.</p>
 
-    <h4>define</h4>
+    <h4 id="define">define</h4>
     <p>How to set a variable to a value.
 The left side value is specified by <em>variable-name</em>
 or <em>variable_name</em> depending on the convention of the language.
 The right side value is specifed by <em>value</em>.</p>
 
-    <h4>expression</h4>
+    <h4 id="expression">expression</h4>
     <p>
 How to display an expression.
 You must write a form to display an expression.
 <em>expression</em> is used as keyword to show where it is placed.</p>
 
-    <h4>finalization</h4>
+    <h4 id="false">false</h4>
+    <p>The external representation of a value to be used
+to show it is not a string.</p>
+
+    <h4 id="finalization">finalization</h4>
     <p>
 The finalization code.
 This may has no lines.</p>
 
-    <h4>intialization</h4>
+    <h4 id="initialization">intialization</h4>
     <p>
 The initialization code.
 This may has no lines.</p>
 
-    <h4>null</h4>
-    <p>The external representation of a value to be used
-to show it is not a string.</p>
-
-    <h4>string</h4>
+    <h4 id="string">string</h4>
     <p>
 How to display a string.
 You must write a form to display a string <em>&quot;string&quot;</em>.</p>
 
+    <h4 id="true">true</h4>
+    <p>The external representation of a true.</p>
 
   </body>
 </html>

@@ -14,18 +14,14 @@
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif /* HAVE_STRING_H */
-#include <errno.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
 
 #include <stdarg.h>
+#include <errno.h>
 
 #include "escm.h"
 
 enum cgi_header_type {
   CGI_HEADER_NONE,
-  CGI_HEADER_PLAIN,
   CGI_HEADER_HTML,
 };
 
@@ -44,34 +40,16 @@ escm_is_cgi(void)
   return in_cgi;
 }
 
-/* escm_stderr2stdout() - redirect stderr to stdout.
- */
-int
-escm_stderr2stdout(void)
-{
-  return dup2(fileno(stdout), fileno(stderr)) < 0 ? FALSE : TRUE;
-}
-/* escm_html_header() - send an HTML content-type header.
+/* escm_header(&lang, outp)
  */
 void
-escm_html_header(void)
+escm_header(const struct escm_lang *lang, FILE *outp)
 {
-  if (header_type == CGI_HEADER_NONE) {
-    header_type = CGI_HEADER_HTML;
-    printf("Content-type: text/html\r\n\r\n");
-    fflush(stdout);
-  }
-}
-/* escm_plain_header() - send a plain text content-type header.
- */
-void
-escm_plain_header(void)
-{
-  if (header_type == CGI_HEADER_NONE) {
-    header_type = CGI_HEADER_PLAIN;
-    printf("Content-type: text/plain\r\n\r\n");
-    fflush(stdout);
-  }
+  fputs(lang->literal_prefix, outp);
+  fputs("Content-type: text/html\\r\\n\\r\\n", outp);
+  fputs(lang->literal_suffix, outp);
+  fputc('\n', outp);
+  header_type = CGI_HEADER_HTML;
 }
 /* escm_error(fmt, ...) - print a warning message and exit the program.
  * The message is specified by strerror(errno) if msg is NULL.
@@ -83,16 +61,13 @@ void escm_error(const char *fmt, ...)
   va_start(ap, fmt);
   if (fmt == NULL) fmt = strerror(errno);
   if (escm_is_cgi()) {
-    if (header_type == CGI_HEADER_HTML) {
-      fputs("<p>", stdout);
-      vfprintf(stdout, fmt, ap);
-      fputs("</p></body></html>\n", stdout);
-      exit(EXIT_SUCCESS);
-    } else {
-      if (header_type == CGI_HEADER_NONE) escm_plain_header();
-      vfprintf(stdout, fmt, ap);
-      exit(EXIT_SUCCESS);
+    if (header_type != CGI_HEADER_HTML) {
+      fputs("Content-header: text/plain\r\n\r\n", stdout);
     }
+    fputs("<p>", stdout);
+    vfprintf(stdout, fmt, ap);
+    fputs("</p></body></html>\n", stdout);
+    exit(EXIT_SUCCESS);
   } else {
     vfprintf(stderr, fmt, ap);
     exit(EXIT_FAILURE);
