@@ -88,7 +88,7 @@ noinst_PROGRAMS = langconf
 langconf_SOURCES = langconf.c escm.c escm.h cmdline.c cmdline.h lang.c misc.c misc.h
 
 bin_PROGRAMS = aescm 2aescm
-aescm_SOURCES = escm.c escm.h misc.c misc.h $(BUILT_SOURCES) filter.c fork.c fork.h cmdline.c cmdline.h lang.awk
+aescm_SOURCES = escm.c escm.h misc.c misc.h $(BUILT_SOURCES) filter.c fork.c fork.h cmdline.c cmdline.h
 
 2aescm_SOURCES = classic.c
 
@@ -468,8 +468,8 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-recursive uninstall-recursive
 
 
-deflang.c : langconf lang/@DEFAULT_LANG@ 
-	./langconf ./lang/@DEFAULT_LANG@ > $@
+deflang.c : langconf $(srcdir)/lang/@DEFAULT_LANG@ 
+	./langconf $(srcdir)/lang/@DEFAULT_LANG@ > $@
 
 # end of src/Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

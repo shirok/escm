@@ -11,15 +11,14 @@ CLEANFILES = deflang.c langconf
 noinst_PROGRAMS = langconf
 langconf_SOURCES = langconf.c escm.c escm.h cmdline.c cmdline.h lang.c misc.c misc.h
 
-deflang.c : langconf lang/@DEFAULT_LANG@ 
-	./langconf ./lang/@DEFAULT_LANG@ > $@
+deflang.c : langconf $(srcdir)/lang/@DEFAULT_LANG@ 
+	./langconf $(srcdir)/lang/@DEFAULT_LANG@ > $@
 
 bin_PROGRAMS = aescm 2aescm
 aescm_SOURCES  = escm.c escm.h misc.c misc.h $(BUILT_SOURCES)
 aescm_SOURCES += filter.c
 aescm_SOURCES += fork.c fork.h
 aescm_SOURCES += cmdline.c cmdline.h
-aescm_SOURCES += lang.awk
 
 2aescm_SOURCES = classic.c
 

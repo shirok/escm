@@ -1,46 +1,66 @@
-This is README file for aescm 0.22 (README or doc/readme.html).
+This document is README for aescm 0.25 (either README or doc/readme.html).
 
-Aescm is developers' version of escm. The stable version is still escm 1.1.
+Aescm is a generic tool to embed code in a document. You can use it as filer,
+as wrapper of an interpreter in a script, and as hander CGI program. The
+current version (0.25) is in alpha state and specifications may be changed. The
+stable version is escm 1.1, which is a tool for Scheme. This package comes with
+a little program named 2aescm. It is a converter from the original escm format
+to XMLI format.
 
-Aescm is a filter program to preprocesses embedded Scheme code in documents
-like eperl or eruby. Scheme code between <?scm and ?> is evaluated and replaced
-with what is written to (current-output-port) while the evaluation. An
-expression between <?scm:d and ?> is evaluated and replaced with the result.
+The body of aescm is a filter which converts part outside XML preprocessor
+instructions to code. It sends the code to an interpreter which has been
+invoked as child process. As you can change conversion rules flexibly, you will
+be able to use this tool with your favorite interpreter of your favorite
+scripting language.
 
-The body of aescm is a simple converter from a text to Scheme code, which will
-be sent to a Scheme interpreter. Because of this architecture, it works with
-most implementations.
+Installation
 
-INSTALLATION
-
-If your favorite interpreter is Gauche or if it is Guile and you have not
-installed Gauche, then type as usual:
+If you want to use Gauche (Scheme interpreter written by Shiro Kawai, the
+author of the original escm) as default backend or Guile when Gauche is not
+installed, type as usual:
 
     ./configure
     make
     make install
     
 
-If it is not the case, you should specify the interpreter and its option
-arguments for a batch mode when you run configure script. The options for some
+With this setting, only Scheme code is preprocessed. You cannot use SCM, for it
+requires different translation rules from those of other Scheme interpreters.
+If you want to use this tool with other scripting languages, add 
+--enable-polyglot option to configure. See INSTALL(doc/install.html) for more
+information. You can change the default computer language and the default
+backend.
+
+Environment Variables
+
+You can specify the backend interpreter by setting it with options to
+environment vairable ESCM_BACKEND. Command line options for some popular Schme
 implementations are listed in doc/interpreter.html.
 
-Suppose your choice be scheme -s /dev/stdin. Then run as:
+If you have run configure with --enable-polyglot option, you can specify the
+default scripting languge with environment variable ESCM_DEFAULT.
 
-    ./configure --with-backend="scheme -s /dev/stdin"
-    
+CGI
 
-You can also embed other interpreter languages than Scheme if you run configure
-with --enable-polyglot option. See doc/gimmick.html for detail.
+You can use this tool as handler CGI program or as wrapper of an interpreter in
+the sharp-bang line of a CGI script. The query string by POST method is bound
+to *escm-query-string* (or $escm_query_string, EscmQueryString), for you cannot
+directly get it in a CGI script. It is also bound if the method is GET.
 
-This program can be used as a handler CGI program of Apache web servers. The
-tool will be automatically installed in cgi-bin directory. You may have to add
-a suffix. Consult the example in the man page.
+To use the tool as handler CGI program, copy or hard-link it to the cgi-bin
+directory (/var/www/cgi-bin, /usr/local/apache/cgi-bin, ...). You might have to
+add suffix .cgi. See the handler document of Apache for settings.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+Language Configuration File
 
-This file was converted from readme.escm on Thu Feb 5 12:09:12 UTC 2004. The
-backend is /usr/local/bin/guile -s /dev/stdin.
+If you run ./configure with --enable-polyglot, the filter reads the translation
+rules form a language configuration file. The language configuration files find
+themselves in $(datadir)/aescm/lang (e.g. /usr/local/share/aescm/lang). You can
+edit them to change translation rules. and backend interpreters. To edit or add
+a configuration file consult doc/gimmick.html.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+
+This document was converted from readme.escm on Mon Feb 23 10:38:28 UTC 2004.
+The backend interpreter is /home/tagga/bin/gosh. Please send bug reports or
+comments to the mailing list or tagga@tsuda.ac.jp.
 SourceForge.net Logo

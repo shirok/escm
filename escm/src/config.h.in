@@ -6,9 +6,6 @@
 /* Command line to invoke the backend interpreter. */
 #undef ESCM_BACKEND
 
-/* argv for the backend interpreter */
-#undef ESCM_BACKEND_ARGV
-
 /* Define to 1 if you have the `atexit' function. */
 #undef HAVE_ATEXIT
 

@@ -79,6 +79,8 @@ install_sh = @install_sh@
 with_backend = @with_backend@
 
 SUBDIRS = src test doc
+
+EXTRA_DIST = README.ja INSTALL.ja
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
