@@ -21,7 +21,7 @@
 
 #ifdef ESCM_LANG_DIR
 /* defined in lang.c */
-struct escm_lang * parse_lang(const char *name);
+struct escm_lang * parse_lang(const char *name, const char **interp);
 #endif /* ESCM_LANG_DIR */
 
 /* usage() - print a short help message.

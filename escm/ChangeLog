@@ -1,3 +1,11 @@
+2003-06-10  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* Remove src/escm/* which have benn moved to src/.
+	* configure.ac, src/Makefile.am, and others: libtoolized.
+	* src/filter.c, src/lang.c: fix bugs on getting the interpreter
+	  name from config files.
+	* test/t110_string.test, test/t120_awk.test: add more tests.
+	
 2003-06-09  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* *** version 0.16

@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.16], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.16])
+AC_INIT([aescm], [0.16a], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.16a])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
@@ -12,7 +12,8 @@ AC_SUBST(CFLAGS)
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_AWK
-AC_PROG_RANLIB
+# AC_PROG_RANLIB
+AC_PROG_LIBTOOL
 AC_CHECK_PROGS(LYNX, [lynx links w3m])
 
 # Checks for Scheme.

@@ -3,6 +3,9 @@
 /* Command line to invoke the scheme interpreter. */
 #undef ESCM_SCM
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
 /* Define to 1 if you have the `dup2' function. */
 #undef HAVE_DUP2
 

@@ -25,7 +25,7 @@ static struct escm_lang mylang;
 /* parse_lang(langname, &interp) - parse a language configuration file.
  */
 struct escm_lang *
-parse_lang(const char *name, const char *interp)
+parse_lang(const char *name, const char **interp)
 {
   FILE *fp;
   size_t n;
