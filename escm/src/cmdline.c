@@ -36,7 +36,7 @@ char *strchr(const char *s, int c);
 #if defined(XERROR)
 void XERROR();
 #else
-# define XERROR(msg) { perror(msg) ; exit(EXIT_FAILURE) }
+# define XERROR(msg) { perror(msg) ; exit(EXIT_FAILURE); }
 #endif /* defined(XERROR) */
 
 #if !defined(xmalloc)

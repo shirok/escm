@@ -31,8 +31,16 @@ put_string(const char *str, FILE *outp)
   const char *p = str;
   fputc('\"', outp);
   while (*p) {
-    if (*p == '\"' || *p == '\\') fputc('\\', outp);
-    fputc(*p++, outp);
+    if (*p == '\"' || *p == '\\') {
+      fputc('\\', outp);
+      fputc(*p, outp);
+    } else if (*p == '\n') {
+      fputc('\\', outp);
+      fputc('n', outp);
+    } else {
+      fputc(*p, outp);
+    }
+    p++;
   }
   fputc('\"', outp);
 }

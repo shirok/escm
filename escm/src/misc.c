@@ -53,6 +53,7 @@ void cgi_error(const char *fmt, ...)
   char* iscgi;
   FILE* fp;
 
+  va_start(ap, fmt);
   iscgi = getenv("GATEWAY_INTERFACE");
   fp = iscgi ? stdout : stderr;
   if (header == HTML) {
