@@ -23,8 +23,10 @@ fi
 backend_path=`which $backend_path`
 AC_CHECK_FILE($backend_path)
 backend_prog="$backend_path$backend_args"
+ESCM_BACKEND=$backend_prog
 AC_DEFINE_UNQUOTED(ESCM_BACKEND, ["$backend_prog"],
 	[Command line to invoke the backend interpreter.])
+AC_SUBST(ESCM_BACKEND)
 backend_args=`echo $backend_prog | sed -e "s/  */\", \"/g"`
 AC_DEFINE_UNQUOTED(ESCM_BACKEND_ARGV, ["$backend_args"], [argv for the backend interpreter])
 ])

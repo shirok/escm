@@ -120,13 +120,15 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     escm_error(_("inconsistent environment"));
   else {
     if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
-    put_variable(lang, "QUERY_STRING", outp);
+    put_variable(lang, "*escm-query-string*", outp);
     if (lang->bind.infix) fputs(lang->bind.infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {
       fputc('\"', outp);
       len = (int) llen;
       while ((c = getc(stdin)) != EOF && len-- > 0) {
+	/* better replace the next line with an error check. */
+	if (c == '\"') fputc('\\', outp);
 	fputc(c, outp);
       }
       fputc('\"', outp);

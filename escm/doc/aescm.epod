@@ -1,4 +1,7 @@
-<?scm (load (string-append *pwd* "/config-h.scm"))?>
+<?scm
+  (load (string-append *pwd* "/config.scm"))
+  (load (string-append *pwd* "/helper.scm"))
+?>
 
 =head1 NAME
 
@@ -108,7 +111,7 @@ The Scheme interpreter and its arguments.
 
 The name and the version of this project.
 
-=item QUERY_STRING
+=item E<42>escm-query-stringE<42>
 
 The query string of a CGI program.
 The request method is either B<POST> or B<GET>.

@@ -1,10 +1,46 @@
-Dummy README for aescm 0.22 - experimental version of escm
+This is README file for aescm 0.22 (README or doc/readme.html).
 
-In version 0.22, dangerous or useless features will be removed,
-for example:
+Aescm is developers' version of escm. The stable version is still escm 1.1.
 
- * format strings (done)
- * internationalization (done)
- * Scheme binding of environmental variables (done)
+Aescm is a filter program to preprocesses embedded Scheme code in documents
+like eperl or eruby. Scheme code between <?scm and ?> is evaluated and replaced
+with what is written to (current-output-port) while the evaluation. An
+expression between <?scm:d and ?> is evaluated and replaced with the result.
 
-I will also remove some bashism and gmakism.
+The body of aescm is a simple converter from a text to Scheme code, which will
+be sent to a Scheme interpreter. Because of this architecture, it works with
+most implementations.
+
+INSTALLATION
+
+If your favorite interpreter is Gauche or if it is Guile and you have not
+installed Gauche, then type as usual:
+
+    ./configure
+    make
+    make install
+    
+
+If it is not the case, you should specify the interpreter and its option
+arguments for a batch mode when you run configure script. The options for some
+implementations are listed in doc/interpreter.html.
+
+Suppose your choice be scheme -s /dev/stdin. Then run as:
+
+    ./configure --with-backend="scheme -s /dev/stdin"
+    
+
+You can also embed other interpreter languages than Scheme if you run configure
+with --enable-polyglot option. See doc/gimmick.html for detail.
+
+This program can be used as a handler CGI program of Apache web servers. The
+tool will be automatically installed in cgi-bin directory. You may have to add
+a suffix. Consult the example in the man page.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+
+This file was converted from readme.escm on Wed Feb 4 12:57:27 UTC 2004. The
+backend is /home/tagga/bin/gosh -b.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+SourceForge.net Logo

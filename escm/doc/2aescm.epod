@@ -1,4 +1,7 @@
-<?scm (load (string-append *pwd* "/config-h.scm"))?>
+<?scm
+  (load (string-append *pwd* "/config.scm"))
+  (load (string-append *pwd* "/helper.scm"))
+?>
 
 =head1 NAME
 

@@ -1,9 +1,12 @@
-<?xml version="1.0"?><!-- -*- xml -*- -->
+<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
 <!-- $Id$ -->
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
-     "DTD/xhtml11-flat.dtd">
-<?scm (load (string-append *pwd* "/config-h.scm"))?>
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<?scm
+  (load (string-append *pwd* "/config.scm"))
+  (load (string-append *pwd* "/helper.scm"))
+?>
 <html>
   <head>
     <title>README for <?scm:d PACKAGE?></title>

@@ -1,4 +1,8 @@
 2004-02-03  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* src/escm.c (escm_bind_query_string): Escape \" in QUERY_STRING
+	though it may not appear.
+	
+	* doc/Makefile.am: Works both with GNU make and BSD make.
 
 	* src/escm.h (escm_lang): Added newline field.
 	

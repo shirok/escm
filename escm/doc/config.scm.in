@@ -1,0 +1,23 @@
+;; config.scm.in -*- mode:scheme -*-
+(define ENABLE_POLYGLOT
+  (let ((str "@ENABLE_POLYGLOT@"))
+    (if (equal? "" str) #f str)))
+
+(define DEFAULT_LANG "@DEFAULT_LANG@")
+
+(define ESCM_BACKEND "@ESCM_BACKEND@")
+
+(define PACKAGE "@PACKAGE@")
+
+(define PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@")
+
+(define PACKAGE_NAME "@PACKAGE_NAME@")
+
+(define PACKAGE_STRING "@PACKAGE_STRING@")
+
+(define PACKAGE_TARNAME "@PACKAGE_TARNAME@")
+
+(define PACKAGE_VERSION "@PACKAGE_VERSION@")
+
+(define VERSION "@VERSION@")
+;; end of config.scm

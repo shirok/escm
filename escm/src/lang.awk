@@ -69,7 +69,7 @@ END {
   print "struct escm_lang deflang = {";
   print " ", escape_string(data["name"]), ", /* name */";
 
-  if (data["name"] == "scm" || data["name"] == "scheme") {
+  if (data["name"] == "scm" || data["name"] == "lisp") {
     print " 1 , /* scm_p */";
   } else {
     print " 0 , /* scm_p */";

@@ -49,12 +49,14 @@ AC_ARG_ENABLE([polyglot],
    [  --enable-polyglot -- enable polyglot support.])
 if test x$enable_polyglot = xyes; then
   POLYGLOT_OBJ=lang.$OBJEXT
+  ENABLE_POLYGLOT=1
   AC_SUBST(POLYGLOT_OBJ)
+  AC_SUBST(ENABLE_POLYGLOT)
   AC_DEFINE_UNQUOTED(ENABLE_POLYGLOT, [1], [enable polyglot support.])
 fi
 AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
 
 AC_CONFIG_FILES([Makefile test/Makefile
-			  doc/Makefile
+			  doc/Makefile doc/config.scm
 			  src/Makefile src/lang/Makefile])
 AC_OUTPUT

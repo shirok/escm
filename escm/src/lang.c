@@ -158,7 +158,7 @@ parse_lang(const char *name)
   if (ptr == NULL || mylang.name == NULL || data == NULL)
     escm_error(_("broken config file - %s"), name);
 
-  if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "scheme") == 0)
+  if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "lisp") == 0)
     mylang.scm_p = 1;
   mylang.backend = tokenize_cmd(data);
   mylang.nil = "\"\"";
