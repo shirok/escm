@@ -24,6 +24,7 @@
 #endif /* defined(HAVE_UNISTD_H) */
 
 #include "escm.h"
+#include "escmcgi.h"
 
 extern struct escm_lang deflang;
 

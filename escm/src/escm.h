@@ -39,17 +39,13 @@ struct escm_lang {
   char *finish;          /* finalization code */
 };
 
+void escm_puts(const char *str, FILE *outp);
+
 void escm_init(const struct escm_lang *lang, FILE *outp);
 void escm_finish(const struct escm_lang *lang, FILE *outp);
 
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
-
-/* CGI */
-#ifdef ENABLE_CGI
-void escm_header(const struct escm_lang *lang, FILE *outp);
-int escm_query_string(const struct escm_lang *lang, FILE *outp);
-#endif /* ENABLE_CGI */
 
 /* converter */
 int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);

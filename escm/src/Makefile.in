@@ -18,7 +18,7 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) $(aescm_cgi_SOURCES) $(langconf_SOURCES)
+SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(langconf_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -58,10 +58,12 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_1 = deflang.$(OBJEXT)
-am_aescm_OBJECTS = escm.$(OBJEXT) filter.$(OBJEXT) $(am__objects_1)
-aescm_OBJECTS = $(am_aescm_OBJECTS)
-am_aescm_cgi_OBJECTS = cgimain.$(OBJEXT) escm.$(OBJEXT) \
+am_aescm_OBJECTS = escm.$(OBJEXT) filter.$(OBJEXT) lang.$(OBJEXT) \
 	$(am__objects_1)
+aescm_OBJECTS = $(am_aescm_OBJECTS)
+aescm_LDADD = $(LDADD)
+am_aescm_cgi_OBJECTS = cgimain.$(OBJEXT) escm.$(OBJEXT) \
+	escmcgi.$(OBJEXT) $(am__objects_1)
 aescm_cgi_OBJECTS = $(am_aescm_cgi_OBJECTS)
 aescm_cgi_LDADD = $(LDADD)
 am_langconf_OBJECTS = langconf.$(OBJEXT) escm.$(OBJEXT) lang.$(OBJEXT)
@@ -71,16 +73,16 @@ DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/cgimain.Po ./$(DEPDIR)/deflang.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/escm.Po ./$(DEPDIR)/filter.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/lang.Po ./$(DEPDIR)/langconf.Po
+@AMDEP_TRUE@	./$(DEPDIR)/escm.Po ./$(DEPDIR)/escmcgi.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/filter.Po ./$(DEPDIR)/lang.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/langconf.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) $(aescm_cgi_SOURCES) \
+SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(langconf_SOURCES)
+DIST_SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) \
 	$(langconf_SOURCES)
-DIST_SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) \
-	$(aescm_cgi_SOURCES) $(langconf_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -112,7 +114,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_POLYGLOT = @ENABLE_POLYGLOT@
 ESCM_BACKEND = @ESCM_BACKEND@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
@@ -132,9 +133,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-POLYGLOT_FALSE = @POLYGLOT_FALSE@
-POLYGLOT_OBJ = @POLYGLOT_OBJ@
-POLYGLOT_TRUE = @POLYGLOT_TRUE@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -173,13 +171,8 @@ SUBDIRS = lang
 BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT)
 langconf_SOURCES = langconf.c escm.c escm.h lang.c
-aescm_SOURCES = escm.c escm.h filter.c $(BUILT_SOURCES)
-
-# other language support
-aescm_LDADD = @POLYGLOT_OBJ@
-aescm_DEPENDENCIES = @POLYGLOT_OBJ@
-EXTRA_aescm_SOURCES = lang.c
-aescm_cgi_SOURCES = cgimain.c escm.c escm.h $(BUILT_SOURCES)
+aescm_SOURCES = escm.c escm.h filter.c lang.c $(BUILT_SOURCES)
+aescm_cgi_SOURCES = cgimain.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -276,6 +269,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgimain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deflang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/escm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/escmcgi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/langconf.Po@am__quote@

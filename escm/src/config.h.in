@@ -1,11 +1,5 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* enable CGI support. */
-#undef ENABLE_CGI
-
-/* enable polyglot support. */
-#undef ENABLE_POLYGLOT
-
 /* Command line to invoke the backend interpreter. */
 #undef ESCM_BACKEND
 

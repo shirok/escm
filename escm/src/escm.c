@@ -16,10 +16,10 @@
 #include <ctype.h>
 #include "escm.h"
 
-/* put_string(str, outp) - escape str and put it.
+/* escm_puts(str, outp) - escape str and put it.
  */
-static void
-put_string(const char *str, FILE *outp)
+void
+escm_puts(const char *str, FILE *outp)
 {
   const char *p = str;
   fputc('"', outp);
@@ -46,7 +46,7 @@ escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *
   fputs(var, outp);
   if (lang->bind.infix) fputs(lang->bind.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
-  else put_string(val, outp);
+  else escm_puts(val, outp);
   if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
   fputc('\n', outp);
 }
@@ -59,7 +59,7 @@ escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE
   fputs(var, outp);
   if (lang->assign.infix) fputs(lang->assign.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
-  else put_string(val, outp);
+  else escm_puts(val, outp);
   if (lang->assign.suffix) fputs(lang->assign.suffix, outp);
   fputc('\n', outp);
 }
@@ -83,79 +83,6 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
-
-#ifdef ENABLE_CGI
-#define setter bind
-
-/* escm_header(lang, outp)
- */
-void
-escm_header(const struct escm_lang *lang, FILE *outp)
-{
-  fputs(lang->literal.prefix, outp);
-  if (lang->newline) {
-    fputs("Content-type: text/html", outp);
-    fputs(lang->literal.suffix, outp);
-    fputs(lang->newline, outp);
-    fputs(lang->newline, outp);
-    fputc('\n', outp);
-  } else {
-    fputs("Content-type: text/html\r\n\r\n", outp);
-    fputs(lang->literal.suffix, outp);
-    fputc('\n', outp);
-  }
-}
-/* escm_query_string(lang, outp) - bind the query string to QUERY_STRING
- * when the method is POST. */
-int
-escm_query_string(const struct escm_lang *lang, FILE *outp)
-{
-  const char *content_length;
-  const char *method;
-  char *p;
-  long llen;
-  int len;
-  int c;
-
-  method = getenv("REQUEST_METHOD");
-  if (method && method[0] == 'P') {
-    content_length = getenv("CONTENT_LENGTH");
-    if (content_length == NULL) {
-      return FALSE;
-    } else {
-      if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-      fputs("escm_query_string", outp);
-      if (lang->setter.infix) fputs(lang->setter.infix, outp);
-      llen = strtol(content_length, &p, 10);
-      if (*p == '\0') {
-	fputc('"', outp);
-	len = (int) llen;
-	while ((c = getc(stdin)) != EOF && len-- > 0) {
-	  /* better replace the next line with an error check. */
-	  if (c == '"' || c == '\\') fputc('\\', outp);
-	  fputc(c, outp);
-	}
-	fputc('"', outp);
-      } else {
-	fputs(lang->nil, outp);
-      }
-      if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
-      fputc('\n', outp);
-    }
-  } else {
-    p = getenv("QUERY_STRING");
-    if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-    fputs("escm_query_string", outp);
-    if (lang->setter.infix) fputs(lang->setter.infix, outp);
-    if (p == NULL) fputs(lang->nil, outp);
-    else put_string(p, outp);
-    if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
-    fputc('\n', outp);
-  }
-  return TRUE;
-}
-#undef setter
-#endif /* ENABLE_CGI */
 
 /* escm_preproc(lang, inp, outp)
  */

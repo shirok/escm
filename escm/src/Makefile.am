@@ -22,6 +22,6 @@ DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE
 
 # CGI
 EXTRA_PROGRAMS = aescm.cgi
-aescm_cgi_SOURCES = cgimain.c escm.c escm.h $(BUILT_SOURCES)
+aescm_cgi_SOURCES = cgimain.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
 
 # end of src/Makefile.am
