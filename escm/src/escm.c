@@ -13,6 +13,7 @@
 #ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
+#include <ctype.h>
 #include "escm.h"
 #include "misc.h"
 
@@ -35,27 +36,103 @@ put_string(const char *str, FILE *outp)
   }
   fputc('\"', outp);
 }
+/* foo_bar => *foo-bar* */
+static void
+put_lisp_variable(const char *var, FILE *outp)
+{
+  const char* p;
+  fputc('*', outp);
+  for (p = var; *p; p++) {
+    if (*p == '_' || isspace(*p)) {
+      fputc('-', outp);
+    } else {
+      fputc(*p, outp);
+    }
+  }
+  fputc('*', outp);
+}
+/* foo_bar => foo_bar */
+static void
+put_lower_variable(const char *var, FILE *outp)
+{
+  const char* p;
+  p = var;
+  if (! isalpha(*p)) {
+    fputc('_', outp);
+  } else {
+    fputc(tolower(*p), outp);
+  }
+  for (p = var + 1; *p; p++) {
+    if (! isalnum(*p)) {
+      fputc('_', outp);
+    } else {
+      fputc(tolower(*p), outp);
+    }
+  }
+}
+/* foo_bar => FOO_BAR */
+static void
+put_upper_variable(const char *var, FILE *outp)
+{
+  const char* p;
+  p = var;
+  if (! isalpha(*p)) {
+    fputc('_', outp);
+  } else {
+    fputc(toupper(*p), outp);
+  }
+  for (p = var + 1; *p; p++) {
+    if (! isalnum(*p)) {
+      fputc('_', outp);
+    } else {
+      fputc(toupper(*p), outp);
+    }
+  }
+}
+/* foo_bar => FooBar */
+static void
+put_title_variable(const char *var, FILE *outp)
+{
+  const char* p;
+  int flag = FALSE;
+  p = var;
+  if (! isalpha(*p)) {
+    fputc('_', outp);
+  } else {
+    if (flag) {
+      fputc(tolower(*p), outp);
+    } else {
+      fputc(toupper(*p), outp);
+      flag = FALSE;
+    }
+  }
+  for (p = var + 1; *p; p++) {
+    if (! isalpha(*p)) {
+      flag = FALSE;
+    } else {
+      if (flag) {
+	fputc(tolower(*p), outp);
+      } else {
+	fputc(toupper(*p), outp);
+	flag = FALSE;
+      }
+    }
+  }
+}
+
 /* put_variable(lang, var, outp) - put var as a variable name.
  */
 static void
 put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 {
-  const char *p;
-  if (lang->scm_p) fputs(var, outp);
-  else {
-    int flag = FALSE;
-    for (p = var; *p; p++) {
-      if (!flag) {
-	if (isalpha(*p) || *p == '_') {
-	  fputc(tolower(*p), outp);
-	  flag = TRUE;
-	}
-      } else if (isalnum(*p)) {
-	fputc(tolower(*p), outp);
-      } else if (*p == '-' || *p == '_') {
-	fputc('_', outp);
-      }
-    }
+  if (lang->id_type == ESCM_ID_LISP) {
+    put_lisp_variable(var, outp);
+  } else if (lang->id_type == ESCM_ID_LOWER) {
+    put_lower_variable(var, outp);
+  } else if (lang->id_type == ESCM_ID_UPPER) {
+    put_upper_variable(var, outp);
+  } else {
+    put_title_variable(var, outp);
   }
 }
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
@@ -120,7 +197,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     XERROR("inconsistent environment");
   else {
     if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
-    put_variable(lang, "*escm-query-string*", outp);
+    put_variable(lang, "escm_query_string", outp);
     if (lang->bind.infix) fputs(lang->bind.infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {

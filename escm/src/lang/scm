@@ -1,5 +1,7 @@
 ;; scm - configurations for the Scheme language
 gosh -b
+;; identifier
+*lisp*
 ;; nil
 #f
 ;; bind

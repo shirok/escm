@@ -5,7 +5,7 @@
 BEGIN {
   leading = "";
   key = "";
-  split("name command init nil bind assign string display newline finish", data);
+  split("name command identifier init nil bind assign string display newline finish", data);
   for (x in data) {
     data[data[x]] = "";
     delete data[x];
@@ -69,11 +69,19 @@ END {
   print "struct escm_lang deflang = {";
   print " ", escape_string(data["name"]), ", /* name */";
 
-  if (data["name"] == "scm" || data["name"] == "lisp") {
-    print " 1 , /* scm_p */";
+  if (data["identifier"] == "*lisp*") {
+    print " ESCM_ID_LISP , /* id_type */";
+  } else if (data["identifier"] == "UPPER") {
+    print " ESCM_ID_UPPER , /* id_type */";
+  } else if (data["identifier"] == "Title") {
+    print " ESCM_ID_TITLE , /* id_type */";
+  } else if (data["identifier"] == "lower") {
+    print " ESCM_ID_LOWER , /* id_type */";
   } else {
-    print " 0 , /* scm_p */";
+    print "identifier record broken";
+    exit 1;
   }
+
   print " argv , /* backend */";
   print " { /* literal */";
   if (split(data["string"], tmp, sep) != 2) {

@@ -60,7 +60,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   if (inp == NULL) XERROR("can't open - %s", file);
 
   escm_file = file;
-  escm_assign(lang, "*escm-input-file*", file, outp);
+  escm_assign(lang, "escm_input_file", file, outp);
 
   escm_preproc(lang, inp, outp);
   fclose(inp);
@@ -240,28 +240,28 @@ main(int argc, char **argv)
 
   /* initialization */
   escm_init(lang, outp);
-  escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
+  escm_bind(lang, "escm_version", PACKAGE " " VERSION, outp);
   if (path_translated) {
-    escm_bind(lang, "*escm-input-file*", path_translated, outp);
+    escm_bind(lang, "escm_input_file", path_translated, outp);
   } else if (inp == NULL) {
-    escm_bind(lang, "*escm-input-file*", NULL, outp);
+    escm_bind(lang, "escm_input_file", NULL, outp);
   } else {
-    escm_bind(lang, "*escm-input-file*", argv[argc - 1], outp);
+    escm_bind(lang, "escm_input_file", argv[argc - 1], outp);
   }
-  escm_bind(lang, "*escm-output-file*", output_file, outp);
+  escm_bind(lang, "escm_output_file", output_file, outp);
   if (process_flag) {
-    escm_bind(lang, "*escm-interpreter*",
+    escm_bind(lang, "escm_interpreter",
 	      interp ? interp : ESCM_BACKEND, outp);
     if (gateway_interface) {
       const char *method;
       method = getenv("REQUEST_METHOD");
       if (method[0] == 'P') escm_bind_query_string(lang, outp);
-      else escm_bind(lang, "*escm-query-string*", getenv("QUERY_STRING"), outp);
+      else escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
     } else {
-      escm_bind(lang, "*escm-query-string*", NULL, outp);
+      escm_bind(lang, "escm_query_string", NULL, outp);
     }
   } else {
-    escm_bind(lang, "*escm-interpreter*", NULL, outp);
+    escm_bind(lang, "escm_interpreter", NULL, outp);
   }
 
   /* evaluate the expressions specified in options */

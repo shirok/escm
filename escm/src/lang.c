@@ -160,7 +160,9 @@ parse_lang(const char *name)
     return NULL;
 
   if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "lisp") == 0)
-    mylang.scm_p = 1;
+    mylang.id_type = ESCM_ID_LISP;
+  else
+    mylang.id_type = ESCM_ID_LOWER;
   mylang.backend = parse_cmdline(data);
   mylang.nil = "\"\"";
 
@@ -173,6 +175,17 @@ parse_lang(const char *name)
       break;
     case HASH_KEY('a', 's'): /* assign */
       if (!parse_form3(data, &(mylang.assign))) return NULL;
+      break;
+    case HASH_KEY('i', 'd'): /* identifier */
+      if (*data == '*') {
+	mylang.id_type = ESCM_ID_LISP;
+      } else if (*data == 'T') {
+	mylang.id_type = ESCM_ID_TITLE;
+      } else if (*data == 'U') {
+	mylang.id_type = ESCM_ID_UPPER;
+      } else {
+	mylang.id_type = ESCM_ID_LOWER;
+      }
       break;
     case HASH_KEY('i', 'n'): /* init */
       mylang.init = data;
