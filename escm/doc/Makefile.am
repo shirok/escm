@@ -11,12 +11,12 @@ man_MANS = aescm.1 2aescm.1
 
 HTML_FILES = gimmick.html interpreter.html
 
-all : $(man_MANS) $(HTML_FILES)
-	LANG=C && $(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(define *date* \"`date -u`\")" readme.escm > readme.html
-	 w3m -dump readme.html > ../README
-
 $(ESCM) :
 	cd ../src/ && make
+
+doc : $(man_MANS) $(HTML_FILES)
+	LANG=C && $(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(define *date* \"`date -u`\")" readme.escm > readme.html
+	 w3m -dump readme.html > ../README
 
 .epod.1 :
 	$(ESCM) -e "(define *pwd* \"`pwd`\")" $< > $*.pod
@@ -30,14 +30,16 @@ EXTRA_DIST = config-h.awk helper.scm
 EXTRA_DIST += readme.escm gimmick.escm interpreter.escm
 EXTRA_DIST += aescm.epod 2aescm.epod
 
-CLEANFILES = config-h.scm
+CLEANFILES = config.scm
 
 noinst_DATA = $(HTML_FILES)
 
 clean-local:
 	-rm *~
-	-rm *.1
 	-rm *.pod
+
+realclean : clean-local
+	-rm *.1
 	-rm *.html
 
 # end of doc/Makefile.am

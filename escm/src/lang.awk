@@ -125,8 +125,7 @@ function escape_string(str) {
   if (str == "") {
     str = "NULL";
   } else {
-    gsub("\n", "\\n", str);
-    gsub("\\", "\\\\", str);
+    gsub("\\\\", "\\\\", str);
     gsub("\"", "\\\"", str);
     str = "\"" str "\"";
   }

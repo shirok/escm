@@ -4,4 +4,7 @@
 
 SUBDIRS = src test doc
 
+document :
+	cd doc && make doc
+
 # end of Makefile.am

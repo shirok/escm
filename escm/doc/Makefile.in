@@ -264,12 +264,12 @@ uninstall-man: uninstall-man1
 	uninstall-info-am uninstall-man uninstall-man1
 
 
-all : $(man_MANS) $(HTML_FILES)
-	LANG=C && $(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(define *date* \"`date -u`\")" readme.escm > readme.html
-	 w3m -dump readme.html > ../README
-
 $(ESCM) :
 	cd ../src/ && make
+
+doc : $(man_MANS) $(HTML_FILES)
+	LANG=C && $(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(define *date* \"`date -u`\")" readme.escm > readme.html
+	 w3m -dump readme.html > ../README
 
 .epod.1 :
 	$(ESCM) -e "(define *pwd* \"`pwd`\")" $< > $*.pod
@@ -281,8 +281,10 @@ $(ESCM) :
 
 clean-local:
 	-rm *~
-	-rm *.1
 	-rm *.pod
+
+realclean : clean-local
+	-rm *.1
 	-rm *.html
 
 # end of doc/Makefile.am
