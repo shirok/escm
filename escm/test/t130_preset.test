@@ -18,12 +18,10 @@
 
 cat <<EOF > input
 <?scm:d escm_input_file?>
-<?scm:d escm_output_file?>
 EOF
 
 cat <<EOF > out-ok
 input
-#f
 EOF
 
 ${PROG} input 1> out 2> err
