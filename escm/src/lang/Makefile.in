@@ -75,7 +75,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_POLYGLOT = @ENABLE_POLYGLOT@
 ESCM_BACKEND = @ESCM_BACKEND@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
@@ -95,9 +94,6 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-POLYGLOT_FALSE = @POLYGLOT_FALSE@
-POLYGLOT_OBJ = @POLYGLOT_OBJ@
-POLYGLOT_TRUE = @POLYGLOT_TRUE@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -133,8 +129,8 @@ with_backend = @with_backend@
 
 # Do not forget to add a new config file.
 LANG_FILES = awk csh lisp lisp-cmucl perl python ruby scm scm-scm sh tcl
-@POLYGLOT_TRUE@langdir = $(pkgdatadir)/lang
-@POLYGLOT_TRUE@lang_DATA = $(LANG_FILES)
+langdir = $(pkgdatadir)/lang
+lang_DATA = $(LANG_FILES)
 EXTRA_DIST = $(LANG_FILES)
 all: all-am
 

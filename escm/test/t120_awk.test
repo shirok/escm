@@ -2,12 +2,6 @@
 
 . $srcdir/Init.sh
 
-# Check the environment, and exit 77 if you skip this test.
-if grep -e "undef  *ENABLE_POLYGLOT" ../src/config.h 1> /dev/null 2> /dev/null; then
-    echo " -- Skipped" >> 00check.log
-    exit 77
-fi
-
 # ${PROG} input 1> out 2> err
 # where
 #   input  -- the input file

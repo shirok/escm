@@ -31,10 +31,7 @@
 
 extern struct escm_lang deflang;
 
-#ifdef ENABLE_POLYGLOT
-/* defined in lang.c */
 struct escm_lang * parse_lang(const char *name);
-#endif /* ENABLE_POLYGLOT */
 
 /* main function
  */
@@ -46,9 +43,7 @@ main(int argc, char **argv)
   FILE *outp = stdout;
   int process_flag = TRUE;
   char *output_file = NULL;
-#ifdef ENABLE_POLYGLOT
   char *lang_name = NULL;
-#endif /* ENABLE_POLYGLOT */
   char *interp = ESCM_BACKEND;
   int n_expr = 0;
   char *expr[EOPT_SIZE];
@@ -87,9 +82,7 @@ main(int argc, char **argv)
 "  -E, --no-eval                convert documents into code\n"
 "  -e, --eval=EXPR              evaluate an expression\n"
 "  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
-#ifdef ENABLE_POLYGLOT
 "  -l, --language=LANG          choose the interpreter language\n"
-#endif /* ENABLE_POLYGLOT */
 "      --help                   print this message and exit\n"
 "      --version                print version information and exit\n",
 	       argv[0]);
@@ -115,11 +108,9 @@ main(int argc, char **argv)
     case 'i':
       interp = optarg;
       break;
-#ifdef ENABLE_POLYGLOT
     case 'l':
       lang_name = optarg;
       break;
-#endif /* ENABLE_POLYGLOT */
     case 'o':
       output_file = optarg;
       break;
@@ -127,11 +118,7 @@ main(int argc, char **argv)
 #if defined(HAVE_GETOPT_LONG)
       printf("Try `%s --help' for more information.\n", argv[0]);
 #else /* !defined(HAVE_GETOPT_LONG) */
-# ifdef ENABLE_POLYGLOT
       fprintf(stderr, "Usage: %s [-E] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", argv[0]);
-# else
-      fprintf(stderr, "Usage: %s [-E] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-o OUTPUT] FILE ...\n", argv[0]);
-# endif /* ENABLE_POLYGLOT */
       fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
 #endif /* defined(HAVE_GETOPT_LONG) */
       exit(EXIT_FAILURE);
@@ -147,7 +134,6 @@ main(int argc, char **argv)
     }
   }
 
-#ifdef ENABLE_POLYGLOT
   /* select the language if necessary. */
   if (lang_name) {
     lang = parse_lang(lang_name);
@@ -161,9 +147,6 @@ main(int argc, char **argv)
     fprintf(stderr, "%s: invalid language configuration", argv[0]);
     exit(EXIT_FAILURE);
   }
-#else /* not ENABLE_POLYGLOT */
-  if (!interp) interp = getenv("ESCM_BACKEND");
-#endif /* ENABLE_POLYGLOT */
 
   /* invoke the interpreter. */
   if (process_flag) outp = popen(interp, "w");
