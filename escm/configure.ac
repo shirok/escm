@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.21], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE
+AC_INIT([aescm], [0.22], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.22])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
@@ -19,8 +19,8 @@ AC_CHECK_PROGS(POD2MAN, [pod2man])
 AC_CHECK_PROGS(POD2HTML, [pod2html])
 
 # i18n
-AM_GNU_GETTEXT([external])
-AM_ICONV
+# AM_GNU_GETTEXT([external])
+# AM_ICONV
 
 # The default interpreter language
 AC_ARG_WITH([default], [  --with-default=lang   specify the default language (scm).])
@@ -63,13 +63,10 @@ if test x$enable_polyglot = xyes; then
 fi
 AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
 
-# CGI program
 AC_ARG_ENABLE([cgi],
    [  --disable-cgi -- not to use as a CGI program.])
-AC_ESCM_CHECK_CGI
 
 AC_CONFIG_FILES([Makefile test/Makefile
 			  doc/Makefile
-			  src/Makefile src/lang/Makefile
-			  po/Makefile.in m4/Makefile ])
+			  src/Makefile src/lang/Makefile])
 AC_OUTPUT

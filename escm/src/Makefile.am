@@ -29,10 +29,4 @@ endif
 
 DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DLOCALEDIR=\"$(datadir)/locale\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
 
-# as a CGI program
-if CGI
-cgibindir = @CGIBIN@
-cgibin_PROGRAMS = aescm
-endif
-
 # end of src/Makefile.am

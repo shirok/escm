@@ -39,22 +39,6 @@
 #include "escm.h"
 #include "misc.h"
 
-#ifdef ENABLE_CGI
-/* Will be moved elesewhere. */
-static char * env_to_bind[] = {
-  /* "GATEWAY_INTERFACE", */
-  "HTTP_ACCEPT_LANGUAGE",
-  "HTTP_ACCEPT_CHARSET",
-  "HTTP_COOKIE",
-  "HTTP_HOST",
-  "HTTP_REFERER",
-  "HTTP_USER_AGENT",
-  /* "QUERY_STRING", */
-  "REMOTE_ADDR",
-  /* "REQUEST_METHOD", */
-};
-#endif /* ENABLE_CGI */
-
 #define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
 
 #ifdef ENABLE_POLYGLOT
@@ -99,8 +83,6 @@ main(int argc, char **argv)
   char *interp = NULL;
   char **expr = NULL;
   int n_expr = 0;
-#ifdef ENABLE_CGI
-#endif /* ENABLE_CGI */
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
@@ -126,27 +108,21 @@ main(int argc, char **argv)
   lang = &deflang;
 
   /* Check the environment. */
-#ifdef ENABLE_CGI
   escm_cgi = getenv("GATEWAY_INTERFACE");
-#endif /* ENABLE_CGI */
 
   /* Set the program name. */
   escm_prog = argv[0];
 
-#ifdef ENABLE_CGI
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_cgi) {
     escm_redirect(fileno(stderr), fileno(stdout));
   } else {
-#endif /* ENABLE_CGI */
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif /* ENABLE_NLS */
-#ifdef ENABLE_CGI
   }
-#endif /* ENABLE_CGI */
 
   /* expand meta-arguments if necessary */
   inp = escm_expand(&argc, &argv, &s_argc, &s_argv,
@@ -176,9 +152,6 @@ main(int argc, char **argv)
 "      --help                   print this message and exit\n"
 "      --version                print version information and exit\n"),
 	       escm_prog);
-#ifndef ENABLE_CGI
-	printf(_("Option %s is discarded.\n"), "-H");
-#endif /* ENABLE_CGI */
 #ifndef ENABLE_POLYGLOT
 	printf(_("Option %s is discarded.\n"), "-l");
 #endif /* ENABLE_POLYGLOT */
@@ -195,11 +168,9 @@ main(int argc, char **argv)
     case 'E':
       process_flag = FALSE;
       break;
-#ifdef ENABLE_CGI
     case 'H':
       header_flag = FALSE;
       break;
-#endif /* ENABLE_CGI */
     case 'c':
       header_flag = FALSE;
       if (!escm_cgi) escm_redirect(fileno(stderr), fileno(stdout));

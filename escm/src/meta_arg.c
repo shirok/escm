@@ -55,18 +55,22 @@ static int xlineno = 0;
 #  define XLINENO xlineno
 #endif /* !XLINENO */
 
+#ifndef XERROR1
 #define XERROR1(fmt, arg) {\
   fprintf(stderr, "%s: ", XPROG); \
   fprintf(stderr, fmt, arg);\
   fputc('\n', stderr);\
   exit(EXIT_FAILURE);\
 }
+#endif /* XERROR1 */
+#ifndef XERROR0
 #define XERROR0(fmt) {\
   fprintf(stderr, "%s: %s %d: ", XPROG, XFILE, XLINENO); \
   fputs(fmt, stderr);\
   fputc('\n', stderr);\
   exit(EXIT_FAILURE);\
 }
+#endif /* XERROR0 */
 
 /* fp = expand_args(fp) */
 #define ADD_CHAR(c) {\

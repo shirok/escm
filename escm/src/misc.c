@@ -39,7 +39,6 @@ void *realloc(void *ptr, size_t size);
 #include "escm.h"
 #include "misc.h"
 
-#ifdef ENABLE_CGI
 static int header = FALSE;
 
 /* escm_html_header(&lang, outp)
@@ -60,7 +59,7 @@ escm_text_header(const struct escm_lang *lang, FILE *outp)
   fflush(outp);
   header = TRUE;
 }
-#endif /* ENABLE_CGI */
+
 /* escm_error(fmt, ...) - print a warning message and exit the program.
  */
 void escm_error(const char *fmt, ...)
@@ -68,7 +67,6 @@ void escm_error(const char *fmt, ...)
   va_list ap;
 
   va_start(ap, fmt);
-#ifdef ENABLE_CGI
   if (escm_cgi) {
     if (!header) {
       fputs("Content-type: text/html\r\n\r\n", stdout);
@@ -81,16 +79,13 @@ void escm_error(const char *fmt, ...)
     fputs("</p></body></html>\n", stdout);
     exit(EXIT_SUCCESS);
   } else {
-#endif /* ENABLE_CGI */
     fprintf(stderr, "%s: ", escm_prog);
     if (escm_file) fprintf(stderr, "%s: ", escm_file);
     if (escm_lineno) fprintf(stderr, "%d: ", escm_lineno);
     vfprintf(stderr, fmt, ap);
     fputc('\n', stderr);
     exit(EXIT_FAILURE);
-#ifdef ENABLE_CGI
   }
-#endif /* ENABLE_CGI */
 }
 
 /*========================================================

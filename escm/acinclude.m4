@@ -28,34 +28,4 @@ AC_DEFINE_UNQUOTED(ESCM_BACKEND, ["$backend_prog"],
 backend_args=`echo $backend_prog | sed -e "s/  */\", \"/g"`
 AC_DEFINE_UNQUOTED(ESCM_BACKEND_ARGV, ["$backend_args"], [argv for the backend interpreter])
 ])
-
-# --enable-cgi
-AC_DEFUN([AC_ESCM_CHECK_CGI],
-[dnl
-if test x$enable_cgi = xno; then
-   ENABLE_CGI=
-elif test x$enable_cgi = xyes || test x$enable_cgi = x; then
-   ENABLE_CGI=1
-#   if test -d $prefix/public_html; then
-#      CGIBIN=$prefix/public_html/cgi-bin
-#   elif test -d $prefix/cgi-bin; then
-   if test -d $prefix/cgi-bin; then
-      CGIBIN=$prefix/cgi-bin
-   else
-      for x in /Local/Library/WebServer/CGI-Executables /Library/WebServer/CGI-Executables /opt/apache/share/cgi-bin /boot/home/apache/cgi-bin /usr/local/apache/cgi-bin /usr/local/httpd/cgi-bin /usr/local/www/cgi-bin /usr/local/share/apache/cgi-bin /usr/share/apache/cgi-bin /var/apache/cgi-bin /var/www/cgi-bin; do
-	  if test -d $x; then
-	     CGIBIN=$x
-	     break
-          fi
-      done
-   fi
-else
-   CGIBIN=$enable_cgi
-fi
-AC_SUBST(CGIBIN)
-AM_CONDITIONAL(CGI, test "$enable_cgi" != "no")
-if test x$ENABLE_CGI != x; then
-   AC_DEFINE_UNQUOTED(ENABLE_CGI, [1], ["Whether to use it as a CGI program."])
-fi
-])
 dnl end of acinclude.m4

@@ -21,22 +21,13 @@ extern const char *escm_file;
 extern int escm_lineno;
 extern struct escm_lang deflang;
 
-#ifdef ENABLE_CGI
-extern const char *escm_cgi;
-#endif /* ENABLE_CGI */
-
 /* escm.c */
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
-#ifdef ENABLE_CGI
-void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
-#endif /* ENABLE_CGI */
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
 /* misc.c */
-#ifdef ENABLE_CGI
 void escm_html_header(const struct escm_lang *lang, FILE *outp);
 void escm_text_header(const struct escm_lang *lang, FILE *outp);
-#endif /* ENABLE_CGI */
 void escm_error(const char *fmt, ...);
 char ** tokenize_cmd(const char *cmd);
 
@@ -52,6 +43,8 @@ void *escm_realloc(void *ptr, size_t size);
 
 /* redirection */
 void escm_redirect(int from, int to);
+
+char *escm_cgi;
 
 #endif /* not MISC_H */
 /* end of misc.h */

@@ -1,3 +1,7 @@
+2004-02-03  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* Removed code on i18n.
+	
 2003-07-28  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* doc/2aescm.epod: Added the manpage of 2aescm.
