@@ -1,0 +1,14 @@
+;; configurations for the Scheme language
+<?octave:d ...?>
+;; command
+octave -q
+;; initialization
+;; nil
+0
+;; assign
+variable_name = value;
+;; string
+puts("string");
+;; expression
+printf("%g", expression);
+;; finalization
