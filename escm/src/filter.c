@@ -186,7 +186,10 @@ main(int argc, char **argv)
   }
 
   if (optind == argc) {
-    escm_preproc(lang, stdin, outp);
+    if (!escm_preproc(lang, stdin, outp)) {
+      fprintf(stderr, "%s: unterminated instruction: %s\n", argv[0], "stdin");
+      exit(EXIT_FAILURE);
+    }
   } else {
     for (i = optind; i < argc; i++) {
       escm_assign(lang, "escm_input_file", argv[i], outp);
@@ -195,7 +198,10 @@ main(int argc, char **argv)
 	perror(argv[i]);
 	exit(EXIT_FAILURE);
       }
-      escm_preproc(lang, inp, outp);
+      if (!escm_preproc(lang, inp, outp)) {
+	fprintf(stderr, "%s: unterminated instruction: %s\n", argv[0], argv[i]);
+	exit(EXIT_FAILURE);
+      }
       fclose(inp);
     }
   }

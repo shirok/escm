@@ -208,7 +208,7 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
 }
 /* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
  * when the method is POST. */
-void
+int
 escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
 {
   const char *content_length;
@@ -222,7 +222,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
   if (method[0] == 'P') {
     content_length = getenv("CONTENT_LENGTH");
     if (content_length == NULL) {
-      escm_error("inconsistent environment");
+      return FALSE;
     } else {
       if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
       put_variable(lang, "escm_query_string", outp);
@@ -246,10 +246,11 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
   } else {
     escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
   }
+  return FALSE;
 }
 /* escm_preproc(lang, inp, outp)
  */
-void
+int
 escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 {
   int prefixed = FALSE;
@@ -303,7 +304,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	    }
 	  }
 	  c = fgetc(inp);
-	  if (c == EOF) goto invalid;
+	  if (c == EOF) return FALSE;
 	  else if (isspace(c)) {
 	    display = FALSE;
 	    if (prefixed) fputs(lang->literal.suffix, outp);
@@ -314,7 +315,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  } else {
 	    c = fgetc(inp);
 	    if (c != 'd' || !lang->display.prefix) {
-	      if (c == EOF) escm_error("unterminated instruction");
+	      if (c == EOF) return FALSE;
 	      if (!prefixed) {
 		fputs(lang->literal.prefix, outp);
 		prefixed = TRUE;
@@ -357,13 +358,13 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
       c = fgetc(inp);
       switch (c) {
       case EOF:
-	escm_error("unterminated instruction");
+	return FALSE;
 	/* not reached */
       case '\\':
 	c = fgetc(inp);
 	switch (c) {
 	case EOF:
-	  escm_error("unterminated instruction");
+	  return FALSE;
 	  /* not reached */
 	default:
 	  fputc('\\', outp);
@@ -379,7 +380,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  c = fgetc(inp);
 	  switch (c) {
 	  case EOF:
-	    escm_error("unterminated instruction");
+	    return FALSE;
 	    /* not reached */
 	  case '>':
 	    prefixed = FALSE;
@@ -401,16 +402,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 
   if (prefixed) fputs(lang->literal.suffix, outp);
   fputc('\n', outp);
+  return TRUE;
 }
-
-/*
- */
-void
-escm_error(const char* message)
-{
-  fprintf(stderr, "escm: %s\n", message);
-  exit(EXIT_FAILURE);
-}
-
 
 /* end of escm.c */

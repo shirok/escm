@@ -11,7 +11,9 @@
 #define TRUE (!FALSE)
 #endif /* TRUE */
 
+#ifndef FILE
 #include <stdio.h>
+#endif /* FILE */
 
 struct escm_form_two {
   char *prefix;
@@ -45,14 +47,17 @@ struct escm_lang {
   char *finish;          /* finalization code */
 };
 
-void escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp);
 void escm_init(const struct escm_lang *lang, FILE *outp);
 void escm_finish(const struct escm_lang *lang, FILE *outp);
-void escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
-void escm_error(const char *message);
+/* CGI */
+void escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp);
+int escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
 
-void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
+/* converter */
+int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+
 #endif /* ESCM_H */
