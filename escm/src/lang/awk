@@ -1,6 +1,6 @@
 # awk - configurations for the Awk language
 awk -f /dev/stdin
-# initialization
+# init
 BEGIN {
 # assign
 @VAR@ = @VAL@;
@@ -8,6 +8,8 @@ BEGIN {
 printf "@STR@";
 # display
 printf (@EXP@);
-# finalization
+# format
+printf("%@FMT@", (@EXP@));
+# finish
  exit;
 }

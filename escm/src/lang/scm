@@ -2,8 +2,6 @@
 gosh -b
 ;; nil
 #f
-;; identifier
-*aa-bb*
 ;; bind
 (define @VAR@ @VAL@)
 ;; assign

@@ -1,6 +1,6 @@
 # python - configurations for the Python language
 python
-# initialization
+# init
 import sys
 # assign
 @VAR@ = @VAL@
@@ -8,3 +8,5 @@ import sys
 sys.stdout.write("@STR@")
 # display
 sys.stdout.write("%s" % (@EXP@))
+# format
+sys.stdout.write("%@FMT@" % (@EXP@))
