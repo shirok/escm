@@ -1,4 +1,4 @@
-# aclocal.m4t generated automatically by aclocal 1.5
+# aclocal.m4 generated automatically by aclocal 1.5
 
 # Copyright 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ AC_DEFUN([AC_ESCM_CHECK_BACKEND],
 if test "$with_backend" = "no"; then
   AC_MSG_ERROR([The backend interpreter required.])
 fi
-if test "$with_backend" = "yes" -o "$with_backend" = ""; then
+if test "$with_backend" = "yes" || test "$with_backend" = ""; then
   with_backend=
   AC_CHECK_PROGS(with_backend, $1)
 fi

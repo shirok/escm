@@ -1,0 +1,81 @@
+/* $Id$ */
+h1 {
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: x-large;
+	text-align: center;
+}
+h2 {
+	font-family: serif;
+	font-weight: bold;
+	font-size: x-large;
+}
+h3 {
+	font-family: serif;
+	font-weight: bold;
+	font-size: large;
+}
+h4, h5 {
+	font-family: serif;
+	font-weight: bold;
+}
+dt {
+	font-family: sans-serif;
+	font-weight: bold;
+	text-indent: 1em;
+}
+dd > p {
+	margin-top: 0px;
+}
+
+p { /* assume to be in an European language. */
+	font-family: serif;
+}
+table.center {
+	margin-left: auto;
+	margin-right: auto;
+}
+p.caveat {
+	text-align: center;
+	font-size: large;
+	text-indent: 0pt;
+	color: red;
+}
+p.synopsis {
+	text-align: center;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: large;
+}
+p.synopsis strong {
+	color: red;
+}
+span.warning {
+	font-family: sans-serif;
+	color: red;
+}
+p.note {
+	color: teal;
+	text-indent: 0em;
+}
+address {
+	text-align: right;
+	font-style: normal;
+}
+div.header {
+	text-align: center;
+}
+div.center {
+	text-align: center;
+}
+div.right {
+	text-align: right;
+}
+ul.footnote {
+	list-style-position: inside;
+	list-style-type: none;
+}
+ul.footnote li {
+	text-indent: -2.4ex;
+}
+

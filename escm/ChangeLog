@@ -1,3 +1,10 @@
+2003-07-08  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* doc/Makefile.am: The date is in UTC.
+	* src/escm.c: Added HTTP_USER_AGENT to the list of environment
+	variables to bind to Scheme variables.
+	* doc/aescm.css: Added a stylesheet for documents in HTML formats.
+	* doc/aescm.epod, doc/readme.escm: Updates.
+
 2003-07-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* configure.ac, acinclude.m4, src/Makefile.am, src/filter.c,
 	src/fork.c: Enabled to make default another language than scheme.
@@ -11,6 +18,9 @@
 	src/lang/*: escm_define() is replaced with escm_bind() and
 	escm_assign() and false with nil.
 
+2003-07-01  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	*** version 0.19
+	
 2003-06-30  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* doc/gimmick.escm, src/lang/*, src/lang.c, src/escm.h: Removed
 	true field.

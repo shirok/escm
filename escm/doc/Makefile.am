@@ -15,7 +15,7 @@ config-h.scm : $(top_builddir)/src/config.h $(ESCM)
 	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
 
 %.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
-	-LANG=C && $(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
+	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
 
 
 aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm

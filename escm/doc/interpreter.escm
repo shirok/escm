@@ -72,8 +72,7 @@ echo "\"string\"" | env -i <em>/usr/bin/guile -s /dev/stdin</em>
 </code></pre>
     </blockquote>
     <p>Your specification works
-if the first test shows <em>string</em> and the second nothing.
-Anyway they are to be done in <em>configure</em> script.</p>
+if the first test shows <em>string</em> and the second nothing.</p>
 
     <h2 id="list">Interpreters and Arguments</h2>
     <p>Here is a list of Scheme interpretes I have checked.

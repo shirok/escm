@@ -18,46 +18,57 @@ of <em>escm</em>.
 The stable version is still
 <a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm 1.1</a>.</p>
 
-    <p>Seemingly <em><?scm:d PACKAGE?></em> is a filter program
-to processes embedded Scheme code in documents
-like <em>ePerl</em> or <em>eRuby</em>.
-In fact it converts documents into Scheme code and make 
-it evaluated by a backend Scheme interpreter.
-Scheme code between <em>&lt;?scm</em> and <em>?&gt;</em> is evaluated
-and replaced with what is written to stdout while the evaluation.
-Code between <em>&lt;?scm:d</em> and <em>?&gt;</em> is evaluated
+    <p><em><?scm:d (string-titlecase PACKAGE)?></em> is a filter program
+to preprocesses embedded Scheme code in documents
+like <em>eperl</em> or <em>eruby</em>.
+Scheme code between <q>&lt;?scm</q> and <q>?&gt;</q> is evaluated
+and replaced with what is written to
+<code>(current-output-port)</code> while the evaluation.
+An expression between <q>&lt;?scm:d</q> and <q>?&gt;</q> is evaluated
 and replaced with the result.</p>
-    <p><em><?scm:d (string-titlecase PACKAGE)?></em> is designed
-to be interpreter independent,
-and works with most Scheme implementations.</p>
 
-    <h2>INSTALL</h2>
-    <p>Find out good option arguments for your favorite scheme interprter
-before running <em>configure</em> script.
-Options for some implementations are documented in
-doc/<a href="interpreter.html">interpreter.html</a>.</p>
+    <p>The body of <em><?scm:d PACKAGE?></em> is a simple converter
+from a text to Scheme code,
+which will be sent to a Scheme interpreter.
+Because of this architecture,
+it works with most implementations.</p>
 
-    <p>Suppose your choice be <em>scheme -s /dev/stdin</em>.
-Then type:</p>
-    <blockquote>
-      <pre>
-./configure --with-backend=&quot;<em>scheme -s /dev/stdin</em>&quot;
+    <h2>INSTALLATION</h2>
+    <p>If your favorite interpreter is <em>Gauche</em> or
+if it is <em>Guile</em> and you have not installed <em>Gauche</em>,
+then type as usual:</p>
+    <blockquote><pre>
+./configure
 make
 make install
 </pre>
     </blockquote>
 
-    <p>You can enable to embed other interpreter languages than <em>Scheme</em>
-by specifying <em>--enable-gimmick</em> option.
-The distribution comes with the configuration files
-for Awk, Csh, Perl, Python, Ruby, Sh, and Tcl.
+    <p>If it is not the case,
+you should specify the interpreter and its option arguments
+for a batch mode
+when you run <em>configure</em> script.
+The options for some implementations are listed in
+doc/<a href="interpreter.html">interpreter.html</a>.</p>
+
+    <p>Suppose your choice be <em>scheme -s /dev/stdin</em>.
+Then run as:</p>
+    <blockquote>
+      <pre>
+./configure --with-backend=&quot;<em>scheme -s /dev/stdin</em>&quot;
+</pre>
+    </blockquote>
+
+    <p>You can also embed other interpreter languages than <em>Scheme</em>
+if you run <em>configure</em> with <em>--enable-gimmick</em> option.
 See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
-    <p>You can also use this program as an action handler of Apache.
-You should intall it manually if you want to.
+    <p>This program can be used as a handler CGI program
+of Apache web servers.
+Install it manually in <em>cgi-bin</em> directory if you want to.
 Consult
-the example in the <a href="aescm.html#action handler">man page.</a></p>
+<a href="aescm.html#action handler">the example in the man page.</a></p>
 
 
     <h2>BUGS</h2>

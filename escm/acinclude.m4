@@ -7,7 +7,7 @@ AC_DEFUN([AC_ESCM_CHECK_BACKEND],
 if test "$with_backend" = "no"; then
   AC_MSG_ERROR([The backend interpreter required.])
 fi
-if test "$with_backend" = "yes" -o "$with_backend" = ""; then
+if test "$with_backend" = "yes" || test "$with_backend" = ""; then
   with_backend=
   AC_CHECK_PROGS(with_backend, $1)
 fi
