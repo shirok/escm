@@ -1,23 +1,22 @@
-;; config.scm.in -*- mode:scheme -*-
-(define ENABLE_POLYGLOT
-  (let ((str "@ENABLE_POLYGLOT@"))
-    (if (equal? "" str) #f str)))
-
-(define DEFAULT_LANG "@DEFAULT_LANG@")
-
-(define ESCM_BACKEND "@ESCM_BACKEND@")
-
-(define PACKAGE "@PACKAGE@")
-
+;;;config.scm.in -- rebind variables set by configure script.
 (define PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@")
-
 (define PACKAGE_NAME "@PACKAGE_NAME@")
-
 (define PACKAGE_STRING "@PACKAGE_STRING@")
-
 (define PACKAGE_TARNAME "@PACKAGE_TARNAME@")
-
 (define PACKAGE_VERSION "@PACKAGE_VERSION@")
-
+(define PACKAGE "@PACKAGE@")
 (define VERSION "@VERSION@")
-;; end of config.scm
+
+(define prefix "@prefix@")
+(define srcdir "@srcdir@")
+
+(define NAME
+  (or (sys-getenv "NAME")
+      (car (string-split
+	    (slot-ref (sys-getpwuid (sys-getuid)) 'gecos) #\,))))
+
+
+;;Local Variables:
+;;mode:scheme
+;;End:
+;;;config.scm.in ends here
