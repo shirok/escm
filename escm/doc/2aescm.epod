@@ -1,0 +1,55 @@
+<?scm (load (string-append *pwd* "/config-h.scm"))?>
+
+=head1 NAME
+
+2aescm - convert an escm file into the XML format
+
+=head1 SYNOPSIS
+
+2aescm [-p I<PATH>] [-o I<OUTFILE>] I<INFILE>
+
+=head1 DESCRIPTION
+
+B<2aescm> converts the original escm format
+with C<E<lt>?> and C<!E<gt>>
+into the XML instruction format
+with C<E<lt>scm> and C<?E<gt>>.
+C<#?> syntax, used to specify the backend interpreter,
+is translated by an extended meta-argument functionaly.
+
+=head1 OPTIONS
+
+=over 2
+
+=item -p PATH
+
+Specify the path of B<aescm>.
+The default is the one installed with this program.
+
+=item -o OUTFILE
+
+Specify the output file.
+Without this option, the output is sent to stdout.
+
+=back
+
+=head1 AUTHOR
+
+  Shiro Kawai  -- the original and stable escm from which
+                  this program was derived
+  TAGA Yoshitaka, tagga@tsuda.ac.jp
+
+=head1 SEE ALSO
+
+B<aescm>.
+
+=begin html
+<hr />
+<div>
+<?scm:d (sourceforge-logo)?>
+</div>
+
+=end html
+
+=cut
+
