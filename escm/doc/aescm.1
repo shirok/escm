@@ -129,28 +129,33 @@
 .\" ========================================================================
 .\"
 .IX Title "AESCM 1"
-.TH AESCM 1 "2004-12-03" "" ""
+.TH AESCM 1 "2004-12-08" "" ""
 .SH "NAME"
-aescm \-\- preprocess embedded Scheme code in documents
+aescm \-\- preprocess embedded code in documents
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBaescm\fR \fI[\s-1OPTION\s0]\fR ... \fI\s-1FILE\s0\fR ...
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-\&\fBAescm\fR is a filter program
-to preprocess embedded Scheme code in documents.
-Scheme code between \f(CW\*(C`<?scm\*(C'\fR and \f(CW\*(C`?>\*(C'\fR is evaluated
-and replaced with what is written to
-\&\f(CW\*(C`(current\-output\-port)\*(C'\fR while the evaluation.
-An expression between \f(CW\*(C`<?scm:d\*(C'\fR and \f(CW\*(C`?>\*(C'\fR is evaluated
-and replaced with its result.
-The sharp-bang line and the meta-argument lines (if any)
-of a script are skipped.
+\&\fBAescm\fR is
+a \fImultilingual\fR filter program
+to preprocess code chunks in documents.
+Here \fImultilingual\fR does not mean
+"many natural languages"
+but "many computer languages".
+Chunks between \f(CW\*(C`<?TAG\*(C'\fR and \f(CW\*(C`?>\*(C'\fR are evaluated
+and expressions between \f(CW\*(C`<?TAG:d\*(C'\fR and \f(CW\*(C`?>\*(C'\fR
+are replaced with their evaluated value,
+where \fB\s-1TAG\s0\fR is a namespace
+defined in a configuration file.
+Its default language is Scheme
+and the namespace is \fBscm\fR.
 .PP
-The body of \fBaescm\fR is a simple converter
-from a text to Scheme code,
-which will be evaluated by a backend Scheme interpreter.
-It works with most implementations.
+\&\fBAescm\fR in fact converts
+a document to a program
+and makes it executed by a backend interpreter.
+This mechanism allows us to use
+most favorite languages and most favorite interpreters.
 .Sh "\s-1OPTIONS\s0"
 .IX Subsection "OPTIONS"
 .IP "\-E, \-\-no\-eval" 2
@@ -165,10 +170,11 @@ You can use this option upto 16 times.
 Specify the interpreter with its arguments.
 .IP "\-l, \-\-language \s-1LANG\s0" 2
 .IX Item "-l, --language LANG"
-Specify the interpreter language to be used.
-This option is valid
-if the tool has been configured with
-\&\f(CW\*(C`\-\-enable\-polyglot\*(C'\fR option.
+Specify the language configuration file.
+If the file is not in
+/home/tagga/share/aescm/lang directory,
+you should specify the full path
+or a relative path beginning with \f(CW\*(C`.\*(C'\fR.
 .IP "\-o" 2
 .IX Item "-o"
 Specify the output file.
@@ -178,8 +184,8 @@ Print a short help message.
 .IP "\-\-version" 2
 .IX Item "--version"
 Print version information.
-.Sh "\s-1SCHEME\s0 \s-1VARIABLES\s0"
-.IX Subsection "SCHEME VARIABLES"
+.Sh "\s-1VARIABLES\s0"
+.IX Subsection "VARIABLES"
 .IP "escm_input_file" 2
 .IX Item "escm_input_file"
 The name of the file which the tool is currently processing.
@@ -190,27 +196,25 @@ The name of the output file.
 It is false if the output is stdout.
 .IP "escm_interpreter" 2
 .IX Item "escm_interpreter"
-The Scheme interpreter and its arguments.
+The backend interpreter and its arguments.
 .IP "escm_version" 2
 .IX Item "escm_version"
-The name and the version of this project.
+The name and the version of this program.
 .Sh "\s-1ENVIRONMENT\s0 \s-1VARIABLES\s0"
 .IX Subsection "ENVIRONMENT VARIABLES"
 .IP "\s-1ESCM_DEFAULT\s0" 2
 .IX Item "ESCM_DEFAULT"
-The default interpreter language.
+The default interpreter language's namespace.
 .IP "\s-1ESCM_BACKEND\s0" 2
 .IX Item "ESCM_BACKEND"
-The default backend interpreter.
-.Sh "\s-1OTHER\s0 \s-1INTERPRETER\s0 \s-1LANGUAGES\s0"
-.IX Subsection "OTHER INTERPRETER LANGUAGES"
-\&\fBAescm\fR
-is designed to be interpreter independent.
-This does not mean Scheme interpreter independent.
-You can also embed code of most interpreter languages,
-e.g. Awk, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl.
-But you can use this feature
-only when you have run \f(CW\*(C`configure\*(C'\fR script with \f(CW\*(C`\-\-enable\-polyglot\*(C'\fR option.
+The default backend interpreter and its arguments.
+.Sh "\s-1CONFIGURATION\s0 \s-1FILES\s0"
+.IX Subsection "CONFIGURATION FILES"
+Language configuration files are in
+\&\f(CW\*(C`/home/tagga/share/aescm/lang\*(C'\fR directory.
+.PP
+The format of configuration files is described
+in \f(CW\*(C`/home/tagga/share/doc/aescm/gimmick.html\*(C'\fR.
 .SH "CAVEATS"
 .IX Header "CAVEATS"
 .IP "* \fBAescm\fR is developers' version of \fBescm\fR. The stable version is still \fBescm 1.1\fR." 2

@@ -1,23 +1,11 @@
-<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
+<?xml version="1.0"?><!-- -*- mode:xml -*- -->
 <!-- $Id$ -->
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <?scm
-  (load (string-append *builddir* "/doc/config.scm"))
-  (load (string-append *srcdir* "/doc/helper.scm"))
-  (define escm
-    (link-url "http://www.shiro.dreamhost.com/scheme/vault/escm.html"
-              "escm 1.1"))
-  (define gauche
-    (link-url "http://sourceforge.net/projects/gauche/"
-              "Gauche"))
-  (define guile
-    (link-url "http://www.gnu.org/software/guile/guile.html"
-               "Guile"))
-  (define scm
-    (link-url "http://swissnet.ai.mit.edu/~jaffer/SCM.html"
-               "SCM"))
+  (load "config.scm")
+  (load "helper.scm")
 ?>
 <html>
   <head>
@@ -27,26 +15,36 @@
     <p>This document is README for <?scm:d PACKAGE?> <?scm:d VERSION?>
 (either README or doc/readme.html).</p>
 
-    <p><?scm:d (string-titlecase PACKAGE)?> is a filter tool to
-embed code in a document.
-The current version (<?scm:d VERSION?>) is
-in alpha state and specifications may be changed.
+<p><strong><?scm:d (string-titlecase PACKAGE)?></strong> is
+a <em>multilingual</em> filter program
+to preprocess code chunks in documents.
+Here <em>multilingual</em> does not mean
+<q>many natural languages</q>
+but <q>many computer languages</q>.
+Chunks between <q>&lt;?<strong>TAG</strong></q> and <q>?&gt;</q> are evaluated
+and expressions between <q>&lt;?<strong>TAG</strong>:d</q> and <q>?&gt;</q>
+are replaced with their evaluated value,
+where <strong>TAG</strong> is a namespace
+defined in a configuration file.
+Its default language is Scheme
+and the namespace is <strong>scm</strong>.</p>
+
+    <p>
+This tool is still in alpha state,
+and the interface or the format of configuration files may be changed.
 The stable version is <?scm:d escm ?>,
 which is a tool for Scheme.</p>
 
-    <p>The body of <?scm:d PACKAGE?> is a filter
-which converts part outside XML preprocessor instructions
-to code.
-It sends the code to an interpreter which has been invoked
-as child process.
-As you can change conversion rules flexibly,
-you will be able to use this tool
-with your favorite interpreter
-of your favorite scripting language.</p>
+    <p><strong><?scm:d (string-titlecase PACKAGE)?></strong>
+in fact converts
+a document to a program
+and makes it executed by a backend interpreter.
+This mechanism allows us to use
+most favorite languages and most favorite interpreters.</p>
 
-    <p><?scm:d PACKAGE?> 0.30 is a <strong>downgraded</strong> version.
-Many experimental features have been removed,
-and the tool was divided into
+    <p>Since <?scm:d PACKAGE?> 0.30,
+many experimental features have been removed,
+and the tool has been divided into
 a filter tool and a CGI tool.
 By default, only the filter tool is compiled and installed.
 The CGI tool must be installed manually.
@@ -66,16 +64,6 @@ make
 make install
 </pre>
     </blockquote>
-    <p>With this setting, only Scheme code is preprocessed.
-You cannot use <?scm:d scm?>,
-for it requires different translation rules
-from those of other Scheme interpreters.
-If you want to use this tool with other scripting languages,
-add <em>--enable-polyglot</em> option to <code>configure</code>.
-See INSTALL(doc/<a href="install.html">install.html</a>)
-for more information.
-You can change the default computer language
-and the default backend.</p>
 
     <h2>Environment Variables</h2>
      <p>You can specify the backend interpreter
@@ -83,36 +71,32 @@ by setting it with options
 to environment vairable <code>ESCM_BACKEND</code>.
 Command line options for some popular Schme implementations
 are listed in
-doc/<a href="interpreter.html">interpreter.html</a>.</p>
-
-    <p>If you have run <em>configure</em> with <em>--enable-polyglot</em>
-option, you can specify the default scripting languge
+doc/<?scm:d (link-url "interpreter.html")?>.
+You can also specify the default scripting languge
 with environment variable <code>ESCM_DEFAULT</code>.</p>
 
     <h2>CGI</h2>
     <p>This package comes with a CGI tool named
-<strong>aescm.cgi</strong>,
+<strong><?scm:d PACKAGE?>.cgi</strong>,
 which you should install manually.
 The query string by POST method is bound to
 <code>escm_query_string</code>,
 for you cannot directly get it in a CGI script.
 It is also bound if the method is GET.</p>
-<p>You can use it to process a handler CGI program.
+<p>You can use it as a handler CGI program.
 See
-<a href="http://httpd.apache.org/docs-2.0/handler.html">the handler
-document of Apache</a> for settings.</p>
+<?scm:d
+(link-url "http://httpd.apache.org/docs-2.0/handler.html"
+           "the handler document of Apache")?> for settings.</p>
 
     <h2>Language Configuration File</h2>
-    <p>If you run ./configure with <em>--enable-polyglot</em>,
-the filter reads the translation rules form
-a language configuration file.
 The language configuration files find themselves
 in <code>$(datadir)/aescm/lang</code>
 (e.g. <code>/usr/local/share/aescm/lang</code>).
 You can edit them to change translation rules.
 and backend interpreters.
 To edit or add a configuration file
-consult doc/<a href="gimmick.html">gimmick.html</a>.</p>
+consult doc/<?scm:d (link-url "gimmick.html")?></p>
 
     <address>
 This document was converted from <em><?scm:d escm_input_file?></em>
@@ -120,7 +104,7 @@ on <?scm:d *date*?>.
 The backend interpreter is <?scm:d escm_interpreter?>.
 Please send bug reports or comments
 to
-<a href="mailto:escm-devel@lists.sourceforge.net">the mailing list</a>
+<?scm:d (link-url "mailto:escm-devel@lists.sourceforge.net" "the mailing list")?>
 or <?scm:d (link-mail PACKAGE_BUGREPORT)?>.
 </address>
     <div>

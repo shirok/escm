@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
   "http://www.w3.org/TR/xhtml-basic/DTD/xhtml-basic10.dtd">
+<?scm
+  (load "config.scm")
+  (load "helper.scm")
+?>
 <html>
   <head>
-    <title>aescm.cgi</title>
+    <title><?scm:d PACKAGE?>.cgi</title>
   </head>
-<?scm
-  (load (string-append *builddir* "/doc/config.scm"))
-  (load (string-append *srcdir* "/doc/helper.scm"))
-?>
   <body>
-    <h1>aescm.cgi</h1>
+    <h1><?scm:d PACKAGE?>.cgi</h1>
     <h2>CGI features</h2>
 
     <ol>
@@ -34,17 +34,15 @@ or by optional arguments.</p>
       <pre>./configure --backend=&quot;scsh -s /dev/stdin&quot;</pre>
     </blockquote>
 
-    <p>Move to the <strong>src</strong> directory and
-compile the tool.</p>
+    <p>Then invoke <code>make</code> as follows:</p>
 
     <blockquote>
-      <pre>mv src
-make aescm.cgi</pre>
+      <pre>make cgi</pre>
     </blockquote>
 
     <p>Copy the program to a CGI script directory.</p>
     <blockquote>
-      <pre>cp aescm.cgi ~/public_html/cgi-bin/</pre>
+      <pre>cp src/<?scm:d PACKAGE?>.cgi ~/public_html/cgi-bin/</pre>
     </blockquote>
 
     <h2>Handler CGI script</h2>
@@ -52,7 +50,8 @@ make aescm.cgi</pre>
     <p>To make <strong><?scm:d PACKAGE?></strong> process
 all documents with suffix <em>escm</em>
 under a certain directory,
-add these lines to <strong>.htaccess</strong>:
+add these lines to <strong>.htaccess</strong>
+where you should replace <strong>login</strong> with your user name:
 </p>
 
     <blockquote>

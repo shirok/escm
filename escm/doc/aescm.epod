@@ -1,11 +1,11 @@
 <?scm
-  (load (string-append *builddir* "/doc/config.scm"))
-  (load (string-append *srcdir* "/doc/helper.scm"))
+  (load "config.scm")
+  (load "helper.scm")
 ?>
 
 =head1 NAME
 
-<?scm:d PACKAGE?> -- preprocess embedded Scheme code in documents
+<?scm:d PACKAGE?> -- preprocess embedded code in documents
 
 =head1 SYNOPSIS
 
@@ -13,20 +13,25 @@ B<<?scm:d PACKAGE?>> I<[OPTION]> ... I<FILE> ...
 
 =head1 DESCRIPTION
 
-B<<?scm:d (string-titlecase PACKAGE)?>> is a filter program
-to preprocess embedded Scheme code in documents.
-Scheme code between C<E<lt>?scm> and C<?E<gt>> is evaluated
-and replaced with what is written to
-C<(current-output-port)> while the evaluation.
-An expression between C<E<lt>?scm:d> and C<?E<gt>> is evaluated
-and replaced with its result.
-The sharp-bang line and the meta-argument lines (if any)
-of a script are skipped.
+B<<?scm:d (string-titlecase PACKAGE)?>> is
+a I<multilingual> filter program
+to preprocess code chunks in documents.
+Here I<multilingual> does not mean
+E<quot>many natural languagesE<quot>
+but E<quot>many computer languagesE<quot>.
+Chunks between C<E<lt>?TAG> and C<?E<gt>> are evaluated
+and expressions between C<E<lt>?TAG:d> and C<?E<gt>>
+are replaced with their evaluated value,
+where B<TAG> is a namespace
+defined in a configuration file.
+Its default language is Scheme
+and the namespace is B<scm>.
 
-The body of B<<?scm:d PACKAGE?>> is a simple converter
-from a text to Scheme code,
-which will be evaluated by a backend Scheme interpreter.
-It works with most implementations.
+B<<?scm:d (string-titlecase PACKAGE)?>> in fact converts
+a document to a program
+and makes it executed by a backend interpreter.
+This mechanism allows us to use
+most favorite languages and most favorite interpreters.
 
 =head2 OPTIONS
 
@@ -47,10 +52,11 @@ Specify the interpreter with its arguments.
 
 =item -l, --language LANG
 
-Specify the interpreter language to be used.
-This option is valid
-if the tool has been configured with
-C<--enable-polyglot> option.
+Specify the language configuration file.
+If the file is not in
+<?scm:d prefix?>/share/<?scm:d PACKAGE?>/lang directory,
+you should specify the full path
+or a relative path beginning with C<.>.
 
 =item -o
 
@@ -66,7 +72,7 @@ Print version information.
 
 =back
 
-=head2 SCHEME VARIABLES
+=head2 VARIABLES
 
 =over 2
 
@@ -82,11 +88,11 @@ It is false if the output is stdout.
 
 =item escm_interpreter
 
-The Scheme interpreter and its arguments.
+The backend interpreter and its arguments.
 
 =item escm_version
 
-The name and the version of this project.
+The name and the version of this program.
 
 =back
 
@@ -96,23 +102,21 @@ The name and the version of this project.
 
 =item ESCM_DEFAULT
 
-The default interpreter language.
+The default interpreter language's namespace.
 
 =item ESCM_BACKEND
 
-The default backend interpreter.
+The default backend interpreter and its arguments.
 
 =back
 
-=head2 OTHER INTERPRETER LANGUAGES
+=head2 CONFIGURATION FILES
 
-B<<?scm:d (string-titlecase PACKAGE)?>>
-is designed to be interpreter independent.
-This does not mean Scheme interpreter independent.
-You can also embed code of most interpreter languages,
-e.g. Awk, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl.
-But you can use this feature
-only when you have run C<configure> script with C<--enable-polyglot> option.
+Language configuration files are in
+C<<?scm:d prefix?>/share/<?scm:d PACKAGE?>/lang> directory.
+
+The format of configuration files is described
+in C<<?scm:d prefix?>/share/doc/<?scm:d PACKAGE?>/gimmick.html>.
 
 =head1 CAVEATS
 
@@ -160,7 +164,7 @@ CGI scripts or as a handler CGI program.
 =head1 AUTHOR
 
   Shiro Kawai  -- the original and stable escm
-  TAGA Yoshitaka, tagga@tsuda.ac.jp
+  <?scm:d NAME?>, <?scm:d PACKAGE_BUGREPORT?>
 
 =head1 SEE ALSO
 

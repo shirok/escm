@@ -4,8 +4,8 @@
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <?scm
-  (load (string-append *builddir* "/doc/config.scm"))
-  (load (string-append *srcdir* "/doc/helper.scm"))
+  (load "config.scm")
+  (load "helper.scm")
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
