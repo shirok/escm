@@ -65,6 +65,24 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   escm_preproc(lang, inp, outp);
   fclose(inp);
 }
+static FILE*
+open_and_skip_shebang(const char* file)
+{
+  FILE* inp;
+  int c;
+
+  inp = fopen(file, "r");
+  if (inp == NULL) XERROR("can't open - %s", file);
+  c = fgetc(inp);
+  if (c == '#') {
+    while ((c = fgetc(inp)) != '\n' && c != EOF)
+      ;
+  } else {
+    ungetc(c, inp);
+  }
+  return inp;
+}
+
 /* main function
  */
 int
@@ -280,7 +298,12 @@ main(int argc, char **argv)
       escm_file = "stdin";
       escm_preproc(lang, stdin, outp);
     } else {
-      for (i = optind; i < argc; i++)
+      inp = open_and_skip_shebang(argv[optind]);
+      escm_assign(lang, "escm_input_file", argv[optind], outp);
+      escm_preproc(lang, inp, outp);
+      fclose(inp);
+
+      for (i = optind + 1; i < argc; i++)
 	proc_file_name(lang, argv[i], outp);
     }
   } else { /* wrapper of an interpreter */
