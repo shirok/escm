@@ -24,6 +24,7 @@ static char * env_to_bind[] = {
   "HTTP_COOKIE",
   "HTTP_HOST",
   "HTTP_REFERER",
+  "HTTP_USER_AGENT",
   /* "QUERY_STRING", */
   "REMOTE_ADDR",
   "REQUEST_METHOD",
