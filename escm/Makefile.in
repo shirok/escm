@@ -539,6 +539,9 @@ uninstall-info: uninstall-info-recursive
 document :
 	cd doc && make document
 
+cgi :
+	cd src && make aescm.cgi
+
 # end of Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

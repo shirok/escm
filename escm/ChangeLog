@@ -1,3 +1,11 @@
+2004-12-14  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/fifo.c: Added but it does not work yet.
+
+2004-12-08  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* doc/config.scm.in: Add @prefix@ and @srcdir@.
+
 2004-12-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escmcgi.c (escm_query_string, escm_header): Cut out from escm.c

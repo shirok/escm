@@ -84,4 +84,29 @@ escm_query_string(const struct escm_lang *lang, FILE *outp)
 }
 #undef setter
 
+/* escm_skip_shebang(inp) - skip the sharp-bang line.
+ */
+void
+escm_skip_shebang(FILE *inp)
+{
+  int c;
+  c = fgetc(inp);
+  if (c != '#') {
+    ungetc(c, inp);
+    return;
+  }
+  while ((c = fgetc(inp)) != EOF && c != '\n')
+    ;
+}
+/* escm_add_header(lang, inp, outp) - add the content header if necessary
+ */
+void
+escm_add_header(const struct escm_lang *lang, FILE *inp, FILE *outp)
+{
+  int c;
+  c = fgetc(inp);
+  ungetc(c, inp);
+  if (c == '<') escm_header(lang, outp);
+}
+
 /* end of escmcgi.c */

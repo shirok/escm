@@ -91,15 +91,8 @@ main(int argc, char **argv)
   if (inp == NULL)
     xerror("can't open the input file.\n");
 
-  /* skip the sharp-bang line and add a content header if necessary. */
-  c = fgetc(inp);
-  if (c == '#') {
-    while ((c = fgetc(inp)) != EOF && c != '\n')
-      ;
-    if (c == '\n') c = fgetc(inp);
-  }
-  if (c == '<') escm_header(&deflang, outp);
-  ungetc(c, inp);
+  escm_skip_shebang(inp);
+  escm_add_header(&deflang, inp, outp);
 
   if (!escm_preproc(&deflang, inp, outp))
     xerror("unterminated instruction.\n");
@@ -113,4 +106,4 @@ main(int argc, char **argv)
   }
   return 0;
 }
-/* end of filter.c */
+/* end of cgimain.c */

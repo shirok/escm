@@ -1,6 +1,6 @@
-This document is README for aescm 0.30 (either README or doc/readme.html).
+This document is README for aescm 0.31 (either README or doc/readme.html).
 
-Aescm is a filter tool to embed code in a document. The current version (0.30)
+Aescm is a filter tool to embed code in a document. The current version (0.31)
 is in alpha state and specifications may be changed. The stable version is escm
 1.1, which is a tool for Scheme.
 
@@ -62,6 +62,6 @@ edit them to change translation rules. and backend interpreters. To edit or add
 a configuration file consult doc/gimmick.html.
 
 
-This document was converted from readme.escm on Fri Dec 3 10:47:15 UTC 2004.
-The backend interpreter is /home/tagga/bin/gosh -b. Please send bug reports or
-comments to the mailing list or tagga@tsuda.ac.jp.
+This document was converted from readme.escm on Wed Dec 8 08:58:03 UTC 2004.
+The backend interpreter is gosh -b -I.. Please send bug reports or comments to 
+the mailing list or tagga@tsuda.ac.jp.

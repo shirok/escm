@@ -4,11 +4,12 @@
 
 # Do not forget to add a new config file.
 LANG_FILES = awk csh lisp lisp-cmucl perl python ruby scm scm-scm sh tcl
+FIFO_FILES = scm-fifo
 
 langdir = $(pkgdatadir)/lang
 lang_DATA = $(LANG_FILES)
 
-EXTRA_DIST = $(LANG_FILES)
+EXTRA_DIST = $(LANG_FILES) $(FIFO_FILES)
 
 uninstall-local :
 	-rmdir $(pkgdatadir)/lang

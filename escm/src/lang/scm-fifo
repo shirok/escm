@@ -1,0 +1,18 @@
+;; scm - configurations for the Scheme language
+gosh -b
+;; init
+(with-output-to-file "%s" (lambda ()
+;; nil
+#f
+;; bind
+(define @VAR@ @VAL@)
+;; assign
+(set! @VAR@ @VAL@)
+;; string
+(display "@STR@")
+;; display
+(display @EXP@)
+;; newline
+(newline)
+;; finish
+))

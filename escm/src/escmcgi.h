@@ -9,5 +9,7 @@
 
 void escm_header(const struct escm_lang *lang, FILE *outp);
 int escm_query_string(const struct escm_lang *lang, FILE *outp);
+void escm_skip_shebang(FILE *inp);
+void escm_add_header(const struct escm_lang *lang, FILE *inp, FILE *outp);
 
 #endif /* ESCMCGI_H */

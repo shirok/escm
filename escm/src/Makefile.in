@@ -18,7 +18,7 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(langconf_SOURCES)
+SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(fescm_cgi_SOURCES) $(langconf_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = langconf$(EXEEXT)
 bin_PROGRAMS = aescm$(EXEEXT)
-EXTRA_PROGRAMS = aescm.cgi$(EXEEXT)
+EXTRA_PROGRAMS = aescm.cgi$(EXEEXT) fescm.cgi$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -66,6 +66,10 @@ am_aescm_cgi_OBJECTS = cgimain.$(OBJEXT) escm.$(OBJEXT) \
 	escmcgi.$(OBJEXT) $(am__objects_1)
 aescm_cgi_OBJECTS = $(am_aescm_cgi_OBJECTS)
 aescm_cgi_LDADD = $(LDADD)
+am_fescm_cgi_OBJECTS = fifo.$(OBJEXT) escm.$(OBJEXT) escmcgi.$(OBJEXT) \
+	$(am__objects_1)
+fescm_cgi_OBJECTS = $(am_fescm_cgi_OBJECTS)
+fescm_cgi_LDADD = $(LDADD)
 am_langconf_OBJECTS = langconf.$(OBJEXT) escm.$(OBJEXT) lang.$(OBJEXT)
 langconf_OBJECTS = $(am_langconf_OBJECTS)
 langconf_LDADD = $(LDADD)
@@ -74,15 +78,16 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/cgimain.Po ./$(DEPDIR)/deflang.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/escm.Po ./$(DEPDIR)/escmcgi.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/filter.Po ./$(DEPDIR)/lang.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/langconf.Po
+@AMDEP_TRUE@	./$(DEPDIR)/fifo.Po ./$(DEPDIR)/filter.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/lang.Po ./$(DEPDIR)/langconf.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(langconf_SOURCES)
-DIST_SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) \
+SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) $(fescm_cgi_SOURCES) \
 	$(langconf_SOURCES)
+DIST_SOURCES = $(aescm_SOURCES) $(aescm_cgi_SOURCES) \
+	$(fescm_cgi_SOURCES) $(langconf_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -173,6 +178,7 @@ CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT)
 langconf_SOURCES = langconf.c escm.c escm.h lang.c
 aescm_SOURCES = escm.c escm.h filter.c lang.c $(BUILT_SOURCES)
 aescm_cgi_SOURCES = cgimain.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
+fescm_cgi_SOURCES = fifo.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -256,6 +262,9 @@ aescm$(EXEEXT): $(aescm_OBJECTS) $(aescm_DEPENDENCIES)
 aescm.cgi$(EXEEXT): $(aescm_cgi_OBJECTS) $(aescm_cgi_DEPENDENCIES) 
 	@rm -f aescm.cgi$(EXEEXT)
 	$(LINK) $(aescm_cgi_LDFLAGS) $(aescm_cgi_OBJECTS) $(aescm_cgi_LDADD) $(LIBS)
+fescm.cgi$(EXEEXT): $(fescm_cgi_OBJECTS) $(fescm_cgi_DEPENDENCIES) 
+	@rm -f fescm.cgi$(EXEEXT)
+	$(LINK) $(fescm_cgi_LDFLAGS) $(fescm_cgi_OBJECTS) $(fescm_cgi_LDADD) $(LIBS)
 langconf$(EXEEXT): $(langconf_OBJECTS) $(langconf_DEPENDENCIES) 
 	@rm -f langconf$(EXEEXT)
 	$(LINK) $(langconf_LDFLAGS) $(langconf_OBJECTS) $(langconf_LDADD) $(LIBS)
@@ -270,6 +279,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deflang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/escm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/escmcgi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fifo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/langconf.Po@am__quote@
