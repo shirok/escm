@@ -1,8 +1,12 @@
 # configurations for the Perl language
 <?perl:d ...?>
-# interpreter
+# command
 perl
 # initialization
+# null
+0
+# define
+$variable_name = value;
 # string
 print "string";
 # expression

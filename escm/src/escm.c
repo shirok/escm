@@ -12,6 +12,23 @@
 #endif /* HAVE_CONFIG_H */
 #include "escm.h"
 
+/* the default escm_lang object.
+ */
+struct escm_lang lang_scm = {
+  "scm:d", /* name */
+  "(display \"", /* literal_prefix */
+  "\")", /* literal_suffix */
+  "(display ", /* display_prefix */
+  ")", /* display_suffix */
+  "(define *", /* define_prefix */
+  "* ", /* define_infix */
+  ")", /* define_suffix */
+  1, /* use_hyphen */
+  "#f", /* null */
+  NULL, /* init */
+  NULL, /* finish */
+};
+
 /* escm_put_string(str, outp) - escape str and put it.
  * This function is not used in this file, but will be useful.
  */
@@ -25,6 +42,27 @@ escm_put_string(const char *str, FILE *outp)
     fputc(*p++, outp);
   }
   fputc('\"', outp);
+}
+/* escm_define(lang, var, val, outp) - define var to val in lang
+ */
+void
+escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+{
+  const char *p;
+
+  fputs(lang->define_prefix, outp);
+  for (p = var; *p; p++) {
+    if (*p == '-' && !lang->use_hyphen) {
+      fputc('_', outp);
+    } else {
+      fputc(*p, outp);
+    }
+  }
+  fputs(lang->define_infix, outp);
+  if (val == NULL) fputs(lang->null, outp);
+  else escm_put_string(val, outp);
+  fputs(lang->define_suffix, outp);
+  fputc('\n', outp);
 }
 
 /* escm_init(&lang, outp) - initialize the backend interpreter.

@@ -1,4 +1,4 @@
-   This is README file for aescm 0.16 (README or doc/readme.html).
+   This is README file for aescm 0.16a (README or doc/readme.html).
 
    Aescm is an experimental version of escm. The stable version is escm 1.1.
 
@@ -49,5 +49,5 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Mon Jun 9 16:04:51 JST 2003.
-   The backend is /usr/bin/gosh -b.
+   This file was converted from readme.escm on Wed Jun 11 12:50:02 2003. The
+   backend is /home/tagga/bin/gosh -b.

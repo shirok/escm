@@ -1,9 +1,13 @@
 # configurations for the Python language
 <?python:d ...?>
-# interpreter
+# command
 python
 # initialization
 import sys
+# null
+0
+# define
+variable_name = value
 # string
 sys.stdout.write("string")
 # expression

@@ -1,8 +1,12 @@
 # configurations for the Sh language
 <?sh:d ...?>
-# interpreter
+# command
 sh
 # initialization
+# null
+false
+# define
+variable_name=value
 # string
 echo -n -e "string"
 # expression

@@ -27,8 +27,7 @@
  * IN THE SOFTWARE.
  */
 /* Usage:
- * n_of_meta_args = meta_args(&argc, &argv);
- * n_of_meta_args = meta_args_keep_open(&argc, &argv, &fp);
+ * n = meta_args(&argc, &argv);
  *
  * Example:
  *  $ foo bar
@@ -45,10 +44,14 @@
  *  argv[5] = "bar";
  *  argv[6] = NULL;
  *
+ * Return the number of meta-arguments (a non-negative),
+ *         META_ARGS_NOT
+ *         META_ARGS_ERRNO_ERROR,
+ *         META_ARGS_SYNTAX_ERROR,
+ *
  * This is another implementation of the second-line meta-argument
  * processing introduced by scsh but is NOT compatible with it
  * (see Defferences below).
- * 
  * 
  * Differences from scsh's meta-argument processing:
  * - It parses the meta-argument lines as shells do, but does not expand
@@ -61,19 +64,14 @@
  * Macros and their behaviors:
  * - xmalloc(size):            malloc(size);
  * - xrealloc(ptr, size):      realloc(ptr, size);
- * - meta_arg_error():         { perror(argv[0]); exit(EXIT_FAILURE); }
- * - meta_arg_syntax_error():  { errno = EINVAL; meta_arg_error(); }
  */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif /* HAVE_CONFIG_H */
-
 #include "meta_arg.h"
 
 #ifndef FALSE
@@ -90,299 +88,214 @@
 # define xrealloc(ptr, size) realloc((ptr), (size))
 #endif /* ndef xrealloc */
 
-#ifndef meta_arg_error
-# define meta_arg_error() escm_error(PACKAGE, NULL);
-#endif /* ndef meta_arg_error */
-#ifndef meta_arg_syntax_error
-# define meta_arg_syntax_error() escm_error(PACKAGE, "Syntax error in meta-args")
-#endif /* ndef meta_arg_syntax_error */
-
-/*=====================================================
- * meta_args(&argc, &argv) - parse the meta-argument lines.
- * Return the number of meta-arguments if the script file uses the
- * meta-argument functionality, otherwise -1.
- *====================================================*/
-#define META_ARG_ADDC(ch) {\
-  if (i >= size) {\
-    size += BUFSIZ;\
-    buf = xrealloc(buf, size);\
-    if (buf == NULL) meta_arg_error();\
+#define ADD_CHAR(c) {\
+  if (buf) {\
+     if (size == i) {\
+        size += BUFSIZ;\
+        buf = (char *)xrealloc(buf, size);\
+        if (!buf) return META_ARGS_ERRNO_ERROR;\
+     }\
+     buf[i++] = (char)c;\
   }\
-  buf[i] = (char)(ch);\
-  i++;\
 }
-
-enum META_TYPE {
-  NOT_SHEBANG,
-  NOT_META,
-  META,
-  EOF_REACHED,
-};
-
+/* skip_shebang_line(fp) - skip the sharp-bang line.
+ * Return META_ARGS_SYNTAX_ERROR if there is an error;
+ *        META_ARGS_NOT          if it does not have a meta-argument switch;
+ *        META_ARGS_OK           if it has a meta-argument switch.
+ */
 static int
-skip_to_eol(FILE *fp)
-{
-  int c;
-
-  do {
-    c = getc(fp);
-    if (c == EOF) return FALSE;
-  }while (c != '\n');
-  return TRUE;
-}
-
-static enum META_TYPE
-skip_meta_shebang_line(FILE *fp)
+skip_shebang_line(FILE *fp)
 {
   int c;
 
   c = getc(fp);
-  if (c != '#') {
-    if (c != EOF) ungetc(c, fp);
-    return NOT_SHEBANG;
+  if (c == EOF) return META_ARGS_NOT;
+  else if (c != '#') {
+    ungetc(c, fp);
+    return META_ARGS_NOT;
   }
   c = getc(fp);
-  if (c == EOF) return EOF_REACHED;
-  else if (c == '\n') return NOT_META;
-  else if (c != '!') {
-    if (skip_to_eol(fp)) return NOT_META;
-    else return EOF_REACHED;
+  if (c != '!') return META_ARGS_SYNTAX_ERROR;
+  for (;;) { /* skip blanks if any */
+    c = getc(fp);
+    if (c == EOF || c == '\n') return META_ARGS_SYNTAX_ERROR;
+    if (c != ' ' && c != '\t') break;
   }
-  do {
+  for (;;) { /* skip argv[0] */
     c = getc(fp);
-    if (c == EOF) return EOF_REACHED;
-    if (c == '\n') return NOT_META;
-  }while (c == ' ' || c == '\t');
-  do {
+    if (c == EOF || c == '\n') return META_ARGS_NOT;
+    if (c == ' ' || c == '\t') break;
+  }
+  for (;;) { /* skip blanks */
     c = getc(fp);
-    if (c == EOF) return EOF_REACHED;
-    if (c == '\n') return NOT_META;
-  }while (c != ' ' && c != '\t');
-  do {
-    c = getc(fp);
-    if (c == EOF) return EOF_REACHED;
-    if (c == '\n') return NOT_META;
-  }while (c == ' ' || c == '\t');
+    if (c == EOF || c == '\n') return META_ARGS_NOT;
+    if (c != ' ' && c != '\t') break;
+  }
   if (c == '\\') {
     c = getc(fp);
-    if (c == EOF) return EOF_REACHED;
-    else if (c == '\n') return META;
+    if (c == EOF) return META_ARGS_NOT;
+    if (c == '\n') return META_ARGS_OK;
   }
-  if (skip_to_eol(fp)) return NOT_META;
-  else return EOF_REACHED;
+  for (;;) {
+    c = getc(fp);
+    if (c == EOF || c == '\n') break;
+  }
+  return META_ARGS_NOT;
+}
+/* parse_as_command_line(&buf, &size, fp) - tokenize meta-argument lines
+ * as if they were specified from a terminal.
+ * Return the number of meta-arguments or META_ARGS_SYNTAX_ERROR.
+ */
+static int
+parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
+{
+  int i = 0;
+  size_t size = *psize;
+  int c;
+  int n = 0;
+  char *buf;
+  enum {
+    OUTSIDE,
+    INSIDE,
+    SINGLE,
+    DOUBLE,
+  } state = OUTSIDE;
+
+  buf = *pbuf;
+  while ((c = getc(fp)) != EOF) {
+    if (state == OUTSIDE) {
+      if (c == '\"') {
+	state = DOUBLE;
+	n++;
+      } else if (c == '\'') {
+	state = SINGLE;
+	n++;
+      } else if (c == '\\') {
+	c = getc(fp);
+	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
+	else if (c == '\n') break;
+	state = INSIDE;
+	n++;
+	ADD_CHAR(c);
+      } else if (c == '\n') break;
+      else if (c == ' ' || c == '\t') continue;
+      else {
+	state = INSIDE;
+	n++;
+	ADD_CHAR(c);
+      }
+    } else if (state == INSIDE) {
+      if (c == '\"') state = DOUBLE;
+      else if (c == '\'') state = SINGLE;
+      else if (c == '\\') {
+	c = getc(fp);
+	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
+	else if (c == '\n') continue;
+	else ADD_CHAR(c);
+      } else if (c == '\n') {
+	ADD_CHAR('\0');
+	state = OUTSIDE;
+	break;
+      } else if (c == ' ' || c == '\t') {
+	ADD_CHAR('\0');
+	state = OUTSIDE;
+      } else ADD_CHAR(c);
+    } else if (state == DOUBLE) {
+      if (c == '\"') state = INSIDE;
+      else if (c == '\\') {
+	c = getc(fp);
+	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
+	else if (c == '\n') continue;
+	ADD_CHAR(c);
+      } else ADD_CHAR(c);
+    } else { /* state == SINGLE */
+      if (c == '\'') state = INSIDE;
+      else ADD_CHAR(c);
+    }
+  }
+  if (state != OUTSIDE) return META_ARGS_SYNTAX_ERROR;
+  *pbuf = buf;
+  *psize = i;
+  return n;
+}
+/* next_token(ptr, &size) - return the next token.
+ */
+static char *
+next_token(char *ptr, size_t *psize)
+{
+  printf("DEBUG: %s\n", ptr);
+  if (*psize == 0) return NULL;
+  while (*ptr) {
+    ptr++;
+    (*psize)--;
+  }
+  ptr++;
+  (*psize)--;
+  return ptr;
 }
 
 int
 meta_args(int *pargc, char ***pargv)
 {
+  char **argv, **new_argv;
+  char *buf, *ptr;
+  int argc, ret, i;
   FILE *fp;
-  int argc, c, i, j, k, n_meta_args;
-  char **new_argv, **argv, *buf;
   size_t size = BUFSIZ;
-  enum {
-    OUTSIDE,
-    INSIDE,
-    SINGLE_QUOTED,
-    DOUBLE_QUOTED,
-  } state = OUTSIDE;
 
   argc = *pargc;
   argv = *pargv;
-  /* Check if we need to expand the meta-arguments. */
   if (!(argc >= 3 && argv[1][0] == '\\' && argv[1][1] == '\0')) {
-    return -1;
+    return META_ARGS_NOT;
   }
-
-  /* Open the script file. */
   fp = fopen(argv[2], "r");
-  if (fp == NULL) meta_arg_error();
-
-  if (skip_meta_shebang_line(fp) != META) meta_arg_syntax_error();
- 
-  /* Parse the second line. */
-  /* allocate the buffer. */
-  buf = (char*)xmalloc(size);
-  if (buf == NULL) meta_arg_error();
-
-  /* parser. */
-  i = 0;
-  n_meta_args = 0;
-  while ((c = getc(fp)) != EOF) {
-    if (state == OUTSIDE) {
-      if (c == ' ' || c == '\t') {
-	continue;
-      } else if (c == '\n') {
-	break;
-      } else if (c == '\'') {
-	n_meta_args++;
-	state = SINGLE_QUOTED;
-      } else if (c == '\"') {
-	n_meta_args++;
-	state = DOUBLE_QUOTED;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) {
-	  meta_arg_syntax_error();
-	} else if (c == '\n') {
-	  /* nop */
-	} else {
-	  n_meta_args++;
-	  state = INSIDE;
-	  META_ARG_ADDC(c);
-	}
-      } else {
-	n_meta_args++;
-	state = INSIDE;
-	META_ARG_ADDC(c);
-      }
-    } else if (state == INSIDE) {
-      if (c == ' ' || c == '\t') {
-	state = OUTSIDE;
-	META_ARG_ADDC('\0');
-      } else if (c == '\n') {
-	META_ARG_ADDC('\0');
-	break;
-      } else if (c == '\'') {
-	state = SINGLE_QUOTED;
-      } else if (c == '\"') {
-	state = DOUBLE_QUOTED;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) {
-	  meta_arg_syntax_error();
-	} else if (c == '\n') {
-	  /* nop */
-	} else {
-	  META_ARG_ADDC(c);
-	}
-      } else {
-	META_ARG_ADDC(c);
-      }
-    } else if (state == SINGLE_QUOTED) {
-      if (c == '\'') {
-	state = INSIDE;
-      } else {
-	META_ARG_ADDC(c);
-      }
-    } else { /* if (state == DOUBLE_QUOTED) */
-      if (c == '\"') {
-	state = INSIDE;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) meta_arg_syntax_error();
-	META_ARG_ADDC(c);
-      } else {
-	META_ARG_ADDC(c);
-      }
-    }
+  if (fp == NULL) return META_ARGS_ERRNO_ERROR;
+  ret = skip_shebang_line(fp);
+  if (ret != META_ARGS_OK) {
+    fclose(fp);
+    return ret;
   }
-  if (state != INSIDE && state != OUTSIDE) meta_arg_syntax_error();
-  if (c == EOF) meta_arg_syntax_error();
-
-  /* Renew argc and argv. */
-  new_argv = (char**)xmalloc(sizeof(char*) * (argc + n_meta_args));
-  if (new_argv == NULL) meta_arg_error();
+  buf = (char *)xmalloc(BUFSIZ);
+  if (buf == NULL) return META_ARGS_ERRNO_ERROR;
+  ret = parse_as_command_line(&buf, &size, fp);
+  if (ret < 0) return META_ARGS_SYNTAX_ERROR;
+  argc += ret - 1;
+  new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
+  if (new_argv == NULL) return META_ARGS_ERRNO_ERROR;
   new_argv[0] = argv[0];
-
-  state = OUTSIDE;
-  j = 1;
-  for (k = 0; k < i; k++) {
-    if (state == OUTSIDE) {
-      new_argv[j++] = buf + k;
-      if (buf[k]) state = INSIDE;
-    } else {
-      if (!buf[k]) state = OUTSIDE;
-    }
+  ptr = buf;
+  for (i = 1; i <= ret; i++) {
+    printf("debug: %s\n", ptr);
+    new_argv[i] = ptr;
+    ptr = next_token(ptr, &size);
   }
-  for (j = 2; j <= argc; j++) {
-    new_argv[n_meta_args + j - 1] = argv[j];
+  for (/**/; i <= argc; i++) {
+    new_argv[i] = argv[i - ret + 1];
   }
-  *pargc = argc + n_meta_args - 1;
+  *pargc = argc;
   *pargv = new_argv;
-  fclose(fp);
-  return n_meta_args;
+  return ret;
 }
 
-/*=====================================================
- * meta_skip_shebang(fp) - skip the sharp-bang line
- * 
- *====================================================*/
+/* meta_skip_shebang(fp) - skip the sharp-bang line and meta-argument
+ * lines if any.
+ */
 int
 meta_skip_shebang(FILE *fp)
 {
-  int c, ret;
-  enum {
-    OUTSIDE,
-    INSIDE,
-    SINGLE_QUOTED,
-    DOUBLE_QUOTED,
-  } state = OUTSIDE;
+  int ret;
+  char *buf = NULL;
+  size_t size = 0;
 
-  ret = skip_meta_shebang_line(fp);
-  if (ret == NOT_SHEBANG) return FALSE;
-  else if (ret == NOT_META) return TRUE;
-  else if (ret == EOF_REACHED) meta_arg_syntax_error();
- 
-  /* Parse the second line. */
-  /* parser. */
-  while ((c = getc(fp)) != EOF) {
-    if (state == OUTSIDE) {
-      if (c == ' ' || c == '\t') {
-	continue;
-      } else if (c == '\n') {
-	break;
-      } else if (c == '\'') {
-	state = SINGLE_QUOTED;
-      } else if (c == '\"') {
-	state = DOUBLE_QUOTED;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) {
-	  meta_arg_syntax_error();
-	} else if (c == '\n') {
-	  /* nop */
-	} else {
-	  state = INSIDE;
-	}
-      } else {
-	state = INSIDE;
-      }
-    } else if (state == INSIDE) {
-      if (c == ' ' || c == '\t') {
-	state = OUTSIDE;
-      } else if (c == '\n') {
-	break;
-      } else if (c == '\'') {
-	state = SINGLE_QUOTED;
-      } else if (c == '\"') {
-	state = DOUBLE_QUOTED;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) {
-	  meta_arg_syntax_error();
-	}
-      }
-    } else if (state == SINGLE_QUOTED) {
-      if (c == '\'') {
-	state = INSIDE;
-      }
-    } else { /* if (state == DOUBLE_QUOTED) */
-      if (c == '\"') {
-	state = INSIDE;
-      } else if (c == '\\') {
-	c = getc(fp);
-	if (c == EOF) meta_arg_syntax_error();
-      }
-    }
-  }
-  if (state != INSIDE && state != OUTSIDE) meta_arg_syntax_error();
-  if (c == EOF) meta_arg_syntax_error();
-  return TRUE;
+  ret = skip_shebang_line(fp);
+  if (ret != META_ARGS_OK) return ret;
+  else return parse_as_command_line(&buf, &size, fp);
 }
+
 /*====================================================
  * the main function for debugging.
  *===================================================*/
-#ifdef META_ARG_TEST
+#ifdef META_ARGS_TEST
 int main(int argc, char **argv)
 {
   int i;
@@ -395,5 +308,5 @@ int main(int argc, char **argv)
   }
   return 0;
 }
-#endif /* def META_ARG_TEST */
+#endif /* def META_ARGS_TEST */
 /* end of meta_arg.c */

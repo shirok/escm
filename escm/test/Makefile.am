@@ -12,7 +12,9 @@ TESTS += t030_write.test t040_display.test
 TESTS += t050_wrong_name.test t060_wrong_subname.test
 TESTS += t070_blocks.test t080_displays.test t090_alternate.test
 TESTS += t100_span.test t110_string.test
-TESTS += t120_awk.test
+TESTS += t120_awk.test t140_prst_awk.test
+TESTS += t130_preset.test t140_prst_awk.test
+TESTS += t150_comment.test 
 
 CLEANFILES = input out err out-ok err-ok 00check.log
 

@@ -1,8 +1,12 @@
 ;; configurations for the Scheme language
 <?scm:d ...?>
-;; interpreter
-gosh
+;; command
+gosh -b
 ;; initialization
+;; null
+#f
+;; define
+(define *variable-name* value)
 ;; string
 (display "string")
 ;; expression

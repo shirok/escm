@@ -18,14 +18,21 @@
 
 /* language information structure */
 struct escm_lang {
-  const char *name;            /* the name space with the subname */
-  const char *literal_prefix;
-  const char *literal_suffix;
-  const char *display_prefix;
-  const char *display_suffix;
-  const char *init;            /* initialization code */
-  const char *finish;          /* finalization code */
+  char *name;            /* the name space with the subname */
+  char *literal_prefix;
+  char *literal_suffix;
+  char *display_prefix;
+  char *display_suffix;
+  char *define_prefix;
+  char *define_infix;
+  char *define_suffix;
+  int use_hyphen;
+  char *null;
+  char *init;            /* initialization code */
+  char *finish;          /* finalization code */
 };
+
+extern struct escm_lang lang_scm;
 
 /* escm.c  */
 /* escm_init(&lang, outp) - initialize the backend interpreter. */
@@ -36,9 +43,10 @@ void escm_finish(struct escm_lang *lang, FILE *outp);
 int escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp);
 /* escm_put_string(str, outp) - escape str and put it.*/
 void escm_put_string(const char *str, FILE *outp);
+/* escm_define(lang, var, val, outp) - define var to val. */
+void escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
 /* cgi.c */
-
 /* escm_is_cgi() - return TRUE if invoked in a CGI script, FALSE otherwise. */
 int escm_is_cgi(void);
 /* escm_stderr2stdout() - redirect stderr to stdout. */
@@ -47,8 +55,7 @@ int escm_stderr2stdout(void);
 void escm_html_header(void);
 /* escm_html_header() - send a plain text content-type header. */
 void escm_plain_header(void);
-/* escm_warning(prog, msg) - print a warning message.*/
-void escm_warning(const char *prog, const char *msg);
-/* escm_error(msg) - print a warning message and exit the program. */
-void escm_error(const char *prog, const char *msg);
+/* escm_error(fmt, ...) - print a warning message and exit the program. */
+void escm_error(const char *fmt, ...);
+
 #endif /* ESCM_H */

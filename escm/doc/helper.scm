@@ -11,7 +11,7 @@
   (display "</em> is part of documentation of <strong>")
   (display PACKAGE) (display " ") (display VERSION)
   (display "</strong>. This file was converted from <em>")
-  (display (car *escm-input-file*))
+  (display *escm-input-file*)
   (display "</em> ")
   (display " on ")(display *date*)(display ".\n")
   (display "The backend is <em>")

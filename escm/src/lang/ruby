@@ -1,8 +1,12 @@
 # configurations for the Ruby language
 <?ruby:d ...?>
-# interpreter
+# command
 ruby
 # initialization
+# null
+0
+# define
+$variable_name = value
 # string
 print "string"
 # expression

@@ -103,8 +103,7 @@ the gimmick feature. See <a href="#gimmick">below</a> for detail.</p></dd>
     <h3 id="scheme_variables">Scheme Variables</h3>
     <dl>
       <dt>*escm-input-file*</dt>
-      <dd><p>List of the input files.
-It is <code>null</code> if the input is stdin.</p></dd>
+      <dd><p>The script file.</p></dd>
       <dt>*escm-output-file*</dt>
       <dd><p>The name of the output file.
 It is <code>#f</code> if the output is stdout.</p></dd>
@@ -160,7 +159,7 @@ replaced with their results, and <em>header.escm</em>, the script,
     <blockquote>
     <pre><?scm:d (escape-html
 "<hr /><p>This document was generated from
-<?scm:d (car *escm-input-file*)?> by <?scm:d *escm-version*?>
+<?scm:d *escm-input-file*?> by <?scm:d *escm-version*?>
 and <?scm:d *escm-interpreter*?>.</p>")?>
 &lt;/body&gt;&lt;html&gt;
 </pre>

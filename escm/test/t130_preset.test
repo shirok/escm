@@ -1,0 +1,33 @@
+# t130_preset.test -*- sh -*-
+
+. $srcdir/Init.sh
+
+# Check the environment, and exit 77 if you skip this test.
+
+# ${PROG} input 1> out 2> err
+# where
+#   input  -- the input file
+#   out    -- stdout
+#   out-ok -- expected stdout
+#   err    -- stderr
+#   err-ok -- expected stderr
+# Files are compared by diff with $DIFF_OPTS options.
+#
+# Generate input, out-ok and err-ok.
+# Then invoke the program as above.
+
+cat <<EOF > input
+<?scm:d *escm-input-file*?>
+<?scm:d *escm-output-file*?>
+EOF
+
+cat <<EOF > out-ok
+input
+#f
+EOF
+
+${PROG} input 1> out 2> err
+
+. $srcdir/Finish.sh
+
+# end

@@ -19,6 +19,12 @@
 #include "escm.h"
 #include "escm_scm.h"
 
+#ifdef ESCM_SCM
+const char *scm_interp = ESCM_SCM;
+#else
+const char *scm_interp = "gosh -b"
+#endif /* ESCM_SCM */
+
 #ifdef ESCM_LANG_DIR
 /* defined in lang.c */
 struct escm_lang * parse_lang(const char *name, const char **interp);
@@ -65,7 +71,7 @@ proc_file_fp(struct escm_lang *lang, FILE *inp, FILE *outp)
 {
   int ret;
   ret = escm_preproc(lang, inp, outp);
-  if (!ret) escm_error(PACKAGE, "Syntax error while reading from a stream.");
+  if (!ret) escm_error("Syntax error while reading from an input stream.");
 }
 /* proc_file_name(lang, name, outp) - process a file. The inpuf file
  * is specifeid by its name.
@@ -77,11 +83,14 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   FILE *inp;
 
   inp = fopen(file, "r");
-  if (inp == NULL) escm_error(PACKAGE, NULL);
+  if (inp == NULL) escm_error(NULL);
 
-  meta_skip_shebang(inp);
+  ret = meta_skip_shebang(inp);
+  if (ret == META_ARGS_SYNTAX_ERROR)
+    escm_error("Syntax error while reading from %s", file);
   ret = escm_preproc(lang, inp, outp);
-  if (!ret) escm_error(PACKAGE, "Syntax error while reading from a file");
+  if (!ret)
+    escm_error("Syntax error while reading from %s", file);
   fclose(inp);
 }
 
@@ -123,7 +132,7 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
     case 'e':
       opt->n_expr++;
       opt->expr = (char**)realloc(opt->expr, sizeof(char*) * opt->n_expr);
-      if (opt->expr == NULL) escm_error(PACKAGE, NULL);
+      if (opt->expr == NULL) escm_error(NULL);
       opt->expr[opt->n_expr - 1] = optarg;
       break;
     case 'f':
@@ -174,6 +183,7 @@ main(int argc, char **argv)
     TRUE, /* header */
   };
   struct escm_lang *lang;
+  const char *input_file = NULL;
   lang = &lang_scm;
 
   /* redirect stderr to stdout. */
@@ -181,6 +191,10 @@ main(int argc, char **argv)
 
   /* expand meta-arguments if necessary */
   ret = meta_args(&argc, &argv);
+  if (ret == META_ARGS_ERRNO_ERROR) escm_error(NULL);
+  else if (ret == META_ARGS_SYNTAX_ERROR)
+    escm_error("Syntax error while parse meta argument lines");
+  if (ret >= 0) input_file = argv[1 + ret];
 
   /* process options */
   parse_opts(argc, argv, &opts);
@@ -188,7 +202,7 @@ main(int argc, char **argv)
   /* specify the output file if necessary. */
   if (opts.outfile) {
     if (freopen(opts.outfile, "w", stdout) == NULL)
-      escm_error(PACKAGE, "Can't open output file.");
+      escm_error("Can't open %s", opts.outfile);
   }
 
 #ifdef ESCM_LANG_DIR
@@ -206,29 +220,18 @@ main(int argc, char **argv)
   if (opts.process) {
     outp = popen(opts.interpreter, "w");
     if (outp == NULL)
-      escm_error(PACKAGE, "Can't invoke the interpreter.");
+      escm_error("Can't invoke the interpreter.");
   }
 
   /* initialization */
   escm_init(lang, outp);
 
   /* set useful global variables if the language is scheme. */
-  if (!opts.langname) {
-    define_string("*escm-version*", PACKAGE " " VERSION, outp);
-    define_string("*escm-interpreter*", opts.interpreter, outp);
-    define_string("*escm-output-file*", opts.outfile, outp);
-    /* input files */
-    fprintf(outp, "(define *escm-input-file* '(");
-    for (i = optind; i < argc; i++) {
-      fputc(' ', outp);
-      escm_put_string(argv[i], outp);
-    }
-    if (opts.footer) {
-      fputc(' ', outp);
-      escm_put_string(opts.footer, outp);
-    }
-    fprintf(outp, "))\n");
-  }
+  escm_define(lang, "escm-version", PACKAGE " " VERSION, outp);
+  escm_define(lang, "escm-interpreter", opts.interpreter, outp);
+  escm_define(lang, "escm-output-file", opts.outfile, outp);
+  escm_define(lang, "escm-input-file",
+	      input_file ? input_file : argv[optind], outp);
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {
@@ -250,7 +253,7 @@ main(int argc, char **argv)
 
   /* close the pipe. */
   if (opts.process && pclose(outp) == -1)
-    escm_error(PACKAGE, NULL);
+    escm_error(NULL);
 
   return 0;
 }

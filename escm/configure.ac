@@ -1,9 +1,12 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.16a], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.16a])
+AC_INIT([aescm], [0.16b], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.16b])
 AM_CONFIG_HEADER([src/config.h])
+
+LIB_VERSION="0:0:0"
+AC_SUBST(LIB_VERSION)
 
 # Checks for programs.
 AC_PROG_CC
@@ -28,6 +31,7 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 AC_C_CONST
 AC_TYPE_SIZE_T
 # Checks for library functions.
+AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([strchr strerror strstr dup2])
 
 # Filter

@@ -1,6 +1,15 @@
+2003-06-13  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	
+	* src/escm.c, src/escm.h: changed the interface of escm_error().
+	* src/meta_arg.c: rewrite the parser of meta-arguments.
+	* src/lang.c: rewrite the parser of configuration files.
+	* src/escm_scm.c, src/escm_scm.h: absorbed in src/escm.[ch].
+	* test/t130_preset.test, test/t140_prst_awk.test,
+	  test/t150_comment.test: add more tests.
+
 2003-06-10  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
-	* Remove src/escm/* which have benn moved to src/.
+	* Remove src/escm/* which have been moved to src/.
 	* configure.ac, src/Makefile.am, and others: libtoolized.
 	* src/filter.c, src/lang.c: fix bugs on getting the interpreter
 	  name from config files.

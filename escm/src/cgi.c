@@ -19,6 +19,8 @@
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 
+#include <stdarg.h>
+
 #include "escm.h"
 
 enum cgi_header_type {
@@ -71,72 +73,28 @@ escm_plain_header(void)
     fflush(stdout);
   }
 }
-
-/* plain_warning(fp, prog, tag, msg) - warning in plain text format.
- */
-static void
-plain_warning(FILE *fp, const char *prog, const char *tag, const char *msg)
-{
-  fflush(fp);
-  fputs(prog, fp);
-  fputs(" - ", fp);
-  fputs(tag, fp);
-  fputs(": ", fp);
-  fputs(msg, fp);
-  fputc('\n', fp);
-}
-/* html_warning(fp, prog, tag, msg) - warning in HTML format.
- */
-static void
-html_warning(FILE *fp, const char *prog, const char *tag, const char *msg)
-{
-  fflush(fp);
-  fputs("<p><em>", fp);
-  fputs(prog, fp);
-  fputs("</em> - <strong>", fp);
-  fputs(tag, fp);
-  fputs(":</strong> ", fp);
-  fputs(msg, fp);
-  fputs("</p>", fp);
-  fputc('\n', fp);
-}
-/* escm_warning(prog, msg) - print a warning message.
+/* escm_error(fmt, ...) - print a warning message and exit the program.
  * The message is specified by strerror(errno) if msg is NULL.
  */
-void
-escm_warning(const char *prog, const char *msg)
+void escm_error(const char *fmt, ...)
 {
-  if (msg == NULL) msg = strerror(errno);
-  if (escm_is_cgi()) {
-    if (header_type == CGI_HEADER_HTML) {
-      html_warning(stdout, prog, "warning", msg);
-    } else {
-      if (header_type == CGI_HEADER_NONE) escm_plain_header();
-      plain_warning(stdout, prog, "warning", msg);
-    }
-  } else {
-    plain_warning(stderr, prog, "warning", msg);
-  }
-}
+  va_list ap;
 
-/* escm_error(prog, msg) - print a warning message and exit the program.
- * The message is specified by strerror(errno) if msg is NULL.
- */
-void escm_error(const char *prog, const char *msg)
-{
-  if (msg == NULL) msg = strerror(errno);
+  va_start(ap, fmt);
+  if (fmt == NULL) fmt = strerror(errno);
   if (escm_is_cgi()) {
     if (header_type == CGI_HEADER_HTML) {
-      html_warning(stdout, prog, "error", msg);
-      printf("</body></html>\n");
+      fputs("<p>", stdout);
+      vfprintf(stdout, fmt, ap);
+      fputs("</p></body></html>\n", stdout);
       exit(EXIT_SUCCESS);
     } else {
       if (header_type == CGI_HEADER_NONE) escm_plain_header();
-      plain_warning(stdout, prog, "error", msg);
+      vfprintf(stdout, fmt, ap);
       exit(EXIT_SUCCESS);
     }
   } else {
-    plain_warning(stderr, prog, "error", msg);
+    vfprintf(stderr, fmt, ap);
     exit(EXIT_FAILURE);
   }
 }

@@ -1,8 +1,12 @@
 # configurations for the Csh language
 <?csh:d ...?>
-# interpreter
+# command
 csh
 # initialization
+# null
+false
+# define
+set variable_name=value
 # string
 echo -n "string"
 # expression

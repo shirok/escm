@@ -2,153 +2,207 @@
  * lang.c - parser of interpreter language configuration files.
  * $Id$
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
- *
- * WARNING: This still has many security problems!
  *************************************************************/
 #ifdef HAVE_CONFIG_H
-#  include "config.h"
+# include "config.h"
 #endif /* HAVE_CONFIG_H */
-
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
 #include <string.h>
-#include <ctype.h>
 
 #include "escm.h"
 
 #define ESCM_LANGCFG_SIZE 512
-static char buf[ESCM_LANGCFG_SIZE];
+char buffer[ESCM_LANGCFG_SIZE];
 static struct escm_lang mylang;
 
-/* parse_lang(langname, &interp) - parse a language configuration file.
+#ifndef FALSE
+# define FALSE 0
+#endif /* FALSE */
+#ifndef TRUE
+# define TRUE !FALSE
+#endif /* TRUE */
+
+/* read_conf(lang)
  */
-struct escm_lang *
-parse_lang(const char *name, const char **interp)
+static int
+read_conf(const char *lang)
 {
   FILE *fp;
   size_t n;
-  char *p;
-  int leading_char;
 
-  if (*name == '.' || *name == '/') {
-    fp = fopen(name, "r");
+  if (*lang == '.' || *lang == '/') {
+    fp = fopen(lang, "r");
   } else {
-    strcpy(buf, ESCM_LANG_DIR);
-    strcat(buf, name);
-    fp = fopen(buf, "r");
+    strcpy(buffer, ESCM_LANG_DIR);
+    strncat(buffer, lang, 10); /* enough? */
+    fp = fopen(buffer, "r");
   }
-  if (fp == NULL) escm_error(PACKAGE, NULL);
-  n = fread(buf, 1, ESCM_LANGCFG_SIZE - 1, fp);
+  if (fp == NULL) return FALSE;
+  n = fread(buffer, 1, ESCM_LANGCFG_SIZE - 1, fp);
   fclose(fp);
-  if (n == 0) escm_error(PACKAGE, NULL);
-  buf[n + 1] = '\0';
-  leading_char = buf[0];
-  p = strchr(buf, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  /* name */
-  p = strstr(p, "<?");
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  p += 2;
-  mylang.name = p;
-  p = strchr(p, ' ');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  *p = '\0';
-  p++;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  p++;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  p++;
-  /* interpreter */
-  *interp = p;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  *p = '\0';
-  p++;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  p++;
-  /* initialization */
-  if (*p == leading_char) {
-    mylang.init = NULL;
-  } else {
-    mylang.init = p;
-    while (*p != leading_char) {
-      p = strchr(p, '\n');
-      if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-      p++;
-    }
-    *p = '\0';
-    p++;
+  buffer[n] = '\0';
+  return TRUE;
+}
+
+/* hash_key = get_data(lead_char, &ptr, &data)
+ */
+static int 
+get_data(int lead, char **pptr, char **pdata)
+{
+  char *ptr;
+  int c;
+  int i;
+
+  ptr = *pptr;
+  if (*ptr != lead) return -1; /* error */
+  for (/**/; *ptr != ' ' && *ptr != '\t'; ptr++) {
+    if (!*ptr) return -1;
   }
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
+  for (/**/; *ptr == ' ' || *ptr == '\t'; ptr++) {
+    if (!*ptr) return -1;
+  }
+  for (i = 0; i < 2; i++, ptr++) {
+    if (!*ptr || *ptr == '\n' || *ptr == ' ' || *ptr == '\t')
+      return -1; /* error */
+  }
+  if (!*ptr) return -1; /* error */
+  c = *ptr;
+  for (/**/; *ptr != '\n'; ptr++) {
+    if (!*ptr) return -1; /* error */
+  }
+  ptr++;
+  if (!*ptr) {
+    *pptr = NULL;
+    *pdata = NULL;
+  } else if (*ptr == lead) {
+    *pptr = ptr;
+    *pdata = NULL;
+  } else {
+    *pdata = ptr;
+    for (/**/; *ptr != lead || *(ptr - 1) != '\n'; ptr++) {
+      if (!*ptr) {
+	*pptr = NULL;
+	return c;
+      }
+    }
+    *(ptr-1) = '\0';
+    *pptr = ptr;
+  }
+  return c;
+}
+
+static int
+parse_name(char *p, char **pname)
+{
+  if (*p != '<') return FALSE;
   p++;
-  /* string */
-  mylang.literal_prefix = p;
-  p = strstr(p, "string");
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
+  if (*p != '?') return FALSE;
+  p++;
+  *pname = p;
+  for (/**/; *p != ' ' && *p != '\t'; p++) {
+    if (*p == '\n' || *p == '\0') return FALSE;
+  }
   *p = '\0';
-  p += 6;
-  mylang.literal_suffix = p;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
+  return TRUE;
+}
+static int
+parse_define(char *data, char **prefix, char **infix, char **suffix, int *flag)
+{
+  char *p;
+
+  *prefix = data;
+  *flag = 1;
+  p = strstr(data, "variable-name");
+  if (p == NULL) {
+    *flag = 0;
+    p = strstr(data, "variable_name");
+  }
+  if (p == NULL) return FALSE;
   *p = '\0';
-  p++;
-  /* expression */
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  p++;
-  mylang.display_prefix = p;
-  p = strstr(p, "expression");
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
+  p += 13;
+  *infix = p;
+  p = strstr(p, "value");
+  if (p == NULL) return FALSE;
+  *p = '\0';
+  p += 5;
+  *suffix = p;
+  return TRUE;
+}
+static int
+parse_expression(char *data, char **prefix, char **suffix)
+{
+  char *p;
+  *prefix = data;
+  p = strstr(data, "expression");
+  if (p == NULL) return FALSE;
   *p = '\0';
   p += 10;
-  mylang.display_suffix = p;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
+  *suffix = p;
+  return TRUE;
+}
+static int
+parse_string(char *data, char **prefix, char **suffix)
+{
+  char *p;
+  *prefix = data;
+  p = strstr(data, "string");
+  if (p == NULL) return FALSE;
   *p = '\0';
-  p++;
-  p = strchr(p, '\n');
-  if (p == NULL) escm_error(PACKAGE, "an error in the language config file.");
-  /* finalization */
-  p++;
-  if (!*p) {
-    mylang.finish = NULL;
-  } else {
-    mylang.finish = p;
+  p += 6;
+  *suffix = p;
+  return TRUE;
+}
+
+struct escm_lang *
+parse_lang(const char *name, const char **interp)
+{
+  int c;
+  char *ptr, *data;
+
+  if (!read_conf(name)) escm_error(NULL);
+  ptr = buffer;
+  c = get_data(buffer[0], &ptr, &data);
+  if (c == -1) escm_error("syntax error for %s", name);
+  c = buffer[0];
+  /* name */
+  if (!parse_name(data, &(mylang.name)))
+    escm_error("syntax error for %s", name);
+  while (ptr != NULL) {
+    switch (get_data(c, &ptr, &data)) {
+    case -1:
+      escm_error("syntax error for %s", name);
+      /* not reached */
+    case 'f': /* define */
+      if (!parse_define(data, &(mylang.define_prefix), &(mylang.define_infix), &(mylang.define_suffix), &(mylang.use_hyphen)))
+	escm_error("syntax error for %s", name);
+      break;
+    case 'i': /* initialization */
+      mylang.init = data;
+      break;
+    case 'l': /* nil */
+      mylang.null = data;
+      break;
+    case 'm': /* command */
+      *interp = data;
+      break;
+    case 'n': /* finalization */
+      mylang.finish = data;
+      break;
+    case 'p': /* expression */
+      if (!parse_expression(data, &(mylang.display_prefix), &(mylang.display_suffix)))
+	escm_error("syntax error for %s", name);
+      break;
+    case 'r': /* string */
+      if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
+	escm_error("syntax error for %s", name);
+      break;
+    default:
+      escm_error("syntax error for %s", name);
+    }
   }
   return &mylang;
 }
-
-#ifdef ESCM_LANG_TEST
-#define PRINT_FIELD(field) {\
-  if (ptr->field) printf(#field " => \'%s\'\n", ptr->field);\
-  else printf(#field " => NULL\n");\
-}
-void
-dump_escm_lang(struct escm_lang *ptr)
-{
-  PRINT_FIELD(name);
-  PRINT_FIELD(literal_prefix);
-  PRINT_FIELD(literal_suffix);
-  PRINT_FIELD(display_prefix);
-  PRINT_FIELD(display_suffix);
-  PRINT_FIELD(init);
-  PRINT_FIELD(finish);
-}
-int main(int argc, char **argv)
-{
-  struct escm_lang *lang;
-  char *interp = NULL;
-
-  lang = parse_lang(argv[1], &interp);
-  if (lang != NULL) dump_escm_lang(lang);
-  if (interp != NULL) printf("interpreter => %s\n", interp);
-  return 0;
-}
-#endif /* ESCM_LANG_TEST */
 /* end of lang.c */

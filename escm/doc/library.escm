@@ -23,7 +23,6 @@
 	  <li><a href="#struct">Structure</a></li>
 	  <li><a href="#functions">Functions</a></li>
 	</ul>
-      <li><a href="#caveats">CAVEATS</a></li>
       <li><a href="#author">AUTHOR</a></li>
       <li><a href="#see_also">SEE ALSO</a></li>
     </ul>
@@ -74,39 +73,62 @@ of any objects other than strings.</li>
     <h3 id="struct">Structure</h3>
     <blockquote><pre>
 struct escm_lang {
-  const char *<a href="#st_name">name</a>;
-  const char *<a href="#st_lit_pre">literal_prefix</a>;
-  const char *<a href="#st_lit_suf">literal_suffix</a>;
-  const char *<a href="#st_dis_pre">display_prefix</a>;
-  const char *<a href="#st_dis_suf">display_suffix</a>;
-  const char *<a href="#st_init">init</a>;
-  const char *<a href="#st_fin">finish</a>;
+  char *<a href="#st_name">name</a>;
+  char *<a href="#st_lit_pre">literal_prefix</a>;
+  char *<a href="#st_lit_suf">literal_suffix</a>;
+  char *<a href="#st_dis_pre">display_prefix</a>;
+  char *<a href="#st_dis_suf">display_suffix</a>;
+  char *<a href="#df_pre">define_prefix</a>;
+  char *<a href="#df_inf">define_infix</a>;
+  char *<a href="#df_suf">define_suffix</a>;
+  int <a href="#hyphen">use_hyphen</a>;
+  char *<a href="#null">null</a>;
+  char *<a href="#st_init">init</a>;
+  char *<a href="#st_fin">finish</a>;
 };
 </pre>
     </blockquote>
+    <p>A strcuture for Scheme, <code>scm_lang</code>,
+ is defined in this library.</p>
     <p>Here are descriptions of fields.</p>
     <dl>
-      <dt>const char *<a id="st_name">name</a></dt>
+      <dt>char *<a id="st_name">name</a></dt>
       <dd>Pointer to a string which holds the namespace and the
 subname space for display blocks.
 They are separated by a colon like <code>scm:d</code>.</dd>
-      <dt>const char *<a id="st_lit_pre">literal_prefix</a></dt>
-      <dd>Pointer to string used a the prefix for literal part.
+      <dt>char *<a id="st_lit_pre">literal_prefix</a></dt>
+      <dd>Pointer to a string used as prefix for literal part.
 <code>(display &quot;</code> in Scheme.</dd>
-      <dt>const char *<a id="st_lit_suf">literal_suffix</a></dt>
-      <dd>Pointer to string used a the suffix for literal part.
+      <dt>char *<a id="st_lit_suf">literal_suffix</a></dt>
+      <dd>Pointer to a string used as suffix for literal part.
 <code>&quot;)</code> in Scheme.</dd>
-      <dt>const char *<a id="st_dis_pre">display_prefix</a></dt>
-      <dd>Pointer to string used a the prefix for part
+      <dt>char *<a id="st_dis_pre">display_prefix</a></dt>
+      <dd>Pointer to a string used as prefix for part
 in which an evaluated result is displayed.
 <code>(display </code> in Scheme.</dd>
-      <dt>const char *<a id="st_dis_suf">display_suffix</a></dt>
-      <dd>Pointer to string used a the suffix for part
+      <dt>char *<a id="st_dis_suf">display_suffix</a></dt>
+      <dd>Pointer to a string used as suffix for part
 in which an evaluated result is displayed.
 <code>)</code> in Scheme.</dd>
-      <dt>const char *<a id="st_init">init</a></dt>
+      <dt>char *<a id="df_pre">define_prefix</a></dt>
+      <dd>Pointer to a string used as prefix for a form
+to define a variable. <code>(define *</code> in Scheme.</dd>
+      <dt>char *<a id="df_inf">define_infix</a></dt>
+      <dd>Pointer to a string used as infix for a form
+to define a variable. <code>* </code> in Scheme.</dd>
+      <dt>char *<a id="df_suf">define_suffix</a></dt>
+      <dd>Pointer to a string used as suffix for a form
+to define a variable. <code>)</code> in Scheme.</dd>
+      <dt>int <a id="hyphen">use_hyphen</a></dt>
+      <dd>A boolean value. <q>-</q> is converted into <q>_</q>
+if this field is false. <code>1</code> in Scheme.</dd>
+      <dt>char *<a id="null">null</a></dt>
+      <dd>Pointer to a string used as external representation
+for the value corresponding to <code>NULL</code>.
+<code>#f</code> in Scheme.</dd>
+      <dt>char *<a id="st_init">init</a></dt>
       <dd>Initialization code. This can be <code>NULL</code>.</dd>
-      <dt>const char *<a id="st_finish">finish</a></dt>
+      <dt>char *<a id="st_finish">finish</a></dt>
       <dd>Finalization code. This can be <code>NULL</code>.</dd>
     </dl>
 
@@ -122,6 +144,8 @@ in which an evaluated result is displayed.
       <li>void <a href="#escm_plain_header">escm_plain_header</a>(void)</li>
       <li>void <a href="#escm_warning">escm_warning</a>(const char *prog, const char *msg)</li>
       <li>void <a href="#escm_error">escm_error</a>(const char *prog, const char *msg)</li>
+      <li>void <a href="#escm_define">escm_define</a>(struct escm_lang lang,
+char *var, char *val, FILE *fp)</li>
     </ul>
 
     <dl>
@@ -160,6 +184,12 @@ prefixed with <q><code><em>prog</em>: </code></q>
 to <code>stdout</code> or <code>stderr</code> according to its context.
 Then exit the program.
 The status is <code>EXIT_SUCESS</code> or <code>EXIT_FAILURE</code>.</p></dd>
+      <dt>void <a id="escm_define">escm_define</a>(struct escm_lang lang,
+char *var, char *val, FILE *fp)</dt>
+      <dd><p>Write a form to define variable <code>var</code>
+to string<code>val</code> to <code>fp</code>.
+<code>lang-&gt;null</code> is used if <code>val</code> is <code>NULL</code>.
+</p></dd>
     </dl>
 
     <h2 id="author">AUTHOR</h2>

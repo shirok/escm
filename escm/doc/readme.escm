@@ -58,6 +58,7 @@ See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
     <h2>Action Handler</h2>
+    <p><em>This program will be a separate package.</em></p>
     <p>You can compile an action handler version of
 <em><?scm:d PACKAGE?></em> if you run <em>configure</em> script
 with <em>--enable-handler</em> option.
@@ -77,6 +78,6 @@ or email (<?scm:d (mail-link PACKAGE_BUGREPORT)?>).</p>
 
     <hr/>
     <p>
-This file was converted from <em><?scm:d (car *escm-input-file*)?></em>
+This file was converted from <em><?scm:d *escm-input-file*?></em>
 on <?scm:d *date*?>. The backend is <em><?scm:d *escm-interpreter*?></em>.</p>
   </body>

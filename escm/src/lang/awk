@@ -1,9 +1,13 @@
 # configurations for the Awk language
 <?awk:d ...?>
-# interpreter
+# command
 awk -f /dev/stdin
 # initialization
 BEGIN {
+# null
+0
+# define
+variable_name = value;
 # string
 printf "string";
 # expression

@@ -1,8 +1,12 @@
 # configurations for the Sh language
 <?tcl:d ...?>
-# interpreter
+# command
 tclsh
 # initialization
+# null
+0
+# define
+set variable_name value
 # string
 puts -nonewline "string"
 # expression
