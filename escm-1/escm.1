@@ -1,0 +1,186 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH escm 1 "Wed Apr  5 00:00:00 UTC 2001" Version1.1
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+escm \- Embedded Scheme Processor
+.SH SYNOPSIS
+.B escm
+.RB [\| \-Ecv \|]
+.RB [\| \-i
+.IR interpreter \|]
+.RB [\| \-o
+.IR outfile \|]
+.RB [\| \-e
+.IR expr \|]
+.RI [\| infile \|]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B escm
+commands.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+\fBescm\fP is a filter program which takes a text with embedded
+Scheme exressions, copies it to the output with evaluating the Scheme
+expressions. You can use the power of Scheme to preprocess various
+text files, including CGI scripts.
+
+.SH OPTIONS
+.TP
+.B \-E
+Preprocess only. \fBescm\fP emits Scheme expressions which produce, if
+evaluated, the desirable output.
+.TP
+.B \-c
+CGI mode. In CGI mode, when \fBescm\fP encounters an error in preprocessing the
+input text, it generates an HTML page to report an error message and exit
+with zero status. Without this option, \fBescm\fP prints out an error message to
+stderr and exit with non-zero status, which is not desirable for CGI
+scripts.
+.TP
+.B \-e\ \fIexpr\fP
+Pass the specified Scheme expression
+.I expr
+to the Scheme interpreter to be
+evaluated before processing the input text. You can give multiple
+.B \-e
+options, and the expressions are passed in the order. At the time the
+expressions are evaluated, the preset variables (such as *escm-input-file*,
+described below) are already set.
+.TP
+.B \-i\ \fIinterpreter\fP
+Specify the alternative Scheme interpreter to be used.
+.TP
+.B \-o\ \fIoutfile\fP
+The output is written to
+.I outfile
+instead of stdout.
+.TP
+.B \-v
+Print
+.B escm
+version and exit.
+.SH USAGE
+.B escm
+reads a text from
+.I infile
+, or stdin if it is not specified, and copies its
+contents to the
+.I outfile
+, or stdout if it is not specified. If
+.I infile
+contains the following sequences,
+.B escm
+interpretes them.
+
+.TP                             
+.B <? \fIScheme expressions\fB ... !>
+Evaluate Scheme expressions, and replaces this sequence to whatever the
+expressions prints out to stdout.
+.TP                             
+.B <?= \fIScheme expressions\fB ... !>
+Evaluate Scheme expressions, and replaces this sequence to the result of
+the last expression (using display).
+
+.PP
+In the scheme expressions, you can use whatever Scheme expressions the       
+interpreter supports. Besides, the following Scheme variables are set for the
+convenience.
+              
+.TP
+.B *escm-version*
+A string to show the version of
+.B escm
+.TP
+.B *escm-input-file*
+Input file name, if the input is specified in the command line; or
+.B #f
+when input is taken from stdin.
+.TP
+.B *escm-output-file*
+Output file name, if the output is specified in the command line;
+.B #f
+otherwise.
+
+.PP
+The first few lines of the input may be treated specially.
+
+.TP
+.B #!
+If the first line of the input begins with
+.B #!
+, the line is removed. This makes it easy to use escm for cgi scripts.
+.TP
+.B #?
+After the above operation, if the next line begins with
+.B #?
+, followed by a
+string, escm takes the string as a Scheme interpreter to use. This choice
+of interpreter can be overridden by
+.B -i
+command line option. If
+.B #?
+is not followed by a string, the line is simply removed (this feature allows you
+to generate an output file which begins with either
+.B #!
+or
+.B #?
+).
+
+.PP
+No other fancier functions, like parsing CGI form parameters or generating HTTP
+headers, are provided by escm; it's beyond the scope of this small (a few
+hundred lines in C) program. Use the libraries of your own Scheme
+implementations.
+
+.PP
+The Scheme expressions needs not be complete inside single
+<?...!>construct.  Rather, they can be mixed
+with the `literal' part of text freely, although the source
+may become a bit messy.  For example, the following source
+produces either "FOO is true" or "FOO is not true", depends
+on the result of the evaluation of "(foo)".
+
+<? (if (foo) (begin !>
+.br
+FOO is true.
+.br
+<?  ) (begin !>
+.br
+FOO is not true.
+.br
+<?  )) !>
+.br
+
+Note that you need
+.B begin
+, since the literal text part may be translated into several
+Scheme forms by the preprocessor.
+
+You can see more sample code in
+.I escm.esc
+included this package. (In Debian system, the file will be found in
+/usr/share/doc/escm/examples/)
+.SH SEE ALSO
+.BR guile (1).
+.BR mit-scheme (1),
+.BR scm (1),
+.SH AUTHOR
+\fBescm\fP was written by Shiro Kawai <shiro@acm.org>.
+.br
+

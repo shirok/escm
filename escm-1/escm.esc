@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 4.0 transitional//EN">
+<?
+;; $Id$
+ (define *section* 0)
+ (define (section-num) (set! *section* (+ *section* 1)) *section*)
+ (define *VERSION* (with-input-from-file "VERSION" read))
+!>
+<html>
+<head>
+<title>escm - Embedded Scheme Processor</title>
+</head>
+<body bgcolor="#ffffff">
+
+<h1>escm - Embedded Scheme Processor</h1>
+
+<p align="right">For version <?=*version*!></p>
+
+<p><b>escm</b> is a filter program which takes a text
+with embedded Scheme exressions, copies it to the
+output with evaluating the Scheme expressions.
+You can use the power of Scheme to preprocess various
+text files, including CGI scripts.</p>
+
+<p>I borrowed the idea from 
+<a href="http://www.engelschall.com/sw/eperl/">ePerl</a>,
+embedded Perl language.   Conceptually
+escm is the same as ePerl except that escm uses Scheme instead of Perl.
+In implementation level, however, escm is slightly different: the body
+of escm is a simple-minded preprocessor to convert the input text to
+a Scheme program, which then is evaluated by a Scheme interpreter to
+generate the final output.
+Because of this architecture, you can use your choice of
+Scheme implementation.
+</p>
+
+<h2> <?=(section-num)!>. Getting Started </h2>
+
+<p>
+The last version of escm is <?=*version*!>:
+<a href="http://www.shiro.dreamhost.com/scheme/vault/escm-<?=*version*!>.tar.gz">
+Tar+gzipped source
+</a>.
+
+You can browse the document on line:
+<a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">
+Document</a>.
+</p>
+
+<p>
+You need Scheme installed on your system.
+I'm using <a href="http://kaolin.unice.fr/stk/">STk</a>.
+You can use any Scheme system as far as you can pipe Scheme
+expression into the interpreter and let it evaluate them.
+</p>
+
+<ol>
+<li> run <tt>./configure</tt>
+<li> The generated Makefile sets a default Scheme interpreter name.
+     Edit it if you need to.
+<li> run <tt>make</tt> to build the program.
+<li> run <tt>make install</tt> to install.
+</ol>
+
+<h2> <?=(section-num)!>. Invoking escm </h2>
+
+<h3>Synopsis</h3>
+<p><b><tt>escm [-Ecv][-i <i>interpreter</i>][-o <i>outfile</i>][-e <i>expr</i>] [<i>infile</i>]</tt></b>
+</p>
+
+<h3>Options</h3>
+
+<p>Following options are recognized:
+</p>
+
+<dl>
+  <dt> <tt><b>-E</b></tt>
+  <dd> <p>Preprocess only.  <b>escm</b> emits Scheme expressions which
+       produce, if evaluated, the desirable output.</p>
+  <dt> <tt><b>-c</b></tt>
+  <dd> <p>CGI mode.  In CGI mode, when escm encounters an error in
+       preprocessing the input text, it generates an HTML page to
+       report an error message and exit with zero status.
+       Without this option, escm prints out an error message to
+       stderr and exit with non-zero status, which is not desirable
+       for CGI scripts.</p>
+  <dt> <b><tt>-e </tt> <i>expr</i></b>
+  <dd> <p>Pass the specified Scheme expression <i>expr</i> to the Scheme
+       interpreter to be evaluated before processing the input text.
+       You can give multiple <tt>-e</tt> options, and the expressions
+       are passed in the order.  At the time the expressions are evaluated,
+       the preset variables (such as <tt>*escm-input-file*</tt>, described
+       below) are already set.
+       </p>
+  <dt> <b><tt>-i </tt> <i>interpreter</i></b>
+  <dd> <p>Specify the alternative Scheme interpreter to be used.</p>
+  <dt> <b><tt>-o </tt><i>outfile</i></b>
+  <dd> <p>The output is written to <i>outfile</i> instead of stdout.
+  <dt> <tt><b>-v</b></tt>
+  <dd> <p>Print <b>escm</b> version and exit.</p>
+</dl>
+
+<h3>Description</h3>
+
+<p><b>escm</b> reads a text from <i>infile</i>, or stdin if it is not
+specified, 
+and copies its contents to the <i>outfile</i>, or stdout if it is not
+specified.
+If <i>infile</i> contains the following sequences, <b>escm</b> interpretes
+them.
+</p>
+
+<dl>
+  <dt> <tt><b>&lt;? </b></tt><i>Scheme expressions ...</i> <tt><b>!&gt;</b></tt>
+  <dd> <p>Evaluate <i>Scheme expressions</i>, and replaces this sequence
+        to whatever the expressions prints out to stdout.
+       </p>
+
+  <dt> <tt><b>&lt;?= </b></tt> <i>Scheme expressions ...</i> <tt><b>!&gt;</b></tt>
+  <dd> <p>Evaluate <i>Scheme expressions</i>, and replaces this sequence
+        to the result of the last expression (using <tt>display</tt>).
+       </p>
+</dl>
+
+<p>In the scheme expressions, you can use whatever Scheme expressions
+the interpreter supports.  Besides, the following Scheme variables
+are set for the convenience.
+</p>
+
+<dl>
+  <dt> <tt>*escm-version*</tt>
+  <dd> A string to show the version of <b>escm</b>
+  <dt> <tt>*escm-input-file*</tt>
+  <dd> Input file name, if the input is specified in the command line;
+       or <tt>#f</tt> when input is taken from stdin.
+  <dt> <tt>*escm-output-file*</tt>
+  <dd> Output file name, if the output is specified in the command line;
+       <tt>#f</tt> otherwise.
+</dl>
+
+<p>The first few lines of the input may be treated specially.
+
+<ul>
+<li>
+If the first line of the input begins with <tt>#!</tt>, the line
+is removed.  This makes it easy to use <b>escm</b> for cgi scripts.
+
+<li>
+After the above operation, if the next line begins with <tt>#?</tt>,
+followed by a string, <b>escm</b> takes the string as a Scheme interpreter
+to use.  This choice of interpreter can be overridden by <tt><b>-i</b></tt>
+command line option.  If <tt>#?</tt> is not followed by a string,
+the line is simply removed (this feature allows you to generate
+an output file which begins with either <tt>#!</tt> or <tt>#?</tt>).
+</ul>
+
+<p>No other fancier functions, like parsing CGI form parameters
+or generating HTTP headers, are provided by <b>escm</b>; it's beyond
+the scope of this small (a few hundred lines in C) program.
+Use the libraries of your own Scheme implementations.
+</p>
+
+<p>The Scheme expressions needs not be complete inside single
+<tt>&lt;?...!&gt;</tt> construct.  Rather, they can be mixed
+with the `literal' part of text freely, although the source
+may become a bit messy.  For example, the following source
+produces either "FOO is true" or "FOO is not true", depends
+on the result of the evaluation of "<tt>(foo)</tt>".
+</p>
+
+<blockquote><pre>
+&lt;? (if (foo) (begin !&gt;
+FOO is true.
+&lt;?  ) (begin !&gt;
+FOO is not true.
+&lt;?  )) !&gt;
+</pre></blockquote>
+
+<p>Note that you need <tt>begin</tt>, since
+the literal text part may be translated into several
+Scheme forms by the preprocessor.
+</p>
+
+<h2> <?=(section-num)!>. Example </h2>
+
+<p>This lists the contents of the directory, using some
+<b>STk</b> specific libraries.   The second line explicitly
+specifies the Scheme interpreter (/usr/local/bin/snow) to be used.
+</p>
+
+<blockquote><pre>
+#! /usr/local/bin/escm -c
+#? /usr/local/bin/snow
+Content-type: text/html
+
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Directory Listing&lt;/title&gt;
+&lt;/head&gt;
+&lt;body bgcolor="#ffffff"&gt;
+&lt;h1&gt;Directory Listing&lt;/h1&gt;
+
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;File&lt;/th&gt;&lt;th&gt;Size&lt;/th&gt;&lt;th&gt;Modified&lt;/th&gt;&lt;/tr&gt;
+&lt;?
+(require "posix")
+
+(do ((count 0 (+ count 1))
+     (files (sort (glob ".*" "*") string&lt;?) (cdr files)))
+    ((null? files))
+  (let* ((file (car files))
+         (statv (posix-stat-&gt;vector (posix-stat file)))
+         (color (if (odd? count) "bgcolor=\"#eeeeee\"" "bgcolor=\"#cccccc\"")))
+    (display "&lt;tr&gt;")
+    (if (file-is-directory? file)
+        (format #t "&lt;td ~a&gt;~a/&lt;/td&gt;~%" color file)
+        (format #t "&lt;td ~a&gt;&lt;a href=~s&gt;~a&lt;/a&gt;&lt;/td&gt;~%" color file file))
+    (format #t "&lt;td ~a align=\"right\"&gt;~a&lt;/td&gt;~%"
+           color (vector-ref statv 6))                 ; size
+    (format #t "&lt;td ~a&gt;~a&lt;/td&gt;~%"
+           color
+           (posix-strftime "%Y/%m/%d %H:%M:%S HST"
+             (posix-localtime (vector-ref statv 8))))  ; mtime
+    ))
+ !&gt;
+&lt;/table&gt;
+&lt;p&gt;(This list is generated by &lt;b&gt;escm &lt;?=*escm-version*!&gt;&lt;/b&gt;)&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre></blockquote>
+
+<p>Also take a look at <tt>escm.esc</tt> included in the tarball,
+which is a source of this html document.
+</p>
+
+<author>
+Shiro Kawai, <a href="mailto:shiro@acm.org">shiro@acm.org</a>
+</author>
+
+<!-- Local variables: -->
+<!-- mode: html -->
+<!-- end: -->
+</body>
+</html>

@@ -1,0 +1,42 @@
+#
+# $Id$
+#
+
+prefix      = @prefix@
+exec_prefix = @exec_prefix@
+bindir      = @bindir@
+
+INTERPRETER = @INTERPRETER@
+INSTALL     = @INSTALL@
+DEFS        = @DEFS@
+
+PACKAGE = escm
+PACKAGE_VERSION = @ESCM_VERSION@
+
+CFLAGS = @CFLAGS@ $(DEFS) -D'INTERPRETER="$(INTERPRETER)"' -D'VERSION=$(PACKAGE_VERSION)'
+
+escm : escm.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o escm escm.o $(LIBS)
+
+escm.o : escm.c
+	$(CC) -c $(CFLAGS) escm.c
+
+doc: escm.html
+
+escm.html : escm.esc escm
+	./escm -o escm.html escm.esc
+
+install: escm
+	$(INSTALL) escm $(bindir)
+
+clean:
+	rm -f escm *.o *~
+
+distclean: clean
+	rm -f Makefile config.cache config.log config.status
+
+dist: configure
+	cd ..; tar cvf - `cat $(PACKAGE)/Manifest | sed 's/^\(.*\)$$/$(PACKAGE)\/\1/'` | gzip > $(PACKAGE)-$(PACKAGE_VERSION).tar.gz
+
+configure: configure.in
+	autoconf
