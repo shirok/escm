@@ -1,4 +1,9 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.21 (2003-07-??)
+* --with-default-language was renamed to --with-default.
+* The default language can be specified by ESCM_DEFAULT environement variable.
+* The default interpreter can be specified by ESCM_BACKEND environement variable.
+
 Version 0.20 (2003-07-14)
 * The default language need not be Scheme.
 * Added a language information file for Octave.

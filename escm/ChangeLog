@@ -1,4 +1,26 @@
+2003-07-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/lang/*, src/lang.awk, src/lang.c (parse_lang): Suppressed
+	name and command records.
+
+	* src/lang/*, src/lang.awk, src/escm.c (escm_preproc): The subname
+	for display mode is always "d".
+
+	* src/filter.c (main): Check the values of ESCM_BACKEND and
+	ESCM_DEFAULT.
+
+	* configure.ac: Renamed --with-default-lang to --with-default.
+
+	* src/filter.c, src/escm.c: Some code of escm.c related to
+	command line options was moved to filter.c.
+
+	* src/escm.h, src/cgi.c, src/escm.c, src/filter.c: Suppressed
+	escm_is_cgi() and use escm_cgi to store the value of
+	GATEWAY_INTERFACE.
+
 2003-07-14  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.h, src/*.c: Wrapped error messages with a macro.
 
 	* src/Makefile.am, src/meta_arg.h, src/meta_arg.c, src/escm.h,
 	src/escm.c, src/filter.c: Changed the policy on signalling

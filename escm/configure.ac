@@ -17,13 +17,13 @@ AC_PROG_AWK
 AC_CHECK_PROGS(LYNX, [lynx links w3m])
 
 # The default interpreter language
-AC_ARG_WITH([default-language], [  --with-default-language=lang   specify the default language (scm).])
-if test x$with_default_language == xyes || test x$with_default_language == x; then
+AC_ARG_WITH([default], [  --with-default=lang   specify the default language (scm).])
+if test x$with_default == xyes || test x$with_default == x; then
    DEFAULT_LANG=scm
-elif test x$with_default_language == xno; then
+elif test x$with_default == xno; then
    AC_MSG_ERROR([The default language required.])
 else
-   DEFAULT_LANG=$with_default_language
+   DEFAULT_LANG=$with_default
 fi
 AC_SUBST(DEFAULT_LANG)
 
