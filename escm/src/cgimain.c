@@ -56,7 +56,7 @@ main(int argc, char **argv)
   }
 
   if (process_flag) {
-    outp = popen(ESCM_BACKEND, "w");
+    outp = popen(deflang.backend, "w");
     if (outp == NULL) XERROR(NULL);
   } else {
     fputs("Content-type: text/plain\r\n\r\n", outp);
@@ -73,7 +73,7 @@ main(int argc, char **argv)
   escm_init(&deflang, outp);
   escm_bind(&deflang, "escm_version", PACKAGE " " VERSION "(cgi)", outp);
   escm_bind(&deflang, "escm_input_file", infile, outp);
-  escm_bind(&deflang, "escm_interpreter", ESCM_BACKEND, outp);
+  escm_bind(&deflang, "escm_interpreter", deflang.backend, outp);
   if (!escm_query_string(&deflang, outp))
     XERROR("inconsistent environment variables");
   inp = fopen(infile, "r");

@@ -91,9 +91,6 @@ main(int argc, const char** argv)
     fprintf(stderr, "Invalid language configuration: %s\n", argv[1]);
     exit(EXIT_FAILURE);
   }
-#ifdef ESCM_BACKEND
-  lang->backend = ESCM_BACKEND;
-#endif /* ESCM_BACKEND */
   printf("/* src/deflang.c - generated from %s */\n", argv[1]);
   fputs(
 "#ifdef HAVE_CONFIG_H\n"
