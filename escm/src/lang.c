@@ -13,8 +13,11 @@
 #ifdef HAVE_STRING_H
 # include <string.h>
 #endif /* HAVE_STRING_H */
+#include <ctype.h>
 
 #include "escm.h"
+
+#define HASH_KEY(a, b) ((a) * 128 + (b))
 
 #define ESCM_LANGCFG_SIZE 512
 char buffer[ESCM_LANGCFG_SIZE];
@@ -49,134 +52,121 @@ read_conf(const char *lang)
   return TRUE;
 }
 
-#define HASH_KEY(a, b) ((a) * 128 + (b))
-/* hash_key = get_data(lead_char, &ptr, &data)
+/* ptr = get_data2(ptr, &name, &data)
  */
-static int 
-get_data(int lead, char **pptr, char **pdata)
+static char *
+get_data2(char *p, char **pname, char **pdata)
 {
-  char *ptr;
-  int c;
-  int i;
+  int leadchar;
 
-  ptr = *pptr;
-  if (*ptr != lead) return -1; /* error */
-  for (/**/; *ptr != ' ' && *ptr != '\t'; ptr++) {
-    if (!*ptr) return -1;
+  leadchar = *p;
+  *pname = NULL;
+  *pdata = NULL;
+  if (leadchar == '\0') return NULL;
+  p++;
+  while (*p != ' ' && *p != '\t') {
+    if (*p == '\0') return NULL;
+    p++;
   }
-  for (/**/; *ptr == ' ' || *ptr == '\t'; ptr++) {
-    if (!*ptr) return -1;
+  while (*p == ' ' || *p == '\t') {
+    if (*p == '\0') return NULL;
+    p++;
   }
-  ptr[-1] = '\0';
-  for (i = 0; i < 2; i++, ptr++) {
-    if (!*ptr || *ptr == '\n' || *ptr == ' ' || *ptr == '\t')
-      return -1; /* error */
+  *pname = p;
+  while (isalnum(*p)) {
+    p++;
   }
-  c = HASH_KEY(ptr[-2], ptr[-1]);
-  for (/**/; *ptr != '\n'; ptr++) {
-    if (!*ptr) return -1; /* error */
-    if (*ptr == ' ' || *ptr == '\t') *ptr = '\0';
+  if (*p == '\0') return NULL;
+  else if (*p != '\n') {
+    *p = '\0';
+    p++;
   }
-  ptr++;
-  if (!*ptr) {
-    *pptr = NULL;
-    *pdata = NULL;
-  } else if (*ptr == lead) {
-    *pptr = ptr;
-    *pdata = NULL;
-  } else {
-    *pdata = ptr;
-    for (/**/; *ptr != lead || *(ptr - 1) != '\n'; ptr++) {
-      if (!*ptr) {
-	*pptr = NULL;
-	return c;
-      }
+  while (*p != '\n') {
+    if (*p == '\0') return NULL;
+    p++;
+  }
+  *p = '\0';
+  p++;
+  if (*p == '\0') return NULL;
+  else if (*p == leadchar) return p;
+  *pdata = p;
+  for (;;) {
+    while (*p != '\n') {
+      if (*p == '\0') return NULL;
+      p++;
     }
-    *(ptr-1) = '\0';
-    *pptr = ptr;
+    p++;
+    if (*p == '\0') return NULL;
+    else if (*p == leadchar) break;
   }
-  return c;
+  p[-1] = '\0';
+  return p;
 }
 
 static int
-parse_bind(char *data, char **prefix, char **infix, char **suffix, int *flag)
+parse2(char *data, char **prefix, char **suffix)
 {
-  char *p;
+  char *prev, *this;
 
   *prefix = data;
-  *flag = 1;
-  p = strstr(data, "variable-name");
-  if (p == NULL) {
-    *flag = 0;
-    p = strstr(data, "variable_name");
+  prev = strchr(data, '@');
+  if (prev == NULL) return FALSE;
+  for (;;) {
+    this = strchr(prev + 1, '@');
+    if (this == NULL) return FALSE;
+    if (this - prev == 4) break;
+    prev = this;
   }
-  if (p == NULL) return FALSE;
-  if (p == data) *prefix = NULL;
-  *p = '\0';
-  p += 13;
-  *infix = p;
-  p = strstr(p, "value");
-  if (p == NULL) return FALSE;
-  *p = '\0';
-  p += 5;
-  *suffix = p;
-  if (!*p) *suffix = NULL;
+  if (prev == data) *prefix = NULL;
+  else *prev = '\0';
+  *suffix = this + 1;
+  if (!**suffix) *suffix = NULL;
   return TRUE;
 }
 static int
-parse_expression(char *data, char **prefix, char **suffix)
+parse3(char *data, char **prefix, char **infix, char **suffix)
 {
-  char *p;
-  *prefix = data;
-  p = strstr(data, "expression");
-  if (p == NULL) return FALSE;
-  *p = '\0';
-  p += 10;
-  *suffix = p;
-  return TRUE;
+  int ret;
+
+  ret = parse2(data, prefix, &data);
+  if (!ret) return FALSE;
+  return parse2(data, infix, suffix);
 }
+
 static int
-parse_string(char *data, char **prefix, char **suffix)
+parse_form2(char *data, struct escm_form_two *p)
 {
-  char *p;
-  *prefix = data;
-  p = strstr(data, "string");
-  if (p == NULL) return FALSE;
-  *p = '\0';
-  p += 6;
-  *suffix = p;
-  return TRUE;
+  return parse2(data, &(p->prefix), &(p->suffix));
+}
+
+static int
+parse_form3(char *data, struct escm_form_three *p)
+{
+  return parse3(data, &(p->prefix), &(p->infix), &(p->suffix));
 }
 
 struct escm_lang *
 parse_lang(const char *name, const char **interp)
 {
-  int c;
-  char *ptr, *data;
-  int flag1, flag2;
+  char *ptr, *rname, *data;
 
   if (!read_conf(name)) escm_error(gettext("can't open - %s"), name);
-  ptr = buffer;
-  c = get_data(buffer[0], &ptr, &data);
-  if (c == -1) escm_error(gettext("broken config file - %s"), name);
-  c = buffer[0];
-  *interp = data;
-  data = buffer;
-  while (*data) data++;
-  while (!*data) data++;
-  mylang.name = data;
+  ptr = get_data2(buffer, &(mylang.name), (char **)interp);
+  if (ptr == NULL || mylang.name == NULL || *interp == NULL)
+    escm_error(gettext("broken config file - %s"), name);
 
-  while (ptr != NULL) {
-    switch (get_data(c, &ptr, &data)) {
-    case -1:
-      escm_error(gettext("broken config file - %s"), name);
-      /* not reached */
+  mylang.nil = "\"\"";
+
+  while (ptr) {
+    ptr = get_data2(ptr, &rname, &data);
+    if (rname == NULL) escm_error(gettext("broken config file - %s"), name);
+    switch (HASH_KEY(rname[0], rname[1])) {
     case HASH_KEY('b', 'i'): /* bind */
-      if (!parse_bind(data, &(mylang.bind_prefix), &(mylang.bind_infix), &(mylang.bind_suffix), &flag1))
+      if (!parse_form3(data, &(mylang.bind)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('a', 's'): /* assign */
-      if (!parse_bind(data, &(mylang.assign_prefix), &(mylang.assign_infix), &(mylang.assign_suffix), &flag2))
+      if (!parse_form3(data, &(mylang.assign)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('i', 'n'): /* initialization */
@@ -185,34 +175,29 @@ parse_lang(const char *name, const char **interp)
     case HASH_KEY('n', 'i'): /* nil */
       mylang.nil = data;
       break;
+    case HASH_KEY('i', 'd'): /* identifier */
+      if (strchr(data, '-')) mylang.use_hyphen = 1;
+      break;
     case HASH_KEY('f', 'i'): /* finalization */
       mylang.finish = data;
       break;
-    case HASH_KEY('e', 'x'): /* expression */
-      if (!parse_expression(data, &(mylang.display_prefix), &(mylang.display_suffix)))
+    case HASH_KEY('d', 'i'): /* display */
+      if (!parse_form2(data, &(mylang.display)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('s', 't'): /* string */
-      if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
+      if (!parse_form2(data, &(mylang.literal)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
     default:
       escm_error(gettext("broken config file - %s"), name);
     }
   }
-  if (!mylang.bind_infix) {
-    mylang.bind_prefix = mylang.assign_prefix;
-    mylang.bind_infix = mylang.assign_infix;
-    mylang.bind_suffix = mylang.assign_suffix;
-    flag1 = flag2;
-  }
-  if (!mylang.assign_infix) {
-    mylang.assign_prefix = mylang.bind_prefix;
-    mylang.assign_infix = mylang.bind_infix;
-    mylang.assign_suffix = mylang.bind_suffix;
-    flag2 = flag1;
-  }
-  mylang.use_hyphen = flag1;
+  if (!mylang.assign.infix)
+    escm_error(gettext("broken config file - %s"), name);
+  if (!mylang.literal.prefix || !mylang.literal.suffix)
+    escm_error(gettext("broken config file - %s"), name);
+  if (!mylang.bind.infix) mylang.bind = mylang.assign;
   return &mylang;
 }
 /* end of lang.c */

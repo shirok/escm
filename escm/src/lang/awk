@@ -2,14 +2,12 @@
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# nil
-0
 # assign
-variable_name = value;
+@VAR@ = @VAL@;
 # string
-printf "string";
-# expression
-printf (expression);
+printf "@STR@";
+# display
+printf (@EXP@);
 # finalization
  exit;
 }

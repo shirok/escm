@@ -1,12 +1,10 @@
 # ruby - configurations for the Ruby language
 ruby
-# initialization
 # nil
-0
+false
 # assign
-$variable_name = value
+$@VAR@ = @VAL@
 # string
-print "string"
-# expression
-print (expression)
-# finalization
+print "@STR@"
+# display
+print (@EXP@)

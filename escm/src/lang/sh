@@ -1,12 +1,8 @@
 # sh - configurations for the Shell language
 sh
-# initialization
-# nil
-false
 # assign
-variable_name=value
+@VAR@=@VAL@
 # string
-echo -n -e "string"
-# expression
-echo -n -e expression
-# finalization
+echo -n -e "@STR@"
+# display
+echo -n -e @EXP@

@@ -2,12 +2,9 @@
 python
 # initialization
 import sys
-# nil
-0
 # assign
-variable_name = value
+@VAR@ = @VAL@
 # string
-sys.stdout.write("string")
-# expression
-sys.stdout.write("%s" % (expression))
-# finalization
+sys.stdout.write("@STR@")
+# display
+sys.stdout.write("%s" % (@EXP@))

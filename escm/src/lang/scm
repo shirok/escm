@@ -1,14 +1,14 @@
 ;; scm - configurations for the Scheme language
 gosh -b
-;; initialization
 ;; nil
 #f
+;; identifier
+*aa-bb*
 ;; bind
-(define variable-name value)
+(define @VAR@ @VAL@)
 ;; assign
-(set! variable-name value)
+(set! @VAR@ @VAL@)
 ;; string
-(display "string")
-;; expression
-(display expression)
-;; finalization
+(display "@STR@")
+;; display
+(display @EXP@)

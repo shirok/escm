@@ -1,12 +1,10 @@
 # tcl - configurations for the Tcl language
 tclsh
-# initialization
 # nil
 0
 # assign
-set variable_name value
+set @VAR@ @VAL@
 # string
-puts -nonewline "string"
-# expression
-puts -nonewline expression
-# finalization
+puts -nonewline "@STR@"
+# display
+puts -nonewline @EXP@

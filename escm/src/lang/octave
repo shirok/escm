@@ -1,12 +1,10 @@
-;; octave - configurations for the Octave language
+# octave - configurations for the Octave language
 octave -q
-;; initialization
-;; nil
+# nil
 0
-;; assign
-variable_name = value;
-;; string
-puts("string");
-;; expression
-printf("%g", expression);
-;; finalization
+# assign
+@VAR@ = @VAL@;
+# string
+puts("@STR@");
+# display
+printf("%g", @EXP@);

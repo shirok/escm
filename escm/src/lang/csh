@@ -1,12 +1,8 @@
 # csh - configurations for the C Shell language
 csh
-# initialization
-# nil
-false
 # assign
-set variable_name=value
+set @VAR@=@VAL@
 # string
-echo -n "string"
-# expression
-echo -n expression
-# finalization
+echo -n "@STR@"
+# display
+echo -n @EXP@

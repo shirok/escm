@@ -1,12 +1,8 @@
 # perl - configurations for the Perl language
 perl
-# initialization
-# nil
-0
 # assign
-$variable_name = value;
+$@VAR@ = @VAL@;
 # string
-print "string";
-# expression
-print (expression);
-# finalization
+print "@STR@";
+# display
+print (@EXP@);
