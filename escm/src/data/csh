@@ -1,0 +1,19 @@
+# configurations for the Csh language
+# code
+<?csh ...?>
+# display
+<?csh:d ...?>
+# command
+csh
+# initialization
+# true
+true
+# false
+false
+# define
+set variable_name=value
+# string
+echo -n "string"
+# expression
+echo -n expression
+# finalization

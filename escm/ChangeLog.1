@@ -1,0 +1,40 @@
+2001-04-06  Shiro Kawai  <shiro@scherzo>
+
+	* release 1.1
+	* escm.1: manpage contributed by HATTA Shuzo (hattas@debian.org)
+	* escm.c: applied patch from HATTA Shuzo (hattas@debian.org) to allow
+	  to pass extra command-line options to the Scheme interpreter
+	  in #? line.
+
+2001-04-04  Shiro Kawai  <shiro@scherzo>
+
+	* release 1.0
+	* COPYING, escm.c: clearify distribution condition.
+
+2000-06-30  Shiro Kawai  <shiro@scherzo>
+
+	* escm.c: Added -e option.
+	* escm.esc: Added description of -e and -c options.  Fix some typos.
+
+2000-02-22  Shiro Kawai  <shiro@scherzo>
+
+	* escm.esc: The version extracting regexp was incorrect.
+
+	* Makefile.in: Made some rules to explicit for non-gmake to work.
+
+2000-02-21  Shiro Kawai  <shiro@scherzo>
+
+	* escm.esc: Finished the minimal documentation.  Wrapping up
+	  the version 0.1.
+
+2000-02-20  Shiro Kawai  <shiro@scherzo>
+
+	* escm.c (get_interpreter_name): Allow to read the interpreter
+	  name from the input file, if the first line of input file
+	  begins with #?. (In case that the first line is #!, the next
+	  line is used).
+
+2000-02-19  Shiro Kawai  <shiro@scherzo>
+
+	* first alpha release
+

@@ -1,0 +1,143 @@
+<?xml version="1.0"?><!-- -*- xml -*- -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "DTD/xhtml11-flat.dtd">
+<html>
+  <head>
+    <title>README</title>
+    <meta http-equiv="Content-Type" content="text/html" />
+    <link href="aescm.css" type="text/css" rel="stylesheet" />
+    <?xml-stylesheet type="text/css" href="aescm.css"?>
+    <!-- $Id$ -->
+  </head>
+<?scm
+  (load "./helper.scm")
+  (load "./config.scm")
+  (define package-titlecase (string-titlecase PACKAGE))
+?>
+  <body>
+    <h1><?scm:d package-titlecase?></h1>
+    <p>This is README file for <?scm:d PACKAGE?> Version <?scm:d VERSION?>.
+The plain text README was dumped from doc/readme.html,
+which was converted from doc/readme.escm.</p>
+    <h2>What is it?</h2>
+    <p><strong><?scm:d package-titlecase?></strong> is
+a filter tool to embed programming codes in documents
+as <strong>PHP</strong>,
+but you can use most interpreter languages you like,
+for example, 
+<a href="interpreters.html#awk">Awk</a>,
+<a href="interpreters.html#csh">Csh</a>,
+<a href="interpreters.html#perl">Perl</a>,
+<a href="interpreters.html#python">Python</a>,
+<a href="interpreters.html#ruby">Ruby</a>,
+<a href="interpreters.html#sh">Sh</a>,
+<a href="interpreters.html#tcl">Tcl</a>
+and of course its default language
+<a href="interpreters.html#scheme">Scheme</a>.</p>
+    <p>
+<?scm:d (string-titlecase PACKAGE)?> supports three major styles.</p>
+    <ul>
+      <li><?scm:d (escape-html "<?lang expression ...?>")?>,
+<?scm:d (escape-html "<?lang:d expression ?>")?> (the default.
+The XML processor instruction)</li>
+      <li><?scm:d (escape-html "<? expression ...!>")?>,
+<?scm:d (escape-html "<?= expression!>")?>
+(<samp>-a</samp> option, as ePerl and the original escm)</li>
+      <li><?scm:d (escape-html "<% expression ...%>")?>,
+<?scm:d (escape-html "<%= expression %>")?>
+(<samp>-s</samp> option, as eRuby and server side scripts)</li>
+    </ul>
+    <p>Another popular style, at least for Scheme,
+the BRL (beautiful report language) will not be supported,
+for it goes beyond the range of a simple preprocessor.</p>
+
+    <p><?scm:d package-titlecase?> invokes an interpreter as backend
+and makes it evaluate embedded codes.
+Code blocks are replaced with their output to stdout.</p>
+
+    <blockquote>
+      <pre>
+<?scm:d (escape-html "<p>In Scheme, a string appears as <?scm (define foo \"string\") (write foo)?>.</p>")?>
+==>
+<?scm:d (escape-html "<p>In Scheme, a string appears as")?> <?scm (define foo "string") (write foo)?><?scm:d (escape-html ".</p>")?>
+</pre>
+    </blockquote>
+
+
+    <p>Expression blocks are converted into their results.</p>
+    <blockquote>
+      <pre>
+<?scm:d (escape-html "<p>1 + 2 = <?scm:d (+ 1 2)?></p>")?>
+==>
+<?scm:d (escape-html "<p>1 + 2 =")?><?scm:d (+ 1 2)?><?scm:d (escape-html "</p>")?>
+</pre>
+    </blockquote>
+
+
+    <h2>How to install <?scm:d package-titlecase?></h2>
+    <h3>What you need</h3>
+    <ul>
+      <li>Your favorite Scheme interpreter.
+It must have a explicit or implicit batch mode
+(no prompts, no results printed, exit when the eof reaches).
+See <a href="interpreters.html">the list of interpreters I've checked.</a>
+(You may have Guile or Rep if you live in a modern Unix-like environment.
+If not, install
+<a href="http://www.sourceforge.net/projects/gauche/">Gauche</a>.
+It is a masterpiece of Shiro Kawai, the author of the original escm.)</li>
+      <li>Unix-like environment. <?scm:d (string-titlecase PACKAGE)?>
+runs your interpreter as a child process.</li>
+      <li>Awk. Some C source files are created by Awk.</li>
+    </ul>
+
+    <h3>How to compile and install <?scm:d package-titlecase?></h3>
+    <p>Type as usual:</p>
+    <blockquote>
+    <pre>
+gunzip <?scm:d PACKAGE?>-<?scm:d VERSION?>.tar.gz
+tar xvf <?scm:d PACKAGE?>-<?scm:d VERSION?>.tar
+cd <?scm:d PACKAGE?>-<?scm:d VERSION?>
+./configure
+make
+make install
+</pre>
+    </blockquote>
+    <p>I use Automake <strong>1.5</strong>
+and Autoconf <strong>2.53</strong>.
+So you may have many warnings and <em>configure</em>
+may will be run serveral times.
+But it will not be a real problem.</p>
+
+    <p>If you want to use other interpreters than Gauche, Stklos, Guile
+and Rep, configure with <q>-with-scm="INTERPRETER OPTION ...</q>.
+In scm directory are stored the configuration files for those interpreters.
+</p>
+
+    <h2>Other script languages</h2>
+    <p>
+To use other languages, for example Perl and Ruby,
+run <em>./configure</em> script
+with <samp>-with-perl</samp> and <samp>-with-ruby</samp> options.
+Those options do not appear in the help message.
+See src/data/directory to know what langauges are supported.
+</p>
+    <p>If an interpreter is not in /bin or /usr/bin, and
+still you want to use it in a CGI script.
+You need to specify the full path.
+You also use <samp>-with-LANG</samp> option.
+You must specify all options. For example,
+suppose you dare to use mawk stored in <q>/usr/local/bin</q>.
+You run the configure script as follows:</p>
+    <blockquote>
+      <pre>
+./configure -with-scm="/usr/local/bin/mawk --f /dev/stdin"
+</pre>
+    </blockquote>
+    <p>To print the list of language, invoke <?scm:d PACKAGE?>
+with <samp>-l</samp> option.
+   <p>To use a non default language, specify it with <samp>-L</samp> option.</p>
+
+<?scm (footer)?>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+Aescm
+
+What is it?
+
+Aescm is a filter tool to embed programming codes in documents as PHP, but you
+can use most interpreter languages you like, for example, Awk, Csh, Perl, 
+Python, Ruby, Sh, Tcl and of course its default language Scheme.
+
+Aescm supports three major styles.
+
+  * <?lang expression ...?>, <?lang:d expression ?> (the default. The XML
+    processor instruction)
+  * <? expression ...!>, <?= expression!> (-a option, as ePerl and the original
+    escm)
+  * <% expression ...%>, <%= expression %> (-s option, as eRuby and server side
+    scripts)
+
+Another popular style, at least for Scheme, the BRL (beautiful report language)
+will not be supported, for it goes beyond the range of a simple preprocessor.
+
+Aescm invokes an interpreter as backend and makes it evaluate embedded codes.
+Code blocks are replaced with their output to stdout.
+
+    <p>In Scheme, a string appears as <?scm (define foo "string") (write foo)?>.</p>
+    ==>
+    <p>In Scheme, a string appears as "string".</p>
+
+Expression blocks are converted into their results.
+
+    <p>1 + 2 = <?scm:d (+ 1 2)?></p>
+    ==>
+    <p>1 + 2 =3</p>
+
+How to install Aescm
+
+What you need
+
+  * Your favorite interpreter. It must have a explicit or implicit batch mode
+    (no prompts, no results printed, exit when the eof reaches). See the list
+    of interpreters I've checked.
+  * Unix-like environment. Aescm runs your interpreter as a child process.
+  * Awk. Some C source files are created by Awk.
+  * Scheme interpreter. Scheme codes are embedded in documents. (You may have
+    Guile or Rep if you live in a modern Unix-like environment. If not, install
+    Gauche. It is a masterpiece of Shiro Kawai, the author of the original
+    escm.)
+
+How to compile and install Aescm
+
+Type as usual:
+
+    gunzip aescm-0.14.tar.gz
+    tar xvf aescm-0.14.tar
+    cd aescm-0.14
+    ./configure
+    make
+    make install
+
+I use Automake 1.5 and Autoconf 2.53. So you may have many warnings and 
+configure may will be run serveral times. But it will not be a real problem.
+
+The default language support (Scheme's) is automatically incorporated. To use
+other languages, for example Perl and Ruby, run ./configure script with
+-with-perl and -with-ruby options. Those options do not appear in the help
+message. See src/data/directory to know what langauges are supported.
+
+To specify the full path of an interpreter, you also use -with-LANG option. But
+in this case, you must also specify options. For example, suppose you dare to
+use Rep stored in /usr/local/bin. You run the configure script as follows:
+
+    ./configure -with-scm="/usr/local/bin/rep --batch -s /dev/stdin"
+
+-------------------------------------------------------------------------------
+This document was converted off-line by aescm (version 0.14) on Wed Dec 25
+16:41:29 2002.

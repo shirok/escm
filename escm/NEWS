@@ -1,0 +1,51 @@
+NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.15 (2002-12-26)
+* Alpha release.
+
+Version 0.14 (2002-12-24)
+* Version before adding the metaswitch mechanism.
+
+Version 0.13 (2002-12-23)
+* Language data are stored in text files.
+
+Version 0.12 (2002-12-21)
+* Add documentation.
+
+Version 0.11 (2002-12-19)
+* Freeze code of the preprocessor engine.
+
+Version 0.10 (2002-12-19)
+* Version before renaming xmlpi_* to escm_*.
+
+Version 0.09 (2002-12-19)
+* Version before moving filter drivers to src/filter directory.
+
+Version 0.08 (2002-12-18)
+* Candidate of a stable version.
+
+Version 0.07 (2002-12-17)
+* Rename functions and change internal structures.
+
+Version 0.06 (2002-12-15)
+* Print the HTML content header if in a CGI script.
+
+Version 0.05 (2002-12-14)
+* Experimental support of BRL.
+
+Version 0.04 (2002-12-14)
+* Improved efficiency a bit.
+
+Version 0.03 (2002-12-13)
+* Implemented most of what I(tagga) wanted to.
+
+Version 0.02 (2002-12-12)
+* Added -E option again.
+
+Version 0.01 (2002-12-11)
+* A private release for evaluations.
+
+
+Local Variables:
+mode: outline
+outline-regexp: "[\f*]+ ?"
+End:

@@ -1,0 +1,19 @@
+# configurations for the Sh language
+# code
+<?sh ...?>
+# display
+<?sh:d ...?>
+# command
+sh
+# initialization
+# true
+true
+# false
+false
+# define
+variable_name=value
+# string
+echo -n -e "string"
+# expression
+echo -n -e expression
+# finalization
