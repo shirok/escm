@@ -3,10 +3,7 @@
 . $srcdir/Init.sh
 
 # Check the environment, and exit 77 if you skip this test.
-${PROG} -h > tmp
-grep "Option -l discarded" tmp > /dev/null
-if test x$? = x0; then
-    rm tmp
+if grep -e "undef  *ENABLE_POLYGLOT" $srcdir/../src/config.h 1> /dev/null 2> /dev/null; then
     echo " -- Skipped" >> 00check.log
     exit 77
 fi

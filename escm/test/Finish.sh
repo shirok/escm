@@ -27,16 +27,6 @@ else
 fi
 
 # Finalization
-
-tmp_all=`echo tmp*`
-test "$tmp_all" = "tmp*" || rm $tmp_all
-
-test -f input && rm input
-test -f out && rm out
-test -f out-ok && rm out-ok
-test -f err && rm err
-test -f err-ok && rm err-ok
-
 if test $ret = 0; then
    echo " -- OK" >> 00check.log
 fi

@@ -1,5 +1,7 @@
 #  t010_nothing.test -*- sh -*-
 
+test -f 00check.log && rm 00check.log
+
 . $srcdir/Init.sh
 
 # Check the environment, and exit 77 if you skip this test.
