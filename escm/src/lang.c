@@ -36,8 +36,8 @@ read_conf(const char *lang)
   if (*lang == '.' || *lang == '/') {
     fp = fopen(lang, "r");
   } else {
-    strcpy(buffer, ESCM_LANG_DIR);
-    strncat(buffer, lang, 10); /* enough? */
+    strncpy(buffer, ESCM_LANG_DIR, 256 + 128);
+    strncat(buffer, lang, 127);
     fp = fopen(buffer, "r");
   }
   if (fp == NULL) return FALSE;

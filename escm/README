@@ -1,6 +1,7 @@
-   This is README file for aescm 0.16a (README or doc/readme.html).
+   This is README file for aescm 0.17 (README or doc/readme.html).
 
-   Aescm is an experimental version of escm. The stable version is escm 1.1.
+   Aescm is an experimental version of escm. The stable version is still escm
+   1.1.
 
    Seemingly aescm is a filter program to processes embedded Scheme code in
    documents like ePerl or eRuby. In fact it converts documents into Scheme
@@ -27,10 +28,11 @@ INSTALL
  make install
 
    You can enable to embed other interpreter languages than Scheme by
-   specifying --enable-gimmick option, but it is not recommendable. See
-   doc/gimmick.html for detail.
+   specifying --enable-gimmick option. See doc/gimmick.html for detail.
 
 Action Handler
+
+   This program will be a separate package.
 
    You can compile an action handler version of aescm if you run configure
    script with --enable-handler option. Specify as
@@ -49,5 +51,5 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Wed Jun 11 12:50:02 2003. The
-   backend is /home/tagga/bin/gosh -b.
+   This file was converted from readme.escm on Tue Jun 17 00:47:54 2003. The
+   backend is /usr/bin/gosh -b.

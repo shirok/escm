@@ -24,18 +24,12 @@ But this feature is enabled only when you has run <em>configure</em>
 script with <code>-with-gimmick</code> option.
 If you find description on <code>-l</code> option
 in the help message shown by <code>-h</code>, this feature is on.</p>
-    <p>The current implementation is quick and dirty, and has many
-security problems. <strong>Do not enable this feature
-if you want to use this tool in CGI scripts.</strong>
-Moreover, if your communty has a native embedding tool
-such as <em>ePerl</em> or <em>eRuby</em>, it will be more
-efficient than this one.</p>
 
     <p>
 Languages you can embed must satisfy the following conditions:
 </p>
     <ol>
-      <li>Strings are bracketted between two <em>&quot;</em>.
+      <li>Strings are bracketted between two <em>&quot;</em>s.
 In them, <em>\\</em> is treated as <em>\</em>,
 <em>\&quot;</em> as <em>&quot;</em>,
 and <em>\n</em> as <em>newline</em>.
@@ -71,10 +65,14 @@ This is for <em>Awk</em>.
       <pre><?scm:d (escape-html
 "# configurations for the Awk language
 <?awk:d ...?>
-# interpreter
+# command
 awk -f /dev/stdin
 # initialization
 BEGIN {
+# null
+0
+# define
+variable_name = value;
 # string
 printf \"string\";
 # expression
@@ -90,42 +88,69 @@ printf (expression);
     <h3>Leading Character and Namespace</h3>
     <p>
 The first character of a configuration file is the leading character.
-Lines beginnging with this character are used to separate records.
-It will be convenient if it is the first character to begin comments
-in your favorite interpreter language.</p>
+A line beginning with this character is used to separate records.
+It will be convenient if it is the comment character
+of your favorite interpreter language.</p>
     <p>
 You must specify the namespace and the subnamespace for display mode
 in the second line as
 <q>&lt;?<em>namesapace</em>:<em>subnamespace</em> ...&gt;</q>.
 </p>
-    <h3>Interpreter</h3>
+    <h3>Other Records</h3>
+    <p>The first line of a record starts with the leading character.
+The first line's second field is the keyword for the record.
+Following lines are data themselves.</p>
+    <p>These are the keywords:</p>
+    <ul>
+      <li><a href="#command">command</a></li>
+      <li><a href="#define">define</a></li>
+      <li><a href="#expression">expression</a></li>
+      <li><a href="#finalization">finalization</a></li>
+      <li><a href="#initialization">initialization</a></li>
+      <li><a href="#null">null</a></li>
+      <li><a href="#string">string</a></li>
+    </ul>
+
+    <h4>command</h4>
     <p>
-The second record is the interpreter and its arguments.
+The interpreter and its arguments.
 See <a href="interpreter.html">the document of Scheme interpreters</a>
 to decide the arguments.
 But in most cases, your interpreter will need no arguments,
 for it may be wise enough to switch to a batch mode
 if stdin is a pipe.</p>
 
-    <h3>Intialization</h3>
-    <p>
-The third record is the initialization code.
-This may has no lines.</p>
+    <h4>define</h4>
+    <p>How to set a variable to a value.
+The left side value is specified by <em>variable-name</em>
+or <em>variable_name</em> depending on the convention of the language.
+The right side value is specifed by <em>value</em>.</p>
 
-    <h3>Display a String</h3>
+    <h4>expression</h4>
     <p>
-The fourth record tells how to display a string.
-You must write a form to display a string <em>&quot;string&quot;</em>.</p>
-
-    <h3>Display an Expression</h3>
-    <p>
-The fifth record tells how to display an expression.
+How to display an expression.
 You must write a form to display an expression.
 <em>expression</em> is used as keyword to show where it is placed.</p>
 
-    <h3>Finalization</h3>
+    <h4>finalization</h4>
     <p>
-The last record is the finalization code.
+The finalization code.
 This may has no lines.</p>
+
+    <h4>intialization</h4>
+    <p>
+The initialization code.
+This may has no lines.</p>
+
+    <h4>null</h4>
+    <p>The external representation of a value to be used
+to show it is not a string.</p>
+
+    <h4>string</h4>
+    <p>
+How to display a string.
+You must write a form to display a string <em>&quot;string&quot;</em>.</p>
+
+
   </body>
 </html>

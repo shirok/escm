@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.16b], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.16b])
+AC_INIT([aescm], [0.17], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.17])
 AM_CONFIG_HEADER([src/config.h])
 
 LIB_VERSION="0:0:0"

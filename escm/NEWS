@@ -1,4 +1,8 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.17 (2003-06-18)
+* Bugfixes.
+* Update documents.
+
 Version 0.16 (2003-06-09)
 * Remove backward compatibilities.
 * Clean up code a little.

@@ -15,7 +15,7 @@ for <em><?scm:d PACKAGE?> <?scm:d VERSION?></em>
 (README or doc/readme.html).</p>
     <p><em><?scm:d (string-titlecase PACKAGE)?></em> is an experimental version
 of <em>escm</em>.
-The stable version is <em>escm 1.1</em>.</p>
+The stable version is still <em>escm 1.1</em>.</p>
 
     <p>Seemingly <em><?scm:d PACKAGE?></em> is a filter program
 to processes embedded Scheme code in documents
@@ -52,8 +52,7 @@ make install
     </blockquote>
 
     <p>You can enable to embed other interpreter languages than <em>Scheme</em>
-by specifying <em>--enable-gimmick</em> option,
-but it is not recommendable.
+by specifying <em>--enable-gimmick</em> option.
 See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
