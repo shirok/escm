@@ -19,11 +19,11 @@ installed, type as usual:
     ./configure
     make
     make install
-    
+
 
 With this setting, only Scheme code is preprocessed. You cannot use SCM, for it
 requires different translation rules from those of other Scheme interpreters.
-If you want to use this tool with other scripting languages, add 
+If you want to use this tool with other scripting languages, add
 --enable-polyglot option to configure. See INSTALL(doc/install.html) for more
 information. You can change the default computer language and the default
 backend.
@@ -56,6 +56,6 @@ edit them to change translation rules. and backend interpreters. To edit or add
 a configuration file consult doc/gimmick.html.
 
 
-This document was converted from readme.escm on Fri Oct 15 03:10:44 UTC 2004.
+This document was converted from readme.escm on Fri Oct 15 03:56:32 UTC 2004.
 The backend interpreter is /home/tagga/bin/gosh. Please send bug reports or
 comments to the mailing list or tagga@tsuda.ac.jp.

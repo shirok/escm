@@ -851,6 +851,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-polyglot -- enable polyglot support.
+  --enable-cgi -- enable CGI support.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -4061,6 +4062,23 @@ else
   POLYGLOT_TRUE='#'
   POLYGLOT_FALSE=
 fi
+
+
+# CGI
+# Check whether --enable-cgi or --disable-cgi was given.
+if test "${enable_cgi+set}" = set; then
+  enableval="$enable_cgi"
+
+fi;
+if test x$enable_cgi = xyes; then
+   enable_cgi=1
+else
+   enable_cgi=
+fi
+
+cat >>confdefs.h <<_ACEOF
+#define ENABLE_CGI $enable_cgi
+_ACEOF
 
 
                                                             ac_config_files="$ac_config_files Makefile test/Makefile doc/Makefile doc/config.scm src/Makefile src/lang/Makefile"

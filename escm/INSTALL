@@ -6,15 +6,15 @@ scripting langauge is Scheme and if the backend interpreter is Gauche or Guile.
     ./configure
     make
     make install
-    
+
 
 I will describe the pecular settings for this tool. Consult the documents of
 Autotool to know other settings, for example, to change the target directory. I
 added three configure options.
 
-  â€¢ --enable-polyglot
-  â€¢ --with-default=LANG
-  â€¢ --with-backend=INTERP
+ ¡¦ --enable-polyglot
+ ¡¦ --with-default=LANG
+ ¡¦ --with-backend=INTERP
 
 --enable-polyglot
 
@@ -24,7 +24,7 @@ make it read its configuration file, add --enable-polyglot option. To change
 the default language and/or the backend interpreter, see below.
 
     ./configure --enable-polyglot
-    
+
 
 The language configuration files are to be installed to $(pkgdatadir)/lang,
 i.e. $(prefix)/share/aescm/lang.
@@ -48,51 +48,51 @@ CMUCL requires a different configuration file, for we have to send
 initialization code and specify complicated option arguments.
 
 CLISP
-   
+
         ./configure --with-default=lisp
-        
-   
+
+
 CMUCL
-   
+
         ./configure --with-default=lisp-cmucl
-        
-   
+
+
 Scheme
 
 Scheme is our default language. Its XML name space is scm. SCM requires a
 different configuration file, for we have to send initialization code.
 
 Gauche
-   
+
         ./configure
-        
-   
+
+
 Guile
-   
+
     If Gauche is not installed, type:
-   
+
         ./configure
-        
-   
+
+
     If Gauche is installed, type:
-   
+
         ./configure --with-backend=guile
-        
-   
+
+
 SCM
-   
+
         ./configure --with-default=scm-scm
-        
-   
+
+
 Other Implementations
-   
+
     You have to specify the backend interpreter and its command line arguments.
     The command line arguments for some implementations are listed in doc/
     interpreter.html. If your favorite interpreter is not in the list, consult
     doc/gimmick.html to find out its argument.
-   
+
     This example is for Scsh:
-   
+
         ./configure --with-backend="scsh -s /dev/stdin"
-        
-   
+
+

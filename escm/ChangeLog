@@ -1,4 +1,13 @@
+2004-10-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/cgimain.c: Separated CGI features.
+
 2004-10-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c: Some functions return FALSE instead of aborting if
+	an error occurs.
+
+	* src/lang.c: Removed end directive.
 
 	* src/misc.c, src/misc.h, src/cmdline.c, src/cmdline.h: Removed.
 

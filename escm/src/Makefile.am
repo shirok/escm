@@ -8,7 +8,7 @@ SUBDIRS = lang
 BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c langconf$(EXEEXT)
 
-noinst_PROGRAMS = langconf aescm.cgi aescm.fcgi tiny.fcgi
+noinst_PROGRAMS = langconf aescm.cgi
 langconf_SOURCES = langconf.c escm.c escm.h lang.c
 
 deflang.c : langconf$(EXEEXT) $(srcdir)/lang/@DEFAULT_LANG@ 
@@ -27,7 +27,5 @@ DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE
 
 # CGI
 aescm_cgi_SOURCES = cgimain.c escm.c escm.h $(BUILT_SOURCES)
-
-aescm_fcgi_SOURCES = fastcgi.c escm.c escm.h $(BUILT_SOURCES)
 
 # end of src/Makefile.am

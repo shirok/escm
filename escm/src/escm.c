@@ -136,30 +136,6 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
     put_title_variable(var, outp);
   }
 }
-/* escm_header(lang, inp, outp)
- */
-void
-escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp)
-{
-  int c;
-
-  c = fgetc(inp);
-  if (c == '<') {
-    fputs(lang->literal.prefix, outp);
-    if (lang->newline) {
-      fputs("Content-type: text/html", outp);
-      fputs(lang->literal.suffix, outp);
-      fputs(lang->newline, outp);
-      fputs(lang->newline, outp);
-      fputc('\n', outp);
-    } else {
-      fputs("Content-type: text/html\r\n\r\n", outp);
-      fputs(lang->literal.suffix, outp);
-      fputc('\n', outp);
-    }
-  }
-  ungetc(c, inp);
-}
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void
@@ -206,10 +182,32 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
-/* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
+
+#ifdef ENABLE_CGI
+#define setter bind
+
+/* escm_header(lang, outp)
+ */
+void
+escm_header(const struct escm_lang *lang, FILE *outp)
+{
+  fputs(lang->literal.prefix, outp);
+  if (lang->newline) {
+    fputs("Content-type: text/html", outp);
+    fputs(lang->literal.suffix, outp);
+    fputs(lang->newline, outp);
+    fputs(lang->newline, outp);
+    fputc('\n', outp);
+  } else {
+    fputs("Content-type: text/html\r\n\r\n", outp);
+    fputs(lang->literal.suffix, outp);
+    fputc('\n', outp);
+  }
+}
+/* escm_query_string(lang, outp) - bind the query string to QUERY_STRING
  * when the method is POST. */
 int
-escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
+escm_query_string(const struct escm_lang *lang, FILE *outp)
 {
   const char *content_length;
   const char *method;
@@ -219,14 +217,14 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
   int c;
 
   method = getenv("REQUEST_METHOD");
-  if (method[0] == 'P') {
+  if (method && method[0] == 'P') {
     content_length = getenv("CONTENT_LENGTH");
     if (content_length == NULL) {
       return FALSE;
     } else {
-      if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
+      if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
       put_variable(lang, "escm_query_string", outp);
-      if (lang->bind.infix) fputs(lang->bind.infix, outp);
+      if (lang->setter.infix) fputs(lang->setter.infix, outp);
       llen = strtol(content_length, &p, 10);
       if (*p == '\0') {
 	fputc('"', outp);
@@ -240,14 +238,24 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
       } else {
 	fputs(lang->nil, outp);
       }
-      if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
+      if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
       fputc('\n', outp);
     }
   } else {
-    escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
+    p = getenv("QUERY_STRING");
+    if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
+    put_variable(lang, "escm_query_string", outp);
+    if (lang->setter.infix) fputs(lang->setter.infix, outp);
+    if (p == NULL) fputs(lang->nil, outp);
+    else put_string(p, outp);
+    if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
+    fputc('\n', outp);
   }
-  return FALSE;
+  return TRUE;
 }
+#undef setter
+#endif /* ENABLE_CGI */
+
 /* escm_preproc(lang, inp, outp)
  */
 int

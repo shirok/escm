@@ -52,6 +52,15 @@ if test x$enable_polyglot = xyes; then
 fi
 AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
 
+# CGI
+AC_ARG_ENABLE([cgi], [  --enable-cgi -- enable CGI support.])
+if test x$enable_cgi = xyes; then
+   enable_cgi=1
+else
+   enable_cgi=
+fi
+AC_DEFINE_UNQUOTED(ENABLE_CGI, [$enable_cgi], [enable CGI support.])
+
 AC_CONFIG_FILES([Makefile test/Makefile
 			  doc/Makefile doc/config.scm
 			  src/Makefile src/lang/Makefile])
