@@ -6,13 +6,13 @@ SUBDIRS = lang
 
 # Program
 BUILT_SOURCES = deflang.c
-CLEANFILES = deflang.c langconf
+CLEANFILES = deflang.c langconf$(EXEEXT)
 
 noinst_PROGRAMS = langconf
 langconf_SOURCES = langconf.c escm.c escm.h cmdline.c cmdline.h lang.c misc.c misc.h
 
-deflang.c : langconf $(srcdir)/lang/@DEFAULT_LANG@ 
-	./langconf $(srcdir)/lang/@DEFAULT_LANG@ > $@
+deflang.c : langconf$(EXEEXT) $(srcdir)/lang/@DEFAULT_LANG@ 
+	./langconf$(EXEEXT) $(srcdir)/lang/@DEFAULT_LANG@ > $@
 
 bin_PROGRAMS = aescm 2aescm
 aescm_SOURCES  = escm.c escm.h misc.c misc.h $(BUILT_SOURCES)
