@@ -248,7 +248,7 @@ main(int argc, char **argv)
       const char *method;
       method = getenv("REQUEST_METHOD");
       if (method[0] == 'P') escm_bind_query_string(lang, outp);
-      else escm_bind(lang, "*esmc-query-string*", getenv("QUERY_STRING"), outp);
+      else escm_bind(lang, "*escm-query-string*", getenv("QUERY_STRING"), outp);
     }
   }
 
