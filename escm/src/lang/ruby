@@ -1,6 +1,4 @@
-# configurations for the Ruby language
-<?ruby:d ...?>
-# command
+# ruby - configurations for the Ruby language
 ruby
 # initialization
 # nil

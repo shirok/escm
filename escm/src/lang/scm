@@ -1,6 +1,4 @@
-;; configurations for the Scheme language
-<?scm:d ...?>
-;; command
+;; scm - configurations for the Scheme language
 gosh -b
 ;; initialization
 ;; nil

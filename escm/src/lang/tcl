@@ -1,6 +1,4 @@
-# configurations for the Sh language
-<?tcl:d ...?>
-# command
+# tcl - configurations for the Tcl language
 tclsh
 # initialization
 # nil

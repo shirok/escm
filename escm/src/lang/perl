@@ -1,6 +1,4 @@
-# configurations for the Perl language
-<?perl:d ...?>
-# command
+# perl - configurations for the Perl language
 perl
 # initialization
 # nil

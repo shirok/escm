@@ -1,6 +1,4 @@
-# configurations for the Csh language
-<?csh:d ...?>
-# command
+# csh - configurations for the C Shell language
 csh
 # initialization
 # nil

@@ -1,6 +1,4 @@
-# configurations for the Python language
-<?python:d ...?>
-# command
+# python - configurations for the Python language
 python
 # initialization
 import sys

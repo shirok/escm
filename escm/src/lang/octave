@@ -1,6 +1,4 @@
-;; configurations for the Scheme language
-<?octave:d ...?>
-;; command
+;; octave - configurations for the Octave language
 octave -q
 ;; initialization
 ;; nil

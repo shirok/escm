@@ -67,6 +67,7 @@ get_data(int lead, char **pptr, char **pdata)
   for (/**/; *ptr == ' ' || *ptr == '\t'; ptr++) {
     if (!*ptr) return -1;
   }
+  ptr[-1] = '\0';
   for (i = 0; i < 2; i++, ptr++) {
     if (!*ptr || *ptr == '\n' || *ptr == ' ' || *ptr == '\t')
       return -1; /* error */
@@ -74,6 +75,7 @@ get_data(int lead, char **pptr, char **pdata)
   c = HASH_KEY(ptr[-2], ptr[-1]);
   for (/**/; *ptr != '\n'; ptr++) {
     if (!*ptr) return -1; /* error */
+    if (*ptr == ' ' || *ptr == '\t') *ptr = '\0';
   }
   ptr++;
   if (!*ptr) {
@@ -96,20 +98,6 @@ get_data(int lead, char **pptr, char **pdata)
   return c;
 }
 
-static int
-parse_name(char *p, char **pname)
-{
-  if (*p != '<') return FALSE;
-  p++;
-  if (*p != '?') return FALSE;
-  p++;
-  *pname = p;
-  for (/**/; *p != ' ' && *p != '\t'; p++) {
-    if (*p == '\n' || *p == '\0') return FALSE;
-  }
-  *p = '\0';
-  return TRUE;
-}
 static int
 parse_bind(char *data, char **prefix, char **infix, char **suffix, int *flag)
 {
@@ -167,26 +155,29 @@ parse_lang(const char *name, const char **interp)
   char *ptr, *data;
   int flag1, flag2;
 
-  if (!read_conf(name)) escm_error("can't open - %s", name);
+  if (!read_conf(name)) escm_error(gettext("can't open - %s"), name);
   ptr = buffer;
   c = get_data(buffer[0], &ptr, &data);
-  if (c == -1) escm_error("broken config file - %s", name);
+  if (c == -1) escm_error(gettext("broken config file - %s"), name);
   c = buffer[0];
-  /* name */
-  if (!parse_name(data, &(mylang.name)))
-    escm_error("broken config file - %s", name);
+  *interp = data;
+  data = buffer;
+  while (*data) data++;
+  while (!*data) data++;
+  mylang.name = data;
+
   while (ptr != NULL) {
     switch (get_data(c, &ptr, &data)) {
     case -1:
-      escm_error("broken config file - %s", name);
+      escm_error(gettext("broken config file - %s"), name);
       /* not reached */
     case HASH_KEY('b', 'i'): /* bind */
       if (!parse_bind(data, &(mylang.bind_prefix), &(mylang.bind_infix), &(mylang.bind_suffix), &flag1))
-	escm_error("broken config file - %s", name);
+	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('a', 's'): /* assign */
       if (!parse_bind(data, &(mylang.assign_prefix), &(mylang.assign_infix), &(mylang.assign_suffix), &flag2))
-	escm_error("broken config file - %s", name);
+	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('i', 'n'): /* initialization */
       mylang.init = data;
@@ -194,22 +185,19 @@ parse_lang(const char *name, const char **interp)
     case HASH_KEY('n', 'i'): /* nil */
       mylang.nil = data;
       break;
-    case HASH_KEY('c', 'o'): /* command */
-      *interp = data;
-      break;
     case HASH_KEY('f', 'i'): /* finalization */
       mylang.finish = data;
       break;
     case HASH_KEY('e', 'x'): /* expression */
       if (!parse_expression(data, &(mylang.display_prefix), &(mylang.display_suffix)))
-	escm_error("broken config file - %s", name);
+	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('s', 't'): /* string */
       if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
-	escm_error("broken config file - %s", name);
+	escm_error(gettext("broken config file - %s"), name);
       break;
     default:
-      escm_error("broken config file - %s", name);
+      escm_error(gettext("broken config file - %s"), name);
     }
   }
   if (!mylang.bind_infix) {

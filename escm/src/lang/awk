@@ -1,6 +1,4 @@
-# configurations for the Awk language
-<?awk:d ...?>
-# command
+# awk - configurations for the Awk language
 awk -f /dev/stdin
 # initialization
 BEGIN {

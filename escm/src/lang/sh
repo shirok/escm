@@ -1,6 +1,4 @@
-# configurations for the Sh language
-<?sh:d ...?>
-# command
+# sh - configurations for the Shell language
 sh
 # initialization
 # nil
