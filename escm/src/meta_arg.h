@@ -22,6 +22,5 @@ const char *meta_progname(const char *argv0);
 #define xfile escm_file
 #define xlineno escm_lineno
 #endif /* ESCM */
-
 #endif /* META_ARG_H */
 /* end of meta_arg.h */

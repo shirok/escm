@@ -9,6 +9,9 @@
 
 #include <stdio.h>
 
+/* Will be moved elsewhere. */
+#define gettext(text) text
+
 #ifndef FALSE
 # define FALSE 0
 #endif /* FALSE */
@@ -20,6 +23,9 @@
 extern const char *escm_prog;
 extern const char *escm_file;
 extern int escm_lineno;
+
+/* Used here and there. */
+extern const char *escm_cgi;
 
 /* language information structure */
 struct escm_lang {
@@ -51,6 +57,8 @@ void escm_finish(const struct escm_lang *lang, FILE *outp);
 void escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
 /* escm_bind(lang, var, val, outp) - bind var to val. */
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
+/* escm_bind_query_string(lang, outp) - bind QUERY_STRING when the method is POST. */
+void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
 /* escm_assign(lang, var, val, outp) - assign var to val. */
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 /* escm_literal(lang, str, outp) - put a string in lang. */

@@ -86,7 +86,7 @@ escm_popen(const char * prog)
     /* Invoke the interpreter */
     if (argv[0]) execvp(argv[0], argv);
     /* never reached if successful. */
-    escm_error("can't invoke - %s", argv[0]);
+    escm_error(gettext("can't invoke - %s"), argv[0]);
     return NULL; /* dummy */
   }
 }

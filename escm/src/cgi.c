@@ -20,20 +20,7 @@
 
 #include "escm.h"
 
-static int in_cgi = FALSE;
-static int cached = FALSE;
-static int header = TRUE;
-
-/* escm_is_cgi() - return TRUE if invoked in a CGI script, FALSE otherwise.
- */
-int
-escm_is_cgi(void)
-{
-  if (cached) return in_cgi;
-  cached = TRUE;
-  if (getenv("GATEWAY_INTERFACE")) in_cgi = TRUE;
-  return in_cgi;
-}
+static int header = FALSE;
 
 /* escm_header(&lang, outp)
  */
@@ -53,7 +40,7 @@ void escm_error(const char *fmt, ...)
 
   va_start(ap, fmt);
   if (fmt == NULL) fmt = strerror(errno);
-  if (escm_is_cgi()) {
+  if (escm_cgi) {
     if (!header) {
       fputs("Content-type: text/html\r\n\r\n", stdout);
       fputs("<html><body>", stdout);

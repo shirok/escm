@@ -166,10 +166,10 @@ skip_shebang_line(FILE *fp)
     return META_ARGS_NOT;
   }
   c = getc(fp);
-  if (c != '!') xerror1("not a script file");
+  if (c != '!') xerror1(gettext("bad #! line"));
   for (;;) { /* skip blanks if any */
     c = getc(fp);
-    if (c == EOF || c == '\n') xerror1("not a script file");
+    if (c == EOF || c == '\n') xerror1(gettext("bad #! line"));
     if (c != ' ' && c != '\t') break;
   }
   for (;;) { /* skip argv[0] */
@@ -227,7 +227,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
 	n++;
       } else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1("unexpected eof");
+	if (c == EOF) xerror1(gettext("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  break;
@@ -249,7 +249,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       else if (c == '\'') state = SINGLE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1("unexpected eof");
+	if (c == EOF) xerror1(gettext("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  continue;
@@ -267,7 +267,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       if (c == '\"') state = INSIDE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1("unexpected eof");
+	if (c == EOF) xerror1(gettext("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  continue;
@@ -287,8 +287,8 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
   }
   if (state == DOUBLE || state == SINGLE) {
     xlineno = keep_lineno;
-    xerror1("unterminated string");
-  } else if (state == INSIDE) xerror1("unexpected eof");
+    xerror1(gettext("unterminated string"));
+  } else if (state == INSIDE) xerror1(gettext("unexpected eof"));
   *pbuf = buf;
   *psize = i;
   return n;
@@ -323,7 +323,7 @@ meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
   if (!xprog) xprog = meta_progname(argv[0]);
 
   fp = fopen(script, "r");
-  if (fp == NULL) xerror2("can't open - %s", script);
+  if (fp == NULL) xerror2(gettext("can't open - %s"), script);
 
   xfile = script;
   ret = skip_shebang_line(fp);
