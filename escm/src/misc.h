@@ -10,7 +10,6 @@ extern const char *cgi_prog;
 extern const char *cgi_file;
 extern int cgi_header_flag;
 
-void cgi_html_header(FILE *outp);
 void cgi_error(const char *fmt, ...);
 
 #endif /* not MISC_H */

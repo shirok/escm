@@ -45,6 +45,8 @@ struct escm_lang {
   char *finish;          /* finalization code */
 };
 
+/* escm_header(&lang, inp, outp) - write out a content header. */
+void escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp);
 /* escm_init(&lang, outp) - initialize the backend interpreter. */
 void escm_init(const struct escm_lang *lang, FILE *outp);
 /* escm_finish(&lang, outp) - finalize the backend interpreter. */

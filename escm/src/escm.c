@@ -142,6 +142,31 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
     put_title_variable(var, outp);
   }
 }
+/* escm_header(lang, inp, outp)
+ */
+void
+escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp)
+{
+  int c;
+
+  c = fgetc(inp);
+  if (c == '<') {
+    fputs(lang->literal.prefix, outp);
+    if (lang->newline) {
+      fputs("Content-type: text/html", outp);
+      fputs(lang->literal.suffix, outp);
+      fputs(lang->newline, outp);
+      fputs(lang->newline, outp);
+      fputc('\n', outp);
+    } else {
+      fputs("Content-type: text/html\r\n\r\n", outp);
+      fputs(lang->literal.suffix, outp);
+      fputc('\n', outp);
+    }
+    cgi_header_flag = TRUE;
+  }
+  ungetc(c, inp);
+}
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void

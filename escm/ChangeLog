@@ -1,5 +1,10 @@
 2004-10-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
+	* src/misc.c, src/misc.h, src/filter.c (cgi_html_header): Replaced
+	with escm_header.
+
+	* src/escm.c, src/escm.h (escm_header): Write out an HTML header.
+
 	* src/misc.c (cgi_error): Fixed bugs on the content header.
 
 	* src/misc.c, src/misc.h, src/filter.c (cgi_text_header): Removed.

@@ -65,6 +65,8 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   escm_preproc(lang, inp, outp);
   fclose(inp);
 }
+/* open_and_skip_shebang(file) - open the file and skip the sharp-bang line
+ */
 static FILE*
 open_and_skip_shebang(const char* file)
 {
@@ -222,11 +224,9 @@ main(int argc, char **argv)
     }
   }
 
-  /* write out a content header. */
-  if (header_flag && gateway_interface) {
-    if (process_flag) cgi_html_header(outp);
-    else fputs("Content-type: text/plain\r\n\r\n", outp);
-  }
+  /* write out a plain text header if necessary. */
+  if (header_flag && gateway_interface && !process_flag)
+    fputs("Content-type: text/plain\r\n\r\n", outp);
 
   /* specify the output file if necessary. */
   if (output_file) {
@@ -292,14 +292,17 @@ main(int argc, char **argv)
 
   /* process files */
   if (path_translated) {
+    if (header_flag) escm_header(lang, inp, outp);
     escm_preproc(lang, inp, outp);
   } else if (!inp) { /* filter */
     if (argc == optind) {
+      if (gateway_interface) XERROR("no file specified.");
       escm_file = "stdin";
       escm_preproc(lang, stdin, outp);
     } else {
       inp = open_and_skip_shebang(argv[optind]);
       escm_assign(lang, "escm_input_file", argv[optind], outp);
+      if (header_flag && gateway_interface) escm_header(lang, inp, outp);
       escm_preproc(lang, inp, outp);
       fclose(inp);
 
@@ -308,6 +311,7 @@ main(int argc, char **argv)
     }
   } else { /* wrapper of an interpreter */
     if (argc > optind + 1) XERROR("too many arguments");
+    if (header_flag && gateway_interface) escm_header(lang, inp, outp);
     escm_preproc(lang, inp, outp);
   }
 
