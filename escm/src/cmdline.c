@@ -21,7 +21,7 @@ void *realloc(void *ptr, size_t size);
 #if defined(HAVE_STRING_H)
 #  include <string.h>
 #elif defined(HAVE_STRINGS_H)
-#  include <string.sh>
+#  include <strings.h>
 #else
 # if defined(HAVE_STRCHR)
 char *strchr(const char *s, int c);
@@ -31,16 +31,15 @@ char *strchr(const char *s, int c);
 #endif /* defined(HAVE_STRING_H) && defined(HAVE_STRINGS_H) */
 #include <ctype.h>
 
-#include "misc.h"
-#if !defined(XERROR)
+#include "cmdline.h"
+
+#if defined(XERROR)
+void XERROR();
+#else
 # define XERROR(msg) { perror(msg) ; exit(EXIT_FAILURE) }
-#endif /* !defined(XERROR) */
+#endif /* defined(XERROR) */
 
-#if !defined(XMALLOC)
-# define XMALLOC(type, n) ((type *) xmalloc((n) * (sizeof(type))))
-# define XREALLOC(type, p, n) ((type *) xrealloc((p), (n) * (sizeof(type))))
-#endif /* !defined(XMALLOC) */
-
+#if !defined(xmalloc)
 /* xmalloc(size) - wrapper of malloc() 
  */
 void *
@@ -64,6 +63,7 @@ xrealloc(void *ptr, size_t size)
   if (ret == NULL) XERROR("memory exhausted");
   return ret;
 }
+#endif /* !defined(xmalloc) */
 
 /* To use the same routine for strings and files,
  * a wrapper function is needed.

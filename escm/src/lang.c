@@ -25,6 +25,7 @@ char *strchr(const char *s, int c);
 
 #include "escm.h"
 #include "misc.h"
+#include "cmdline.h"
 
 #define HASH_KEY(a, b) ((a) * 128 + (b))
 

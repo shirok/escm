@@ -2,7 +2,7 @@
  * escm.c - preprocess XML with scheme or another
  * interpreter language.
  * $Id$
- * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
+ * Copyright (c) 2003-2004 TAGA Yoshitaka <tagga@tsuda.ac.jp>
  ***********************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -117,7 +117,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
 
   content_length = getenv("CONTENT_LENGTH");
   if (content_length == NULL)
-    escm_error(_("inconsistent environment"));
+    XERROR("inconsistent environment");
   else {
     if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
     put_variable(lang, "*escm-query-string*", outp);
@@ -263,11 +263,11 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     if (in_string) {
       fputc('\"', outp);
       escm_lineno = str_keep_lineno;
-      escm_error(_("unterminated string"));
+      XERROR("unterminated string");
     }
     if (state == DISPLAY) fputs(lang->display.suffix, outp);
     escm_lineno = tag_keep_lineno;
-    escm_error(_("unterminated instruction"));
+    XERROR("unterminated instruction");
   }
   fputc('\n', outp);
 }

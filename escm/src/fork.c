@@ -1,7 +1,7 @@
 /* fork.c - `pipe', `fork' and `exec' version server.
  * $Id$
  *
- * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
+ * Copyright (c) 2003-2004 TAGA Yoshitaka <tagga@tsuda.ac.jp>
  */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,8 +27,12 @@
 #  endif /* defined(HAVE_FCNTL_H) */
 #endif /* !defined(HAVE_DUP2) */
 
-#include "escm.h"
-#include "misc.h"
+#include "fork.h"
+#if !defined(XERROR)
+# error "XERROR must be defined."
+#else
+void XERROR();
+#endif /* XERROR */
 
 static void
 sigterm(void)
@@ -42,8 +46,8 @@ escm_popen(char * const argv[])
   int fd[2];
   pid_t pid;
 
-  if (pipe(fd) < 0) escm_error("can't create a pipe");
-  if ((pid = fork()) < 0)  escm_error("can't create a child process");
+  if (pipe(fd) < 0) XERROR("can't create a pipe");
+  if ((pid = fork()) < 0)  XERROR("can't create a child process");
   if (pid > 0) { /* parent process */
     FILE *pipe;
 
@@ -51,12 +55,12 @@ escm_popen(char * const argv[])
     pipe = fdopen(fd[1], "w"); /* write */
     if (pipe == NULL) {
       kill(pid, SIGTERM);
-      escm_error("can't open a pipe");
+      XERROR("can't open a pipe");
     }
     return pipe;
   } else { /* child process */
     if (atexit(sigterm))
-      escm_error("can't terminate the parenet process");
+      XERROR("can't terminate the parent process");
 
     close(fd[1]); /* write */
     /* connect fd[0] to the child process's stdin */
@@ -64,7 +68,7 @@ escm_popen(char * const argv[])
     /* Invoke the interpreter */
     if (argv[0]) execvp(argv[0], argv);
     /* never reached if successful. */
-    escm_error(_("can't invoke - %s"), argv[0]);
+    XERROR("can't invoke the interpreter");
     return NULL; /* dummy */
   }
 }
@@ -93,7 +97,7 @@ escm_redirect(int from, int to)
   ret = fcntl(to, F_DUPFD, from);
 #endif /* HAVE_DUP2 */
 
-  if (ret < 0) escm_error("can't redirect a file or stream");
+  if (ret < 0) XERROR("can't redirect a file or stream");
   /* the value itself is ignored. */
 }
 /* end of fork.c */

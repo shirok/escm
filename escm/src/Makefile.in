@@ -85,7 +85,7 @@ BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c
 
 bin_PROGRAMS = aescm 2aescm
-aescm_SOURCES = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES) filter.c cmdline.c lang.awk
+aescm_SOURCES = escm.c escm.h misc.c misc.h $(BUILT_SOURCES) filter.c fork.c fork.h cmdline.c cmdline.h lang.awk
 
 2aescm_SOURCES = classic.c
 
@@ -96,7 +96,7 @@ EXTRA_aescm_SOURCES = lang.c
 
 @POLYGLOT_TRUE@pkgdata_DATA = lang.awk
 
-DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DLOCALEDIR=\"$(datadir)/locale\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
+DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DLOCALEDIR=\"$(datadir)/locale\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" -DXERROR=cgi_error @DEFS@
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
@@ -109,8 +109,8 @@ am_2aescm_OBJECTS = classic.$(OBJEXT)
 2aescm_LDADD = $(LDADD)
 2aescm_DEPENDENCIES =
 2aescm_LDFLAGS =
-am_aescm_OBJECTS = escm.$(OBJEXT) misc.$(OBJEXT) fork.$(OBJEXT) \
-	deflang.$(OBJEXT) filter.$(OBJEXT) cmdline.$(OBJEXT)
+am_aescm_OBJECTS = escm.$(OBJEXT) misc.$(OBJEXT) deflang.$(OBJEXT) \
+	filter.$(OBJEXT) fork.$(OBJEXT) cmdline.$(OBJEXT)
 aescm_OBJECTS = $(am_aescm_OBJECTS)
 aescm_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.

@@ -12,9 +12,10 @@ deflang.c : lang.awk lang/@DEFAULT_LANG@
 	$(AWK) -f lang.awk lang/@DEFAULT_LANG@ > $@
 
 bin_PROGRAMS = aescm 2aescm
-aescm_SOURCES  = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES)
+aescm_SOURCES  = escm.c escm.h misc.c misc.h $(BUILT_SOURCES)
 aescm_SOURCES += filter.c
-aescm_SOURCES += cmdline.c
+aescm_SOURCES += fork.c fork.h
+aescm_SOURCES += cmdline.c cmdline.h
 aescm_SOURCES += lang.awk
 
 2aescm_SOURCES = classic.c
@@ -28,6 +29,6 @@ if POLYGLOT
 pkgdata_DATA = lang.awk
 endif
 
-DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DLOCALEDIR=\"$(datadir)/locale\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
+DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DLOCALEDIR=\"$(datadir)/locale\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" -DXERROR=cgi_error @DEFS@
 
 # end of src/Makefile.am

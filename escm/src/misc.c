@@ -14,59 +14,56 @@
 #  define EXIT_SUCCESS 0
 #  define EXIT_FAILURE 1
 void exit(int status);
+char* getenv(const char* name);
 #endif /* HAVE_STDLIB_H */
-
 #include <stdarg.h>
 
-#include "escm.h"
 #include "misc.h"
 
-static int header = FALSE;
+static enum {
+  NONE,
+  TEXT,
+  HTML,
+} header = NONE;
 
-/* escm_html_header(&lang, outp)
+/* cgi_html_header(outp)
  */
 void
-escm_html_header(const struct escm_lang *lang, FILE *outp)
+cgi_html_header(FILE *outp)
 {
   fputs("Content-type: text/html\r\n\r\n", outp);
   fflush(outp);
-  header = TRUE;
+  header = HTML;
 }
-/* escm_text_header(&lang, outp)
+/* cgi_text_header(outp)
  */
 void
-escm_text_header(const struct escm_lang *lang, FILE *outp)
+cgi_text_header(FILE *outp)
 {
   fputs("Content-type: text/plain\r\n\r\n", outp);
   fflush(outp);
-  header = TRUE;
+  header = TEXT;
 }
 
-/* escm_error(fmt, ...) - print a warning message and exit the program.
+/* cgi_error(fmt, ...) - print a warning message and exit the program.
  */
-void escm_error(const char *fmt, ...)
+void cgi_error(const char *fmt, ...)
 {
   va_list ap;
+  char* iscgi;
+  FILE* fp;
 
-  va_start(ap, fmt);
-  if (escm_cgi) {
-    if (!header) {
-      fputs("Content-type: text/html\r\n\r\n", stdout);
-      fputs("<html><body>", stdout);
-    }
-    printf("<p>%s: ", escm_prog);
-    if (escm_file) printf("%s: ", escm_file);
-    if (escm_lineno) printf("%d: ", escm_lineno);
-    vfprintf(stdout, fmt, ap);
-    fputs("</p></body></html>\n", stdout);
-    exit(EXIT_SUCCESS);
-  } else {
-    fprintf(stderr, "%s: ", escm_prog);
-    if (escm_file) fprintf(stderr, "%s: ", escm_file);
-    if (escm_lineno) fprintf(stderr, "%d: ", escm_lineno);
-    vfprintf(stderr, fmt, ap);
-    fputc('\n', stderr);
-    exit(EXIT_FAILURE);
+  iscgi = getenv("GATEWAY_INTERFACE");
+  fp = iscgi ? stdout : stderr;
+  if (header == HTML) {
+    fputs("Content-type: text/html\r\n\r\n", stdout);
+    fputs("<html><body><p>", stdout);
   }
+  fprintf(fp, "%s: ", cgi_prog);
+  if (cgi_file) fprintf(fp, "%s: ", cgi_file);
+  if (cgi_lineno) fprintf(fp, "%d: ", cgi_lineno);
+  vfprintf(fp, fmt, ap);
+  if (header == HTML) fputs("</p></body></html>\n", stdout);
+  exit(iscgi ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 /* end of misc.c */

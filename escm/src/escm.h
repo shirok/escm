@@ -1,10 +1,15 @@
 /* escm.h - preprocess XML with scheme or another
  * interpreter language.
  * $Id$
- * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
+ * Copyright (c) 2003-2004 TAGA Yoshitaka <tagga@tsuda.ac.jp>
  */
 #ifndef ESCM_H
 #  define ESCM_H 1
+
+#ifndef TRUE
+#define FALSE 0
+#define TRUE (!FALSE)
+#endif /* TRUE */
 
 #include <stdio.h>
 
@@ -45,5 +50,14 @@ void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
+#ifndef XERROR
+#define XERROR cgi_error
+#endif /* XERROR */
+
+#ifndef escm_prog
+#define escm_prog cgi_prog
+#define escm_file cgi_file
+#define escm_lineno cgi_lineno
+#endif /* escm_prog */
 
 #endif /* ESCM_H */
