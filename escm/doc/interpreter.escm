@@ -28,7 +28,7 @@ Still you may have to specify option arguments either when you run
 <em>configure</em> script as:</p>
     <blockquote>
       <pre><code>
-<strong>$</strong> ./configure --with-scm=&quot;<em>guile -s /dev/stdin</em>&quot;
+<strong>$</strong> ./configure --with-backend=&quot;<em>guile -s /dev/stdin</em>&quot;
 </code></pre>
     </blockquote>
 

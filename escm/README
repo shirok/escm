@@ -31,7 +31,7 @@ INSTALLATION
  ./configure --with-backend="scheme -s /dev/stdin"
 
    You can also embed other interpreter languages than Scheme if you run
-   configure with --enable-gimmick option. See doc/gimmick.html for detail.
+   configure with --enable-polyglot option. See doc/gimmick.html for detail.
 
    This program can be used as a handler CGI program of Apache web servers.
    The tool will be automatically installed in cgi-bin directory. You may
@@ -47,7 +47,7 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Fri Jul 11 01:49:30 UTC 2003.
+   This file was converted from readme.escm on Mon Jul 14 00:20:44 UTC 2003.
    The backend is /usr/bin/gosh -b.
 
      ----------------------------------------------------------------------

@@ -44,10 +44,7 @@
  *  argv[5] = "bar";
  *  argv[6] = NULL;
  *
- * Return the number of meta-arguments (a non-negative),
- *         META_ARGS_NOT
- *         META_ARGS_ERRNO_ERROR,
- *         META_ARGS_SYNTAX_ERROR,
+ * Return the number of meta-arguments (a non-negative).
  *
  * This is another implementation of the second-line meta-argument
  * processing introduced by scsh but is NOT compatible with it
@@ -62,8 +59,11 @@
  * - The ANSI C escapes (\r, \n, etc.) are not supported.
  *
  * Macros and their behaviors:
- * - xmalloc(size):            malloc(size);
- * - xrealloc(ptr, size):      realloc(ptr, size);
+ * - xmalloc(size)            malloc(size)
+ * - xrealloc(ptr, size)      realloc(ptr, size)
+ * - xerror0()                print an error message and exit            
+ * - xerror1(msg)
+ * - xerror2(fmt, arg)
  */
 
 #ifdef HAVE_CONFIG_H
@@ -83,26 +83,74 @@
 # define TRUE !FALSE
 #endif /* TRUE */
 
+#ifndef xprog
+static char *xprog = NULL;
+#endif /* xprog */
+#ifndef xfile
+static char *xfile = NULL;
+#endif /* xfile */
+#ifndef xlineno
+static int xlineno = 0;
+#endif /* xlineno */
+
 #ifndef xmalloc
 # define xmalloc(size) malloc((size))
 #endif /* ndef xmalloc */
 #ifndef xrealloc
 # define xrealloc(ptr, size) realloc((ptr), (size))
 #endif /* ndef xrealloc */
+#ifndef xerror0
+# define xerror0() {\
+  perror(xprog);\
+  exit(EXIT_FAILURE);\
+}
+#endif /* xerror0 */
+#ifndef xerror1
+# define xerror1(str) {\
+  fprintf(stderr, "%s: ", xprog);\
+  if (xfile) fprintf(stderr, "%s: ", xfile);\
+  if (xlineno) fprintf(stderr, "%d: ", xlineno);\
+  fputs(str, stderr);\
+  exit(EXIT_FAILURE);\
+}
+#endif /* xerror1 */
+#ifndef xerror2
+# define xerror2(fmt, arg) {\
+  fprintf(stderr, "%s: ", xprog);\
+  if (xfile) fprintf(stderr, "%s: ", xfile);\
+  if (xlineno) fprintf(stderr, "%d: ", xlineno);\
+  fprintf(stderr, fmt, arg);\
+  exit(EXIT_FAILURE);\
+}
+#endif /* xerror2 */
+
+/* meta_progname(argv[0]) - return the program name.
+ */
+const char *
+meta_progname(const char *argv0)
+{
+  const char *p = argv0;
+  while (*p)
+    p++;
+  while (argv0 < p && *p != '/')
+    p--;
+  if (p == argv0 || !p[1]) return argv0;
+  else return p + 1;
+}
+
 
 #define ADD_CHAR(c) {\
   if (buf) {\
      if (size == i) {\
         size += BUFSIZ;\
         buf = (char *)xrealloc(buf, size);\
-        if (!buf) return META_ARGS_ERRNO_ERROR;\
+        if (!buf) xerror0();\
      }\
      buf[i++] = (char)c;\
   }\
 }
 /* skip_shebang_line(fp) - skip the sharp-bang line.
- * Return META_ARGS_SYNTAX_ERROR if there is an error;
- *        META_ARGS_NOT          if it does not have a meta-argument switch;
+ * Return META_ARGS_NOT          if it does not have a meta-argument switch;
  *        META_ARGS_OK           if it has a meta-argument switch.
  */
 static int
@@ -110,6 +158,7 @@ skip_shebang_line(FILE *fp)
 {
   int c;
 
+  xlineno = 1;
   c = getc(fp);
   if (c == EOF) return META_ARGS_NOT;
   else if (c != '#') {
@@ -117,10 +166,10 @@ skip_shebang_line(FILE *fp)
     return META_ARGS_NOT;
   }
   c = getc(fp);
-  if (c != '!') return META_ARGS_SYNTAX_ERROR;
+  if (c != '!') xerror1("not a script file");
   for (;;) { /* skip blanks if any */
     c = getc(fp);
-    if (c == EOF || c == '\n') return META_ARGS_SYNTAX_ERROR;
+    if (c == EOF || c == '\n') xerror1("not a script file");
     if (c != ' ' && c != '\t') break;
   }
   for (;;) { /* skip argv[0] */
@@ -162,25 +211,34 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
     SINGLE,
     DOUBLE,
   } state = OUTSIDE;
+  int keep_lineno = 0;
 
+  xlineno = 2;
   buf = *pbuf;
   while ((c = getc(fp)) != EOF) {
     if (state == OUTSIDE) {
       if (c == '\"') {
+	keep_lineno = xlineno;
 	state = DOUBLE;
 	n++;
       } else if (c == '\'') {
+	keep_lineno = xlineno;
 	state = SINGLE;
 	n++;
       } else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
-	else if (c == '\n') break;
+	if (c == EOF) xerror1("unexpected eof");
+	else if (c == '\n') {
+	  xlineno++;
+	  break;
+	}
 	state = INSIDE;
 	n++;
 	ADD_CHAR(c);
-      } else if (c == '\n') break;
-      else if (c == ' ' || c == '\t') continue;
+      } else if (c == '\n') {
+	xlineno++;
+	break;
+      } else if (c == ' ' || c == '\t') continue;
       else {
 	state = INSIDE;
 	n++;
@@ -191,10 +249,13 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       else if (c == '\'') state = SINGLE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
-	else if (c == '\n') continue;
-	else ADD_CHAR(c);
+	if (c == EOF) xerror1("unexpected eof");
+	else if (c == '\n') {
+	  xlineno++;
+	  continue;
+	} else ADD_CHAR(c);
       } else if (c == '\n') {
+	xlineno++;
 	ADD_CHAR('\0');
 	state = OUTSIDE;
 	break;
@@ -206,16 +267,28 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       if (c == '\"') state = INSIDE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) return META_ARGS_SYNTAX_ERROR;
-	else if (c == '\n') continue;
+	if (c == EOF) xerror1("unexpected eof");
+	else if (c == '\n') {
+	  xlineno++;
+	  continue;
+	}
 	ADD_CHAR(c);
-      } else ADD_CHAR(c);
+      } else {
+	if (c == '\n') xlineno++;
+	ADD_CHAR(c);
+      }
     } else { /* state == SINGLE */
       if (c == '\'') state = INSIDE;
-      else ADD_CHAR(c);
+      else {
+	if (c == '\n') xlineno++;
+	ADD_CHAR(c);
+      }
     }
   }
-  if (state != OUTSIDE) return META_ARGS_SYNTAX_ERROR;
+  if (state == DOUBLE || state == SINGLE) {
+    xlineno = keep_lineno;
+    xerror1("unterminated string");
+  } else if (state == INSIDE) xerror1("unexpected eof");
   *pbuf = buf;
   *psize = i;
   return n;
@@ -247,20 +320,23 @@ meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
   argc = *pargc;
   argv = *pargv;
 
+  if (!xprog) xprog = meta_progname(argv[0]);
+
   fp = fopen(script, "r");
-  if (fp == NULL) return META_ARGS_ERRNO_ERROR;
+  if (fp == NULL) xerror2("can't open - %s", script);
+
+  xfile = script;
   ret = skip_shebang_line(fp);
   if (ret == META_ARGS_OK) {
     buf = (char *)xmalloc(BUFSIZ);
-    if (buf == NULL) return META_ARGS_ERRNO_ERROR;
+    if (buf == NULL) xerror0();
     ret = parse_as_command_line(&buf, &size, fp);
   }
   fclose(fp);
-  if (ret == META_ARGS_SYNTAX_ERROR) return META_ARGS_SYNTAX_ERROR;
-  else if (ret == META_ARGS_NOT) ret = 0;
+  if (ret == META_ARGS_NOT) ret = 0;
   argc += 2 + ret - from;
   new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
-  if (new_argv == NULL) return META_ARGS_ERRNO_ERROR;
+  if (new_argv == NULL) xerror0();
   new_argv[0] = argv[0];
   if (ret > 0) {
     ptr = buf;

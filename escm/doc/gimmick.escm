@@ -5,7 +5,7 @@
      "DTD/xhtml11-flat.dtd">
 <html>
   <head>
-    <title>Gimmick Feature</title>
+    <title>Polyglot Feature</title>
     <meta http-equiv="Content-Type" content="text/html" />
     <link href="aescm.css" type="text/css" rel="stylesheet" />
     <?xml-stylesheet type="text/css" href="aescm.css"?>
@@ -13,7 +13,7 @@
   <?scm (load (string-append *pwd* "/config-h.scm"))
         (load (string-append *pwd* "/helper.scm"))?>
   <body>
-    <h1>Gimmick Feature</h1>
+    <h1>Polyglot Feature</h1>
     <address>TAGA Yoshitaka
 &lt;<?scm:d (link-mail PACKAGE_BUGREPORT)?>&gt;</address>
     <p>
@@ -22,7 +22,7 @@ is designed to be interpreter independent.
 This does not mean Scheme interpreter independent.
 You can embed code of most interpreter languages.
 But this feature is enabled only when you has run <em>configure</em>
-script with <code>-with-gimmick</code> option.
+script with <code>-with-polyglot</code> option.
 If you find description on <code>-l</code> option
 in the help message shown by <code>-h</code>, this feature is on.</p>
 
@@ -45,15 +45,7 @@ of any objects other than strings.</li>
 Information on your interpreter language is read
 from a simple configuratioon file, about a dozen of lines at most.
 This distribution comes with the configuration files for
-<a href="../src/lang/awk">Awk</a>,
-<a href="../src/lang/csh">Csh</a>,
-<a href="../src/lang/perl">Perl</a>,
-<a href="../src/lang/python">Python</a>,
-<a href="../src/lang/ruby">Ruby</a>,
-<a href="../src/lang/scheme">Scheme</a>,
-<a href="../src/lang/sh">Sh</a>,
-and
-<a href="../src/lang/tcl">Tcl</a>.
+Awk, C Shell, Octave, Perl, Python, Rugy, Schem, Shell, and Tcl.
 They are stored in <code>$(pkgdatadir)/lang</code>
 (maybe in <code>/usr/local/share/<?scm:d PACKAGE?>/lang/</code>).
 </p>

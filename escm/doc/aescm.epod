@@ -54,9 +54,7 @@ Preprocess files and convert them into a Scheme program.
 
 =item -H
 
-Print no content header even in a CGI script
-but print the content header if this option is specified
-with C<-E> option outside a CGI script.
+Print no content header even in a CGI script.
 
 =item -e EXPR
 
@@ -77,7 +75,7 @@ Specify the interpreter with its arguments.
 Specify the interpreter language to be used.
 This option is valid
 if the tool has been configured with
-C<--enable-gimmick> option.
+C<--enable-polyglot> option.
 
 =item -o FILENAME
 
@@ -177,7 +175,7 @@ the tool is invoked in a CGI or not.
 =item PATH_TRANSLATED
 
 The file to be processed
-when the tool is invoked as an action handler.
+when the tool is invoked as a handler CGI program.
 
 =back
 
@@ -225,10 +223,10 @@ Copy or hard-link B<<?scm:d PACKAGE?>> to
 C<~/public_html/cgi-bin/<?scm:d PACKAGE?>.cgi>.
 Then add these lines to your C<.htaccess>.
 
-  AddHandler escm-handler escm
+  AddHandler escm-handler schtml
   Action escm-handler /~YOURNAME/cgi-bin/aescm.cgi
 
-Access to a file suffixed with C<.escm> will be processed by this tool
+Access to a file suffixed with C<.schtml> will be processed by this tool
 and embedded Scheme code will be evaluated.
 The file permission is the same as that of other static documents
 and you need not to add the sharp-bang line.
@@ -239,9 +237,9 @@ B<<?scm:d (string-titlecase PACKAGE)?>>
 is designed to be interpreter independent.
 This does not mean Scheme interpreter independent.
 You can also embed code of most interpreter languages,
-e.g. Awk, Csh, Perl, Python, Ruby, Sh, Tcl.
+e.g. Awk, Csh, Octave, Perl, Python, Ruby, Sh, Tcl.
 But you can use this feature
-only when you have run C<configure> script with C<--enable-gimmick> option.
+only when you have run C<configure> script with C<--enable-polyglot> option.
 
 Try C<aescm -h> and
 check whether a description of C<-l> option appears.

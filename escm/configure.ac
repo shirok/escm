@@ -43,17 +43,19 @@ AC_TYPE_PID_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([dup2 strerror strstr strtol])
+AC_CHECK_FUNCS([atexit dup2 strerror strstr strrchr strtol])
 
-# gimmick
+# polyglot
 AC_OBJEXT
-AC_ARG_ENABLE([gimmick],
-   [  --enable-gimmick -- enable a gimmick feature in the filter tool (no).])
-if test x$enable_gimmick = xyes; then
-  GIMMICK_OBJ=lang.$OBJEXT
-  AC_SUBST(GIMMICK_OBJ)
+AC_ARG_ENABLE([polyglot],
+   [  --enable-polyglot -- enable a polyglot support (no).])
+if test x$enable_polyglot = xyes; then
+  POLYGLOT_OBJ=lang.$OBJEXT
+  AC_SUBST(POLYGLOT_OBJ)
 fi
-AM_CONDITIONAL(GIMMICK, test "$enable_gimmick" = "yes")
+AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
+LANG_FILES="`cd src/lang && echo -n [[a-z]]*`"
+AC_SUBST(LANG_FILES)
 
 # handler CGI program
 AC_ARG_ENABLE([handler],
@@ -66,5 +68,6 @@ HTML_DOC_FILES=`echo $ESCM_DOC_FILES | sed -e "s/\.escm/.html/g"`
 AC_SUBST(ESCM_DOC_FILES)
 AC_SUBST(HTML_DOC_FILES)
 
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile test/Makefile
+	         src/lang/Makefile])
 AC_OUTPUT

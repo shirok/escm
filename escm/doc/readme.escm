@@ -60,7 +60,7 @@ Then run as:</p>
     </blockquote>
 
     <p>You can also embed other interpreter languages than <em>Scheme</em>
-if you run <em>configure</em> with <em>--enable-gimmick</em> option.
+if you run <em>configure</em> with <em>--enable-polyglot</em> option.
 See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
@@ -69,7 +69,7 @@ of Apache web servers.
 The tool will be automatically installed in <em>cgi-bin</em> directory.
 You may have to add a suffix.
 Consult
-<a href="aescm.html#action handler">the example in the man page.</a></p>
+<a href="aescm.html#handler cgi program">the example in the man page.</a></p>
 
 
     <h2>BUGS</h2>

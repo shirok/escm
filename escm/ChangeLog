@@ -1,3 +1,29 @@
+2003-07-14  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/Makefile.am, src/meta_arg.h, src/meta_arg.c, src/escm.h,
+	src/escm.c, src/filter.c: Changed the policy on signalling
+	an error.
+
+2003-07-13  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* configure.ac, src/Makefile.am, doc/Makefile.am, doc/readme.escm,
+	doc/aescm.epod: Replace "gimmick" with "polyglot".
+	* configure.ac, src/Makefile.am, src/lang/Makefile.am: Added
+	Makefile.am to src/lang/.
+
+2003-07-12  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/fork.c (sigterm, escm_popen): Send SIGTERM to its process
+	group if an error occurs in the child process.
+	* src/fork.c (escm_popen): Removed restrictions of the arguments
+	of backend interpreters.
+	* src/escm.h, src/lang.awk, src/filter.c: Renamed the default
+	language information struct `lang_scm' to `deflang'.
+	* src/filter.c, src/cgi.c (escm_header): Write the content header
+	directly to stdout, so it must be called before invoking the
+	backend interpreter.
+	* src/lang/octave: Added a language configuration file for Octave.
+	
 2003-07-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* configure.ac, acinclude.m4, src/Makefile.am, src/filter.c: Can
 	disable the tool from being used as a handler CGI program.

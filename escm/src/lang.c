@@ -167,26 +167,26 @@ parse_lang(const char *name, const char **interp)
   char *ptr, *data;
   int flag1, flag2;
 
-  if (!read_conf(name)) escm_error("Can't open config file for %s", name);
+  if (!read_conf(name)) escm_error("can't open - %s", name);
   ptr = buffer;
   c = get_data(buffer[0], &ptr, &data);
-  if (c == -1) escm_error("syntax error for %s", name);
+  if (c == -1) escm_error("broken config file - %s", name);
   c = buffer[0];
   /* name */
   if (!parse_name(data, &(mylang.name)))
-    escm_error("syntax error for %s", name);
+    escm_error("broken config file - %s", name);
   while (ptr != NULL) {
     switch (get_data(c, &ptr, &data)) {
     case -1:
-      escm_error("syntax error for %s", name);
+      escm_error("broken config file - %s", name);
       /* not reached */
     case HASH_KEY('b', 'i'): /* bind */
       if (!parse_bind(data, &(mylang.bind_prefix), &(mylang.bind_infix), &(mylang.bind_suffix), &flag1))
-	escm_error("syntax error for %s", name);
+	escm_error("broken config file - %s", name);
       break;
     case HASH_KEY('a', 's'): /* assign */
       if (!parse_bind(data, &(mylang.assign_prefix), &(mylang.assign_infix), &(mylang.assign_suffix), &flag2))
-	escm_error("syntax error for %s", name);
+	escm_error("broken config file - %s", name);
       break;
     case HASH_KEY('i', 'n'): /* initialization */
       mylang.init = data;
@@ -202,14 +202,14 @@ parse_lang(const char *name, const char **interp)
       break;
     case HASH_KEY('e', 'x'): /* expression */
       if (!parse_expression(data, &(mylang.display_prefix), &(mylang.display_suffix)))
-	escm_error("syntax error for %s", name);
+	escm_error("broken config file - %s", name);
       break;
     case HASH_KEY('s', 't'): /* string */
       if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
-	escm_error("syntax error for %s", name);
+	escm_error("broken config file - %s", name);
       break;
     default:
-      escm_error("syntax error for %s", name);
+      escm_error("broken config file - %s", name);
     }
   }
   if (!mylang.bind_infix) {

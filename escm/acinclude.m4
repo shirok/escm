@@ -37,9 +37,10 @@ if test x$enable_handler = xno; then
    enable_handler=no
    ENABLE_HANDLER=
 elif test x$enable_handler = xyes || test x$enable_handler = x; then
-   if test -d $prefix/public_html; then
-      CGIBIN=$prefix/public_html/cgi-bin
-   elif test -d $prefix/cgi-bin; then
+#   if test -d $prefix/public_html; then
+#      CGIBIN=$prefix/public_html/cgi-bin
+#   elif test -d $prefix/cgi-bin; then
+   if test -d $prefix/cgi-bin; then
       CGIBIN=$prefix/cgi-bin
    else
       for x in /Local/Library/WebServer/CGI-Executables /Library/WebServer/CGI-Executables /opt/apache/share/cgi-bin /boot/home/apache/cgi-bin /usr/local/apache/cgi-bin /usr/local/httpd/cgi-bin /usr/local/www/cgi-bin /usr/local/share/apache/cgi-bin /usr/share/apache/cgi-bin /var/apache/cgi-bin /var/www/cgi-bin; do

@@ -16,6 +16,11 @@
 # define TRUE !FALSE
 #endif /* TRUE */
 
+/* Used to make error messages. */
+extern const char *escm_prog;
+extern const char *escm_file;
+extern int escm_lineno;
+
 /* language information structure */
 struct escm_lang {
   char *name;            /* the name space with the subname */
@@ -35,7 +40,7 @@ struct escm_lang {
   char *finish;          /* finalization code */
 };
 
-extern struct escm_lang lang_scm;
+extern struct escm_lang deflang;
 
 /* escm.c  */
 /* escm_init(&lang, outp) - initialize the backend interpreter. */
@@ -43,11 +48,13 @@ void escm_init(const struct escm_lang *lang, FILE *outp);
 /* escm_finish(&lang, outp) - finalize the backend interpreter. */
 void escm_finish(const struct escm_lang *lang, FILE *outp);
 /* escm_preproc(&lang, inp, outp) - the preprocessor. */
-int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+void escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
 /* escm_bind(lang, var, val, outp) - bind var to val. */
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 /* escm_assign(lang, var, val, outp) - assign var to val. */
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
+/* escm_literal(lang, str, outp) - put a string in lang. */
+void escm_literal(const struct escm_lang *lang, const char *str, FILE *outp);
 
 /* cgi.c */
 /* escm_header(lang, outp) - send an HTML content-type header. */

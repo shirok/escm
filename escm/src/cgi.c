@@ -20,14 +20,9 @@
 
 #include "escm.h"
 
-enum cgi_header_type {
-  CGI_HEADER_NONE,
-  CGI_HEADER_HTML,
-};
-
 static int in_cgi = FALSE;
 static int cached = FALSE;
-static enum cgi_header_type header_type = CGI_HEADER_NONE;
+static int header = TRUE;
 
 /* escm_is_cgi() - return TRUE if invoked in a CGI script, FALSE otherwise.
  */
@@ -45,11 +40,9 @@ escm_is_cgi(void)
 void
 escm_header(const struct escm_lang *lang, FILE *outp)
 {
-  fputs(lang->literal_prefix, outp);
-  fputs("Content-type: text/html\\r\\n\\r\\n", outp);
-  fputs(lang->literal_suffix, outp);
-  fputc('\n', outp);
-  header_type = CGI_HEADER_HTML;
+  fputs("Content-type: text/html\r\n\r\n", outp);
+  fflush(outp);
+  header = TRUE;
 }
 /* escm_error(fmt, ...) - print a warning message and exit the program.
  * The message is specified by strerror(errno) if msg is NULL.
@@ -61,16 +54,22 @@ void escm_error(const char *fmt, ...)
   va_start(ap, fmt);
   if (fmt == NULL) fmt = strerror(errno);
   if (escm_is_cgi()) {
-    if (header_type != CGI_HEADER_HTML) {
+    if (!header) {
       fputs("Content-type: text/html\r\n\r\n", stdout);
       fputs("<html><body>", stdout);
     }
-    fputs("<p>", stdout);
+    printf("<p>%s: ", escm_prog);
+    if (escm_file) printf("%s: ", escm_file);
+    if (escm_lineno) printf("%d: ", escm_lineno);
     vfprintf(stdout, fmt, ap);
     fputs("</p></body></html>\n", stdout);
     exit(EXIT_SUCCESS);
   } else {
+    fprintf(stderr, "%s: ", escm_prog);
+    if (escm_file) fprintf(stderr, "%s: ", escm_file);
+    if (escm_lineno) fprintf(stderr, "%d: ", escm_lineno);
     vfprintf(stderr, fmt, ap);
+    fputc('\n', stderr);
     exit(EXIT_FAILURE);
   }
 }

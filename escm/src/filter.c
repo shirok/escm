@@ -11,6 +11,9 @@
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif /* HAVE_STRING_H */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
@@ -61,36 +64,22 @@ version(void)
   fputs("The default interpreter is '" ESCM_BACKEND "'\n", stdout);
 }
 
-/* proc_file_fp(lang, inp, outp) - process a file. The inpuf file
- * is specifeid by the pointer to the FILE structure.
- */
-static void
-proc_file_fp(struct escm_lang *lang, FILE *inp, FILE *outp)
-{
-  int ret;
-  ret = escm_preproc(lang, inp, outp);
-  if (!ret) escm_error("Syntax error while reading from an input stream.");
-}
 /* proc_file_name(lang, name, outp) - process a file. The inpuf file
  * is specifeid by its name.
  */
 static void
 proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
 {
-  int ret;
   FILE *inp;
 
   inp = fopen(file, "r");
-  if (inp == NULL) escm_error(NULL);
+  if (inp == NULL) escm_error("can't open - %s", file);
 
+  escm_file = file;
   escm_assign(lang, "*escm-input-file*", file, outp);
 
-  ret = meta_skip_shebang(inp);
-  if (ret == META_ARGS_SYNTAX_ERROR)
-    escm_error("Syntax error while reading from %s", file);
-  ret = escm_preproc(lang, inp, outp);
-  if (!ret)
-    escm_error("Syntax error while reading from %s", file);
+  meta_skip_shebang(inp);
+  escm_preproc(lang, inp, outp);
   fclose(inp);
 }
 
@@ -185,12 +174,14 @@ main(int argc, char **argv)
 #ifdef ENABLE_HANDLER
   const char *path_translated = NULL;
 #endif /* ENABLE_HANDLER */
-  lang = &lang_scm;
+  lang = &deflang;
+
+  /* for error messages */
+  escm_prog = meta_progname(argv[0]);
 
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_is_cgi()) {
-    if (dup2(fileno(stdout), fileno(stderr)) < 0)
-      escm_error("Can't redirect stderr to stdout.");
+    if (dup2(fileno(stdout), fileno(stderr)) < 0) escm_error(NULL);
 #ifdef ENABLE_HANDLER
     path_translated = getenv("PATH_TRANSLATED");
 #endif /* ENABLE_HANDLER */
@@ -206,17 +197,17 @@ main(int argc, char **argv)
 #ifdef ENABLE_HANDLER
   }
 #endif /* ENABLE_HANDLER */
-  if (ret == META_ARGS_ERRNO_ERROR) escm_error(NULL);
-  else if (ret == META_ARGS_SYNTAX_ERROR)
-    escm_error("Syntax error while parse meta argument lines");
 
   /* process options */
   parse_opts(argc, argv, &opts);
 
+  /* write out a content header. */
+  if (opts.header && escm_is_cgi()) escm_header(lang, outp);
+
   /* specify the output file if necessary. */
   if (opts.outfile) {
     if (freopen(opts.outfile, "w", stdout) == NULL)
-      escm_error("Can't open %s", opts.outfile);
+      escm_error("can't open - %s", opts.outfile);
   }
 
 #ifdef ESCM_LANG_DIR
@@ -227,16 +218,13 @@ main(int argc, char **argv)
   /* invoke the interpreter. */
   if (opts.process) {
     outp = escm_popen(opts.interpreter);
-    if (outp == NULL)
-      escm_error("Can't invoke the interpreter.");
+    /* outp will never be NULL. See fork.c */
   }
 
   /* initialization */
   escm_init(lang, outp);
-  if (opts.process)
-    escm_bind(lang, "*escm-interpreter*",
-	      opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
-  else escm_bind(lang, "*escm-interpreter*", NULL, outp);
+  escm_bind(lang, "*escm-interpreter*",
+	    opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
   escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
   escm_bind(lang, "*escm-input-file*", NULL, outp);
 
@@ -246,14 +234,16 @@ main(int argc, char **argv)
     fputc('\n', outp);
   }
 
-  /* write out a content header. */
-  if ((opts.header && escm_is_cgi()) ||
-      (!opts.process && !opts.header && !escm_is_cgi()))
-    escm_header(lang, outp);
+  /* content header if -E */
+  if (opts.header && !opts.process)
+    escm_literal(lang, "Content-type: text/html\\r\\n\\r\\n", outp);
 
   /* process files */
-  if (argc == optind) proc_file_fp(lang, stdin, outp);
-  else {
+  if (argc == optind) {
+    escm_file = "stdin";
+    escm_lineno = 1;
+    escm_preproc(lang, stdin, outp);
+  } else {
     for (i = optind; i < argc; i++) {
       proc_file_name(lang, argv[i], outp);
     }
