@@ -1,25 +1,40 @@
-/* meta_arg.h for aescm.
+/* meta_argc.h - add meta-argument functionality
  * $Id$
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  */
 #ifndef META_ARG_H
-#define META_ARG_H
-int meta_args(int *pargc, char ***pargv);
-int meta_args_replace(int *pargc, char ***pargv, const char *filename, int from);
-int meta_skip_shebang(FILE *fp);
+#  define META_ARG_H 1
+#include <stdio.h> /* defines NULL and FILE */
 
-/* values to be returned */
-#define META_ARGS_OK 0
-#define META_ARGS_NOT -1
-
+#define ESCM 1
 #ifdef ESCM
 #include "escm.h"
 #include "misc.h"
-#define xerror1 escm_error
-#define xerror2 escm_error
-#define xprog escm_prog
-#define xfile escm_file
-#define xlineno escm_lineno
+#define XPROG escm_prog
+#define XFILE escm_file
+#define XLINENO escm_lineno
+#define XERROR0(str) escm_error(str)
+#define XERROR1(fmt, arg) escm_error(fmt, arg)
+#if defined(ENABLE_CGI)
+#  define META_ACTION 1
+#  define escm_expand meta_expand
+#else
+#  define escm_expand(ic, iv, sc, sv, o, p) meta_expand(ic, iv, sc, sv, o)
+#endif /* defined(ENABLE_CGI) */
 #endif /* ESCM */
-#endif /* META_ARG_H */
-/* end of meta_arg.h */
+
+#ifndef _
+#  define _(str) str
+#endif /* !_ */
+
+#ifdef META_ACTION
+FILE * meta_expand(int *pinterpc, char ***pinterpv,
+		   int *pscriptc, char ***pscriptv,
+		   char *optstr, char *path);
+#else /* !META_ACTION */
+FILE * meta_expand(int *pinterpc, char ***pinterpv,
+		   int *pscriptc, char ***pscriptv,
+		   char *optstr);
+#endif /* META_ACTION */
+
+#endif /* !META_ARG_H */

@@ -162,39 +162,4 @@ tokenize_cmd(const char *cmd)
   return argv;
 }
 
-/*========================================================
- * missing functions
- *========================================================*/
-#if !defined(HAVE_ATEXIT)
-/* This implementation is NOT CORRECT at all. */
-static void (*to_be_called)(void) = NULL;
-static void wrapper(int ret, void *arg)
-{
-  to_be_called();
-}
-int atexit(void (*func)(void))
-{
-  if (to_be_called) return -1;
-  to_be_called = func;
-  on_exit(wrapper, NULL);
-  return 0;
-}
-#endif /* !defined(HAVE_ATEXIT) */
-
-#if !defined(HAVE_STRTOL)
-long int
-strtol(const char *p, const char *endptr, int base)
-{
-  long int ret = 0L;
-
-  if (base != 10) escm_error("base must be 10");
-
-  while ('0' < *p && *p < '9') {
-    ret = ret * 10L + *p - '0';
-  }
-  endptr = p;
-  return ret;
-}
-#endif /* HAVE_STRTOL) */
-
 /* end of misc.c */

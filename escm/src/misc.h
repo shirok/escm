@@ -8,9 +8,12 @@
 #define FALSE 0
 #define TRUE !FALSE
 
-/* Will be moved elsewhere. */
-/* #define gettext(text) text */
-#define _(text) text
+#if defined(ENABLE_NLS)
+#  include <libintl.h>
+#  define _(text) gettext(text)
+#else /* !defined(ENABLE_NLS) */
+#  define _(text) text
+#endif /* defined(ENABLE_NLS) */
 
 /* Used to make error messages. */
 extern const char *escm_prog;
@@ -28,7 +31,6 @@ void escm_bind(const struct escm_lang *lang, const char *var, const char *val, F
 void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
 #endif /* ENABLE_CGI */
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
-void escm_literal(const struct escm_lang *lang, const char *str, FILE *outp);
 
 /* misc.c */
 #ifdef ENABLE_CGI
@@ -50,14 +52,6 @@ void *escm_realloc(void *ptr, size_t size);
 
 /* redirection */
 void escm_redirect(int from, int to);
-
-/* missing functions */
-#if !defined(HAVE_ATEXIT)
-int atexit(void (*function)(void));
-#endif /* !defined(HAVE_ATEXIT) */
-#if !defined(HAVE_STRTOL)
-long int strtol(const char *nptr, const char *endptr, int base);
-#endif /* !defined(HAVE_STRTOL) */
 
 #endif /* not MISC_H */
 /* end of misc.h */

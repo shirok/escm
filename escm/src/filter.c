@@ -31,6 +31,10 @@
 #  define getopt_long(a, b, c, d, e) getopt(a, b, c)
 #endif /* !defined(HAVE_GETOPT_LONG) */
 
+#if defined(ENABLE_NLS)
+#  include <locale.h>
+#endif /* defined(ENABLE_NLS) */
+
 #include "meta_arg.h"
 #include "escm.h"
 #include "misc.h"
@@ -72,7 +76,6 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   escm_file = file;
   escm_assign(lang, "*escm-input-file*", file, outp);
 
-  meta_skip_shebang(inp);
   escm_preproc(lang, inp, outp);
   fclose(inp);
 }
@@ -81,11 +84,14 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
 int
 main(int argc, char **argv)
 {
-  int i, c, ret;
+  int i, c, s_argc;
+  char **s_argv;
+  FILE *inp;
   FILE *outp = stdout;
   int header_flag = TRUE;
   int process_flag = TRUE;
   char *footer_file = NULL;
+  char *header_file = NULL;
   char *output_file = NULL;
 #ifdef ENABLE_POLYGLOT
   char *lang_name = NULL;
@@ -94,16 +100,18 @@ main(int argc, char **argv)
   char **expr = NULL;
   int n_expr = 0;
 #ifdef ENABLE_CGI
-  const char *path_translated = NULL;
 #endif /* ENABLE_CGI */
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
+#define OPTSTR "EHce:f:h:i:l:o:"
   const struct option long_opt[] = {
     { "no-eval", 0, NULL, 'E' },
     { "no-header", 0, NULL, 'H', },
+    { "classic", 0, NULL, 'c', },
     { "eval", 1, NULL, 'e', },
     { "footer", 1, NULL, 'f', },
+    { "header", 1, NULL, 'h', },
     { "interp", 1, NULL, 'i', },
     { "language", 1, NULL, 'l', },
     { "output", 1, NULL, 'o', },
@@ -129,24 +137,24 @@ main(int argc, char **argv)
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_cgi) {
     escm_redirect(fileno(stderr), fileno(stdout));
-    path_translated = getenv("PATH_TRANSLATED");
+  } else {
+#endif /* ENABLE_CGI */
+#ifdef ENABLE_NLS
+    setlocale (LC_ALL, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
+#endif /* ENABLE_NLS */
+#ifdef ENABLE_CGI
   }
 #endif /* ENABLE_CGI */
 
   /* expand meta-arguments if necessary */
-#ifdef ENABLE_CGI
-  if (argc == 1 && path_translated) {
-    ret = meta_args_replace(&argc, &argv, path_translated, 1);
-  } else {
-#endif /* ENABLE_CGI */
-    ret = meta_args(&argc, &argv);
-#ifdef ENABLE_CGI
-  }
-#endif /* ENABLE_CGI */
+  inp = escm_expand(&argc, &argv, &s_argc, &s_argv,
+		    OPTSTR, getenv("PATH_TRANSLATED"));
 
   /* process options */
   for (;;) {
-    c = getopt_long(argc, argv, "EHe:f:i:l:o:", long_opt, &long_idx);
+    c = getopt_long(argc, argv, OPTSTR, long_opt, &long_idx);
     if (c == -1) break;
     switch (c) {
 #if defined(HAVE_GETOPT_LONG)
@@ -158,8 +166,10 @@ main(int argc, char **argv)
 "\n"
 "  -E, --no-eval                convert documents into code\n"
 "  -H, --no-header              print no content header even in a CGI\n"
+"  -c, --classic                -H and error messages go to stdout\n"
 "  -e, --eval=EXPR              evaluate an expression\n"
 "  -f, --footer=FILENAME        specify the footer file\n"
+"  -h, --header=FILENAME        specify the header file\n"
 "  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
 "  -l, --language=LANG          choose the interpreter language\n"
 "  -o, --output=FILENAME        specify the output file\n"
@@ -176,7 +186,7 @@ main(int argc, char **argv)
       } else {
 	interp = getenv("ESCM_BACKEND");
 	if (!interp) interp = ESCM_BACKEND;
-	printf(_("%s - experimental version of escm\n"), PACKAGE_STRING);
+	printf(_("%s - developers' version of escm\n"), PACKAGE_STRING);
 	printf(_("The default interpreter is '%s'\n"), interp);
       }
       exit(EXIT_SUCCESS);
@@ -190,6 +200,10 @@ main(int argc, char **argv)
       header_flag = FALSE;
       break;
 #endif /* ENABLE_CGI */
+    case 'c':
+      header_flag = FALSE;
+      if (!escm_cgi) escm_redirect(fileno(stderr), fileno(stdout));
+      break;
     case 'e':
       n_expr++;
       expr = XREALLOC(char *, expr, n_expr);
@@ -197,6 +211,9 @@ main(int argc, char **argv)
       break;
     case 'f':
       footer_file = optarg;
+      break;
+    case 'h':
+      header_file = optarg;
       break;
     case 'i':
       interp = optarg;
@@ -213,7 +230,7 @@ main(int argc, char **argv)
 #if defined(HAVE_GETOPT_LONG)
       printf(_("Try `%s --help' for more information.\n"), escm_prog);
 #else /* !defined(HAVE_GETOPT_LONG) */
-      fprintf(stderr, "Usage: %s [-EH] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
+      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
       fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
 #endif /* defined(HAVE_GETOPT_LONG) */
       exit(EXIT_FAILURE);
@@ -258,7 +275,8 @@ main(int argc, char **argv)
   /* initialization */
   escm_init(lang, outp);
   escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
-  escm_bind(lang, "*escm-input-file*", NULL, outp);
+  if (inp == 0) escm_bind(lang, "*escm-input-file*", NULL, outp);
+  else escm_bind(lang, "*escm-input-file*", s_argv[0], outp);
   escm_bind(lang, "*escm-output-file*", output_file, outp);
   if (process_flag) {
     escm_bind(lang, "*escm-interpreter*",
@@ -286,22 +304,22 @@ main(int argc, char **argv)
     fputc('\n', outp);
   }
 
-  /* content header if -E */
-  if (header_flag && !process_flag)
-    escm_literal(lang, "Content-type: text/html\\r\\n\\r\\n", outp);
-
+  if (header_file) proc_file_name(lang, header_file, outp);
   /* process files */
-  if (argc == optind) {
-    escm_file = "stdin";
-    escm_lineno = 1;
-    escm_preproc(lang, stdin, outp);
-  } else {
-    for (i = optind; i < argc; i++) {
-      proc_file_name(lang, argv[i], outp);
+  if (!inp) {
+    if (argc == optind) {
+      escm_file = "stdin";
+      escm_lineno = 1;
+      escm_preproc(lang, stdin, outp);
+    } else {
+      for (i = optind; i < argc; i++)
+	proc_file_name(lang, argv[i], outp);
     }
+  } else {
+    if (argc > optind || s_argc != 1) escm_error(_("too many arguments"));
+    escm_preproc(lang, inp, outp);
   }
-  if (footer_file)
-    proc_file_name(lang, footer_file, outp);
+  if (footer_file) proc_file_name(lang, footer_file, outp);
 
   /* finalization */
   escm_finish(lang, outp);

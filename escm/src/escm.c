@@ -61,16 +61,6 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
     }
   }
 }
-/* escm_literal(lang, str, outp) - put a string in lang
- */
-void
-escm_literal(const struct escm_lang *lang, const char *str, FILE *outp)
-{
-  if (lang->literal.prefix) fputs(lang->literal.prefix, outp);
-  fputs(str, outp);
-  if (lang->literal.suffix) fputs(lang->literal.suffix, outp);
-  fputc('\n', outp);
-}
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void

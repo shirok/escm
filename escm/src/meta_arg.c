@@ -1,225 +1,135 @@
-/************************************************************************
- * meta_arg.c - another implementation of the second line meta-argument
- *              processing but NOT compatible.
+/* meta_argc.c - add meta-argument functionality
  * $Id$
- ************************************************************************
+ * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  *
- * Copyright (c) 2002-2003 TAGA Yoshitaka, All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
- * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
+ * fp = meta_expand(&argc, &argv, &scr_argc, &src_argv, optstr);
  */
-/* Usage:
- * n = meta_args(&argc, &argv);
- *
- * Example:
- *  $ foo bar
- *  and "foo" begins with:
- *  #!/usr/local/bin/interpreter \
- *    -e '(define x "abc")' \
- *    -s
- * =>
- *  argv[0] = "/usr/local/bin/interpreter";
- *  argv[1] = "-e";
- *  argv[2] = "(define x \"abc\")"
- *  argv[3] = "-s";
- *  argv[4] = "foo";
- *  argv[5] = "bar";
- *  argv[6] = NULL;
- *
- * Return the number of meta-arguments (a non-negative).
- *
- * This is another implementation of the second-line meta-argument
- * processing introduced by scsh but is NOT compatible with it
- * (see Defferences below).
- * 
- * Differences from scsh's meta-argument processing:
- * - It parses the meta-argument lines as shells do, but does not expand
- *   wild characters. It means you can use tabs, double quotation marks
- *   and single quotation marks.
- * - The meta-arguments can be stored in successing lines.
- *   Put a backslash at the end of line to continue.
- * - The ANSI C escapes (\r, \n, etc.) are not supported.
- *
- * Macros and their behaviors:
- * - xmalloc(size)            malloc(size)
- * - xrealloc(ptr, size)      realloc(ptr, size)
- * - xerror1(msg)             print an error message and exit
- * - xerror2(fmt, arg)
- */
-
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif /* HAVE_STDLIB_H */
+
+#if defined(HAVE_STDLIB_H)
+#  include <stdlib.h>
+#else /* !defined(HAVE_STDLIB_H) */
+void exit(int status);
+#  define EXIT_SUCCESS 0
+#  define EXIT_FAILURE 1
+#  if !defined(XMALLOC)
+void *malloc(size_t size);
+void *realloc(void *p, size_t size);
+#  endif /* !defined(XMALLOC) */
+#endif /* defined(HAVE_STDLIB_H) */
+
+#if !defined(HAVE_STRCHR)
+#  define strchr index
+#endif /* !defined(HAVE_STRCHR) */
+#if defined(HAVE_STRING_H)
+#  include <string.h>
+#elif defined(HAVE_STRINGS_H)
+#  include <strings.h>
+#else /* !defined(HAVE_STRING_H) && !defined(HAVE_STRINGS_H) */
+char *strchr(const char *s, int c);
+#endif /* defined(HAVE_STRING_H) && defined(HAVE_STRINGS_H) */
+
 #include "meta_arg.h"
 
-#if !defined(_)
-#  define _(str) str
-#endif /* !defined(_) */
-
-#ifndef FALSE
-#  define FALSE 0
-#endif /* FALSE */
-#ifndef TRUE
-#  define TRUE !FALSE
-#endif /* TRUE */
-
-#ifndef xprog
-static char *xprog = NULL;
-#endif /* xprog */
-#ifndef xfile
-static char *xfile = NULL;
-#endif /* xfile */
-#ifndef xlineno
-static int xlineno = 0;
-#endif /* xlineno */
-
-#ifndef xerror1
-# define xerror1(str) {\
-  fprintf(stderr, "%s: ", xprog);\
-  if (xfile) fprintf(stderr, "%s: ", xfile);\
-  if (xlineno) fprintf(stderr, "%d: ", xlineno);\
-  fputs(str, stderr);\
-  exit(EXIT_FAILURE);\
-}
-#endif /* xerror1 */
-#ifndef xerror2
-# define xerror2(fmt, arg) {\
-  fprintf(stderr, "%s: ", xprog);\
-  if (xfile) fprintf(stderr, "%s: ", xfile);\
-  if (xlineno) fprintf(stderr, "%d: ", xlineno);\
-  fprintf(stderr, fmt, arg);\
-  exit(EXIT_FAILURE);\
-}
-#endif /* xerror2 */
-
-/* The real implementations should check the return value. */
 #ifndef XMALLOC
 #  define XMALLOC(type, n) ((type *)malloc((n) * sizeof(type)))
-#endif /* not XMALLOC */
+#endif /* !XMALLOC */
 #ifndef XREALLOC
-#  define XMALLOC(type, p, n) ((type *)realloc((p), (n) * sizeof(type)))
-#endif /* not XREALLOC */
+#  define XREALLOC(type, p, n) ((type *)realloc(p, (n) * sizeof(type)))
+#endif /* !XREALLOC */
 
+#ifndef XPROG
+static char *xprog;
+#  define XPROG xprog
+#endif /* !XPROG */
+#ifndef XFILE
+static const char *xfile = NULL;
+#  define XFILE xfile
+#endif /* !XFILE */
+#ifndef XLINENO
+static int xlineno = 0;
+#  define XLINENO xlineno
+#endif /* !XLINENO */
+
+#define XERROR1(fmt, arg) {\
+  fprintf(stderr, "%s: ", XPROG); \
+  fprintf(stderr, fmt, arg);\
+  fputc('\n', stderr);\
+  exit(EXIT_FAILURE);\
+}
+#define XERROR0(fmt) {\
+  fprintf(stderr, "%s: %s %d: ", XPROG, XFILE, XLINENO); \
+  fputs(fmt, stderr);\
+  fputc('\n', stderr);\
+  exit(EXIT_FAILURE);\
+}
+
+/* fp = expand_args(fp) */
 #define ADD_CHAR(c) {\
-  if (buf) {\
-     if (size == i) {\
-        size += BUFSIZ;\
-        buf = XREALLOC(char, buf, size);\
-     }\
-     buf[i++] = (char)c;\
+  if (size == i) {\
+     size += BUFSIZ;\
+     buf = XREALLOC(char, buf, size);\
   }\
+  buf[i++] = (char) (c);\
 }
-/* skip_shebang_line(fp) - skip the sharp-bang line.
- * Return META_ARGS_NOT          if it does not have a meta-argument switch;
- *        META_ARGS_OK           if it has a meta-argument switch.
- */
-static int
-skip_shebang_line(FILE *fp)
-{
-  int c;
 
-  xlineno = 1;
-  c = getc(fp);
-  if (c == EOF) return META_ARGS_NOT;
-  else if (c != '#') {
-    ungetc(c, fp);
-    return META_ARGS_NOT;
-  }
-  c = getc(fp);
-  if (c != '!') xerror1(_("bad #! line"));
-  for (;;) { /* skip blanks if any */
-    c = getc(fp);
-    if (c == EOF || c == '\n') xerror1(_("bad #! line"));
-    if (c != ' ' && c != '\t') break;
-  }
-  for (;;) { /* skip argv[0] */
-    c = getc(fp);
-    if (c == EOF || c == '\n') return META_ARGS_NOT;
-    if (c == ' ' || c == '\t') break;
-  }
-  for (;;) { /* skip blanks */
-    c = getc(fp);
-    if (c == EOF || c == '\n') return META_ARGS_NOT;
-    if (c != ' ' && c != '\t') break;
-  }
-  if (c == '\\') {
-    c = getc(fp);
-    if (c == EOF) return META_ARGS_NOT;
-    if (c == '\n') return META_ARGS_OK;
-  }
-  for (;;) {
-    c = getc(fp);
-    if (c == EOF || c == '\n') break;
-  }
-  return META_ARGS_NOT;
-}
-/* parse_as_command_line(&buf, &size, fp) - tokenize meta-argument lines
- * as if they were specified from a terminal.
- * Return the number of meta-arguments or META_ARGS_SYNTAX_ERROR.
- */
-static int
-parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
+/* fp = expand_args(script, &argc, &argv) */
+static FILE *
+expand_args(char *script, int *pargc, char ***pargv)
 {
-  int i = 0;
-  size_t size = *psize;
-  int c;
-  int n = 0;
-  char *buf;
   enum {
     OUTSIDE,
     INSIDE,
     SINGLE,
     DOUBLE,
   } state = OUTSIDE;
+  int c, n = 0, i = 0;
+  size_t size = BUFSIZ;
   int keep_lineno = 0;
+  char *buf, *p, **argv;
+  FILE *fp;
 
-  xlineno = 2;
-  buf = *pbuf;
+  fp = fopen(script, "r");
+  if (fp == NULL) XERROR1(_("can't open %s"), script);
+  c = getc(fp);
+  if (c != '#') {
+    if (c != EOF) ungetc(c, fp);
+    fclose(fp);
+    return NULL;
+  }
+  XFILE = script;
+  XLINENO = 1;
+  c = getc(fp);
+  if (c != '!') XERROR0(_("syntax error"));
+
+  buf = XMALLOC(char, BUFSIZ);
   while ((c = getc(fp)) != EOF) {
     if (state == OUTSIDE) {
       if (c == '\"') {
-	keep_lineno = xlineno;
+	keep_lineno = XLINENO;
 	state = DOUBLE;
 	n++;
       } else if (c == '\'') {
-	keep_lineno = xlineno;
+	keep_lineno = XLINENO;
 	state = SINGLE;
 	n++;
       } else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(_("unexpected eof"));
-	else if (c == '\n') {
-	  xlineno++;
-	  break;
+	if (c == EOF) {
+	  XERROR0(_("unexpected eof"));
+	} else if (c == '\n') {
+	  XLINENO++;
+	  continue;
 	}
 	state = INSIDE;
 	n++;
 	ADD_CHAR(c);
       } else if (c == '\n') {
-	xlineno++;
+	XLINENO++;
 	break;
       } else if (c == ' ' || c == '\t') continue;
       else {
@@ -232,13 +142,14 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       else if (c == '\'') state = SINGLE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(_("unexpected eof"));
-	else if (c == '\n') {
-	  xlineno++;
+	if (c == EOF) {
+	  XERROR0(_("unexpected eof"));
+	} else if (c == '\n') {
+	  XLINENO++;
 	  continue;
 	} else ADD_CHAR(c);
       } else if (c == '\n') {
-	xlineno++;
+	XLINENO++;
 	ADD_CHAR('\0');
 	state = OUTSIDE;
 	break;
@@ -250,131 +161,169 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       if (c == '\"') state = INSIDE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(_("unexpected eof"));
-	else if (c == '\n') {
-	  xlineno++;
+	if (c == EOF) {
+	  XERROR0(_("unexpected eof"));
+	} else if (c == '\n') {
+	  XLINENO++;
 	  continue;
 	}
 	ADD_CHAR(c);
       } else {
-	if (c == '\n') xlineno++;
+	if (c == '\n') XLINENO++;
 	ADD_CHAR(c);
       }
     } else { /* state == SINGLE */
       if (c == '\'') state = INSIDE;
       else {
-	if (c == '\n') xlineno++;
+	if (c == '\n') XLINENO++;
 	ADD_CHAR(c);
       }
     }
   }
   if (state == DOUBLE || state == SINGLE) {
-    xlineno = keep_lineno;
-    xerror1(_("unterminated string"));
-  } else if (state == INSIDE) xerror1(_("unexpected eof"));
-  *pbuf = buf;
-  *psize = i;
-  return n;
-}
-/* next_token(ptr, &size) - return the next token.
- */
-static char *
-next_token(char *ptr, size_t *psize)
-{
-  if (*psize == 0) return NULL;
-  while (*ptr) {
-    ptr++;
-    (*psize)--;
+    XLINENO = keep_lineno;
+    XERROR0(_("unterminated string"));
+  } else if (state == INSIDE) XERROR0(_("unexpected eof"));
+
+  *pargc = n;
+  argv = XMALLOC(char *, n + 1);
+  *pargv = argv;
+  p = buf;
+  for (i = 0; i < n; i++) {
+    argv[i] = p;
+    while (*p)
+      p++;
+    p++;
   }
-  ptr++;
-  (*psize)--;
-  return ptr;
+  argv[i] = NULL;
+  return fp;
 }
 
-int
-meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
+/* fp = skip_shebang(script); */
+static FILE *
+skip_shebang(const char *script)
 {
-  char **argv, **new_argv;
-  char *buf, *ptr;
-  int argc, ret, i, j;
   FILE *fp;
-  size_t size = BUFSIZ;
-
-  argc = *pargc;
-  argv = *pargv;
-
-  if (!xprog) xprog = argv[0];
+  int c;
 
   fp = fopen(script, "r");
-  if (fp == NULL) xerror2(_("can't open - %s"), script);
-
-  xfile = script;
-  ret = skip_shebang_line(fp);
-  if (ret == META_ARGS_OK) {
-    buf = XMALLOC(char, BUFSIZ);
-    ret = parse_as_command_line(&buf, &size, fp);
+  if (fp == NULL) XERROR1(_("can't open %s"), script);
+  c = getc(fp);
+  if (c != '#') {
+    if (c != EOF) ungetc(c, fp);
+    fclose(fp);
+    return NULL;
   }
-  fclose(fp);
-  if (ret == META_ARGS_NOT) ret = 0;
-  argc += 2 + ret - from;
-  new_argv = XMALLOC(char *, 1 + argc);
-  new_argv[0] = argv[0];
-  if (ret > 0) {
-    ptr = buf;
-    for (i = 1; i <= ret; i++) {
-      new_argv[i] = ptr;
-      ptr = next_token(ptr, &size);
+  while ((c = getc(fp)) != '\n' && c != EOF)
+    ;
+  return fp;
+}
+
+/* fp = meta_expand(&interpc, &interpv, &scriptc, &scriptv, optstr); */
+FILE *
+meta_expand(int *pinterpc, char ***pinterpv,
+	    int *pscriptc, char ***pscriptv,
+#ifdef META_ACTION
+	    char *optstr, char *path
+#else /* !META_ACTION */
+	    char *optstr
+#endif /* META_ACTION */
+	    )
+{
+  char **argv;
+  int argc, i, which = 1;
+  FILE *fp = NULL;
+
+  argc = *pinterpc;
+  argv = *pinterpv;
+  *pscriptc = 0;
+  *pscriptv = NULL;
+
+  XPROG = argv[0];
+  if (argc <= 1) { /* no shebang script file. */
+#ifndef META_ACTION
+    return NULL;
+#else /* META_ACTION */
+    if (!path) return NULL;
+    fp = expand_args(path, pinterpc, pinterpv);
+    if (!fp) {
+      *pinterpc = 2;
+      *pinterpv = XMALLOC(char *, 3);
+      (*pinterpv)[0] = argv[0];
+      (*pinterpv)[1] = path;
+      (*pinterpv)[2] = NULL;
+    } else if (*pinterpv != argv) {
+      *pscriptc = 1;
+      *pscriptv = XMALLOC(char *, 2);
+      (*pscriptv)[0] = path;
+      (*pscriptv)[1] = NULL;
+    }
+    return fp;
+#endif /* !META_ACTION */
+  } else if (argc == 2) {
+    if (argv[1][0] == '-') { /* no shebang script file. */
+      return NULL;
+    } else {
+      goto script_without_meta_args;
     }
   } else {
-    i = 1;
+    if (argv[1][0] == '\\' && argv[1][1] == '\0') { /* meta-arguments */
+      fp = expand_args(argv[2], pinterpc, pinterpv);
+      if (*pinterpv != argv) {
+	*pscriptc = argc - 2;
+	*pscriptv = argv + 2;
+      }
+      return fp;
+    } else if (argv[1][0] != '-') {
+      goto script_without_meta_args;
+    } else if (argv[2][0] == '-') { /* no shebang script file. */
+      return NULL;
+    } else {
+      /* check if argv[2] is an option argument. */
+      char *p, *q;
+      for (p = argv[1] + 1; *p; p++) {
+	q = strchr(optstr, *p);
+	if (!q) {
+	  return NULL; /* getopt() will cause an error. */
+	} else if (q[1] == ':') {
+	  if (p[1] == '\0') return NULL;
+	  break;
+	}
+      }
+      which = 2;
+    }
   }
-  new_argv[i++] = (char *)script;
-  for (j = from; i <= argc; i++, j++) {
-    new_argv[i] = argv[j];
+ script_without_meta_args:
+  fp = skip_shebang(argv[which]);
+  if (!fp) return NULL;
+  *pinterpc = which;
+  *pinterpv = XMALLOC(char *, which + 1);
+  for (i = 0; i < which; i++) {
+    (*pinterpv)[i] = argv[i];
   }
-  *pargc = argc;
-  *pargv = new_argv;
-  return ret;
+  (*pinterpv)[i] = NULL;
+  *pscriptc = argc - which;
+  *pscriptv = argv + which;
+  return fp;
 }
-int
-meta_args(int *pargc, char ***pargv)
+#ifdef META_DEBUG
+int main(int argc, char *argv[])
 {
-  if (!(*pargc >= 3 && (*pargv)[1][0] == '\\' && (*pargv)[1][1] == '\0'))
-    return META_ARGS_NOT;
-
-  return meta_args_replace(pargc, pargv, (*pargv)[2], 3);
-}
-
-/* meta_skip_shebang(fp) - skip the sharp-bang line and meta-argument
- * lines if any.
- */
-int
-meta_skip_shebang(FILE *fp)
-{
-  int ret;
-  char *buf = NULL;
-  size_t size = 0;
-
-  ret = skip_shebang_line(fp);
-  if (ret != META_ARGS_OK) return ret;
-  else return parse_as_command_line(&buf, &size, fp);
-}
-
-/*====================================================
- * the main function for debugging.
- *===================================================*/
-#ifdef META_ARGS_TEST
-int main(int argc, char **argv)
-{
+  int s_argc;
+  char **s_argv;
   int i;
-  int ret;
+  FILE *fp;
 
-  ret = meta_args(&argc, &argv);
-  printf("meta-args: %d\n", ret);
+  fp = meta_interp(&argc, &argv, &s_argc, &s_argv, "ab:");
+  printf("interp\n");
   for (i = 0; i < argc; i++) {
-    printf("%02d => >>%s<<\n", i, argv[i]);
+    printf("%d => %s\n", i, argv[i]);
+  }
+  printf("script\n");
+  for (i = 0; i < s_argc; i++) {
+    printf("%d => %s\n", i, s_argv[i]);
   }
   return 0;
 }
-#endif /* def META_ARGS_TEST */
+#endif /* META_DEBUG */
 /* end of meta_arg.c */
