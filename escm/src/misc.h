@@ -32,7 +32,8 @@ int escm_pclose(FILE *fp);
 void escm_redirect(int from, int to);
 
 /* cmdline.c */
-char ** tokenize_cmd(const char *cmd);
+char ** parse_cmdline(const char *cmd);
+FILE* parse_shebang(const char* prog, const char* script, int* pargc, char*** pargv);
 void * xmalloc(size_t size);
 void * xrealloc(void *ptr, size_t size);
 #define XMALLOC(type, n) ((type *) xmalloc((n) * (sizeof(type))))

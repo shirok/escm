@@ -160,7 +160,7 @@ parse_lang(const char *name)
 
   if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "lisp") == 0)
     mylang.scm_p = 1;
-  mylang.backend = tokenize_cmd(data);
+  mylang.backend = parse_cmdline(data);
   mylang.nil = "\"\"";
 
   while (ptr) {

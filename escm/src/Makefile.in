@@ -85,7 +85,7 @@ BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c
 
 bin_PROGRAMS = aescm 2aescm
-aescm_SOURCES = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES) filter.c cmdline.c meta_arg.c meta_arg.h lang.awk
+aescm_SOURCES = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES) filter.c cmdline.c lang.awk
 
 2aescm_SOURCES = classic.c
 
@@ -110,8 +110,7 @@ am_2aescm_OBJECTS = classic.$(OBJEXT)
 2aescm_DEPENDENCIES =
 2aescm_LDFLAGS =
 am_aescm_OBJECTS = escm.$(OBJEXT) misc.$(OBJEXT) fork.$(OBJEXT) \
-	deflang.$(OBJEXT) filter.$(OBJEXT) cmdline.$(OBJEXT) \
-	meta_arg.$(OBJEXT)
+	deflang.$(OBJEXT) filter.$(OBJEXT) cmdline.$(OBJEXT)
 aescm_OBJECTS = $(am_aescm_OBJECTS)
 aescm_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
@@ -122,8 +121,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/classic.Po $(DEPDIR)/cmdline.Po \
 @AMDEP_TRUE@	$(DEPDIR)/deflang.Po $(DEPDIR)/escm.Po \
 @AMDEP_TRUE@	$(DEPDIR)/filter.Po $(DEPDIR)/fork.Po \
-@AMDEP_TRUE@	$(DEPDIR)/lang.Po $(DEPDIR)/meta_arg.Po \
-@AMDEP_TRUE@	$(DEPDIR)/misc.Po
+@AMDEP_TRUE@	$(DEPDIR)/lang.Po $(DEPDIR)/misc.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -220,7 +218,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/filter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fork.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/lang.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/meta_arg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/misc.Po@am__quote@
 
 distclean-depend:

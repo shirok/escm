@@ -1,4 +1,19 @@
+2004-02-20  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Fixed a bug on meta-arguments.
+
+	* src/cmdline.c (parse_shebang): Added this function to replace it
+	with functions in meta_argc.c.
+
+	* src/Makefile.am: Removed meta_argc.[ch].
+
+	* src/meta_arg.c: Removed.
+
+	* src/meta_arg.h: Removed.
+
 2004-02-17  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/cmdline.c: Moved some functions from misc.c.
 
 	* src/fork.c (escm_redirect): Moved this function from src/misc.c.
 

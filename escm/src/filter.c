@@ -30,12 +30,14 @@
 #if !defined(HAVE_GETOPT_LONG)
 #  define getopt_long(a, b, c, d, e) getopt(a, b, c)
 #endif /* !defined(HAVE_GETOPT_LONG) */
+#if !defined POSIXLY_CORRECT
+# define POSIXLY_CORRECT 1
+#endif /* !defined POSIXLY_CORRECT */
 
 #if defined(ENABLE_NLS)
 #  include <locale.h>
 #endif /* defined(ENABLE_NLS) */
 
-#include "meta_arg.h"
 #include "escm.h"
 #include "misc.h"
 
@@ -68,8 +70,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
 int
 main(int argc, char **argv)
 {
-  int i, c, s_argc;
-  char **s_argv;
+  int i, c;
   FILE *inp;
   FILE *outp = stdout;
   int header_flag = TRUE;
@@ -119,12 +120,16 @@ main(int argc, char **argv)
 
   /* expand meta-arguments if necessary */
   if (path_translated) {
-    s_argc = 1;
-    inp = meta_expand_path(path_translated, &argc, &argv);
+    if (argc != 1) {
+      escm_error("too many arguments");
+    }
+    escm_lineno = 1;
+    inp = parse_shebang(argv[0], path_translated, &argc, &argv);
+  } else if (argc == 3 && argv[1][0] == '\\' && argv[1][1] == '\0') {
+    inp = parse_shebang(argv[0], argv[2], &argc, &argv);
   } else {
-    inp = meta_expand(&argc, &argv, &s_argc, &s_argv, OPTSTR);
+    inp = NULL;
   }
-
 
   /* process options */
   for (;;) {
@@ -228,7 +233,7 @@ main(int argc, char **argv)
 
   /* invoke the interpreter. */
   if (process_flag) {
-    if (interp) outp = escm_popen(tokenize_cmd(interp));
+    if (interp) outp = escm_popen(parse_cmdline(interp));
     else outp = escm_popen(lang->backend);
     /* outp will never be NULL. See fork.c */
   }
@@ -241,7 +246,7 @@ main(int argc, char **argv)
   } else if (inp == NULL) {
     escm_bind(lang, "*escm-input-file*", NULL, outp);
   } else {
-    escm_bind(lang, "*escm-input-file*", s_argv[0], outp);
+    escm_bind(lang, "*escm-input-file*", argv[argc - 1], outp);
   }
   escm_bind(lang, "*escm-output-file*", output_file, outp);
   if (process_flag) {
@@ -255,6 +260,8 @@ main(int argc, char **argv)
     } else {
       escm_bind(lang, "*escm-query-string*", NULL, outp);
     }
+  } else {
+    escm_bind(lang, "*escm-interpreter*", NULL, outp);
   }
 
   /* evaluate the expressions specified in options */
@@ -265,12 +272,6 @@ main(int argc, char **argv)
 
   /* process files */
   if (path_translated) {
-    if (argc > optind) escm_error(_("too many arguments"));
-    if (inp == NULL) {
-      inp = fopen(path_translated, "r");
-      escm_lineno = 1;
-      if (inp == NULL) escm_error(_("can't open - %s"), path_translated);
-    }
     escm_preproc(lang, inp, outp);
   } else if (!inp) { /* filter */
     if (argc == optind) {
@@ -282,7 +283,7 @@ main(int argc, char **argv)
 	proc_file_name(lang, argv[i], outp);
     }
   } else { /* wrapper of an interpreter */
-    if (argc > optind || s_argc != 1) escm_error(_("too many arguments"));
+    if (argc > optind + 1) escm_error(_("too many arguments"));
     escm_preproc(lang, inp, outp);
   }
 
