@@ -20,7 +20,6 @@
 /* Used to make error messages. */
 const char *escm_prog = NULL;
 const char *escm_file = NULL;
-int escm_lineno = 0;
 
 /* put_string(str, outp) - escape str and put it.
  * This function is not used in this file, but will be useful.
@@ -241,14 +240,11 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
   } state = LITERAL;
   int c;
   const char *p;
-  int str_keep_lineno = 0;
-  int tag_keep_lineno = 0;
   char stack[64] = "<?";
   int stackptr = 0, i = 0;
 
   fputs(lang->literal.prefix, outp);
   while ((c = getc(inp)) != EOF) {
-    if (c == '\n') escm_lineno++;
     if (state == LITERAL) {
       if (c == '<') {
 	stackptr++;
@@ -266,7 +262,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  state = CODE;
 	  fputs(lang->literal.suffix, outp);
 	  fputc('\n', outp);
-	  tag_keep_lineno = escm_lineno;
 	  continue;
 	}
 	if (c != ':') goto empty;
@@ -282,8 +277,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  fputs(lang->literal.suffix, outp);
 	  fputc('\n', outp);
 	  fputs(lang->display.prefix, outp);
-	  tag_keep_lineno = escm_lineno;
-	  if (c == '\n') escm_lineno++;
 	  continue;
 	}
       empty:
@@ -334,7 +327,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	    continue;
 	  } else fputc('?', outp);
 	} else if (c == '\"') {
-	  str_keep_lineno = escm_lineno;
 	  in_string = TRUE;
 	}
 	fputc(c, outp);
@@ -345,11 +337,9 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
   else {
     if (in_string) {
       fputc('\"', outp);
-      escm_lineno = str_keep_lineno;
       XERROR("unterminated string");
     }
     if (state == DISPLAY) fputs(lang->display.suffix, outp);
-    escm_lineno = tag_keep_lineno;
     XERROR("unterminated instruction");
   }
   fputc('\n', outp);

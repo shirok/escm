@@ -65,7 +65,6 @@ void escm_assign(const struct escm_lang *lang, const char *var, const char *val,
 #ifndef escm_prog
 #define escm_prog cgi_prog
 #define escm_file cgi_file
-#define escm_lineno cgi_lineno
 #endif /* escm_prog */
 
 #endif /* ESCM_H */

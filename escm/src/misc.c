@@ -62,7 +62,6 @@ void cgi_error(const char *fmt, ...)
   }
   fprintf(fp, "%s: ", cgi_prog);
   if (cgi_file) fprintf(fp, "%s: ", cgi_file);
-  if (cgi_lineno) fprintf(fp, "%d: ", cgi_lineno);
   vfprintf(fp, fmt, ap);
   if (header == HTML) fputs("</p></body></html>\n", stdout);
   exit(iscgi ? EXIT_SUCCESS : EXIT_FAILURE);

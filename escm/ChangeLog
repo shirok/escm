@@ -1,3 +1,11 @@
+2004-10-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c, src/misc.h, src/misc.c: Remove lineno variables.
+
+2004-10-07  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/lang.c: Added end directive to suppress useless newlines.
+
 2004-02-29  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/filter.c (main): Skip the sharp-bang line of the first file.

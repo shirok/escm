@@ -8,7 +8,6 @@
 /* Used to make error messages. */
 extern const char *cgi_prog;
 extern const char *cgi_file;
-extern int cgi_lineno;
 
 void cgi_html_header(FILE *outp);
 void cgi_text_header(FILE *outp);
