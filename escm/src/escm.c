@@ -237,7 +237,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
       len = (int) llen;
       while ((c = getc(stdin)) != EOF && len-- > 0) {
 	/* better replace the next line with an error check. */
-	if (c == '\"') fputc('\\', outp);
+	if (c == '\"' || c == '\\') fputc('\\', outp);
 	fputc(c, outp);
       }
       fputc('\"', outp);
