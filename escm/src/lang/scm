@@ -10,3 +10,5 @@ gosh -b
 (display "@STR@")
 ;; display
 (display @EXP@)
+;; newline
+(newline)

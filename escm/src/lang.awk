@@ -5,7 +5,7 @@
 BEGIN {
   leading = "";
   key = "";
-  split("name command init nil bind assign string display finish", data);
+  split("name command init nil bind assign string display newline finish", data);
   for (x in data) {
     data[data[x]] = "";
     delete data[x];
@@ -114,6 +114,7 @@ END {
   print "  ", escape_string(tmp[3]), ",";
   print " },";
   print " ", escape_string(data["nil"]), ", /* nil */"
+  print " ", escape_string(data["newline"]), ", /* newline */"
   print " ", escape_string(data["init"]), ", /* init */"
   print " ", escape_string(data["finish"]), ", /* finish */"
 

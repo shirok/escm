@@ -181,6 +181,9 @@ parse_lang(const char *name)
     case HASH_KEY('n', 'i'): /* nil */
       mylang.nil = data;
       break;
+    case HASH_KEY('n', 'e'): /* newline */
+      mylang.newline = data;
+      break;
     case HASH_KEY('f', 'i'): /* finish */
       mylang.finish = data;
       break;

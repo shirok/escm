@@ -179,9 +179,14 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  fputc(c, outp);
 	} else if (c == '\n') {
 	  escm_lineno++;
-	  fputc('\\', outp);
-	  fputc('n', outp);
-	  fputs(lang->literal.suffix, outp);
+	  if (lang->newline) {
+	    fputs(lang->literal.suffix, outp);
+	    fputs(lang->newline, outp);
+	  } else {
+	    fputc('\\', outp);
+	    fputc('n', outp);
+	    fputs(lang->literal.suffix, outp);
+	  }
 	  fputc('\n', outp);
 	  fputs(lang->literal.prefix, outp);
 	} else {

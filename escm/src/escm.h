@@ -27,6 +27,7 @@ struct escm_lang {
   struct escm_form_three bind;
   struct escm_form_three assign;
   char *nil;
+  char *newline;
   char *init;            /* initialization code */
   char *finish;          /* finalization code */
 };

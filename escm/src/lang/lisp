@@ -1,0 +1,14 @@
+;; lisp - configurations for the Common Lisp language (GNU CLISP)
+clisp -q /dev/stdin
+;; nil
+nil
+;; bind
+(defvar @VAR@ @VAL@)
+;; assign
+(setq @VAR@ @VAL@)
+;; string
+(princ "@STR@")
+;; display
+(princ @EXP@)
+;; newline
+(princ #\nl)
