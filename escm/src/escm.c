@@ -267,7 +267,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  fputs(lang->literal.suffix, outp);
 	  fputc('\n', outp);
 	  tag_keep_lineno = escm_lineno;
-	  if (c == '\n') escm_lineno++;
 	  continue;
 	}
 	if (c != ':') goto empty;
@@ -298,7 +297,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  fputc('\\', outp);
 	  fputc(c, outp);
 	} else if (c == '\n') {
-	  escm_lineno++;
 	  if (lang->newline) {
 	    fputs(lang->literal.suffix, outp);
 	    fputs(lang->newline, outp);
