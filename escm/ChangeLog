@@ -1,3 +1,7 @@
+2003-06-24  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* configure.ac, src/Makefile.am: do not use libtool.
+	
 2003-06-23  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* version 0.18

@@ -5,9 +5,6 @@ AC_INIT([aescm], [0.18], [tagga@tsuda.ac.jp])
 AM_INIT_AUTOMAKE([aescm], [0.18])
 AM_CONFIG_HEADER([src/config.h])
 
-LIB_VERSION="0:0:0"
-AC_SUBST(LIB_VERSION)
-
 # Checks for programs.
 AC_PROG_CC
 CFLAGS="$CFLAGS -Wall"
@@ -16,7 +13,7 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_AWK
 # AC_PROG_RANLIB
-AC_PROG_LIBTOOL
+# AC_PROG_LIBTOOL
 AC_CHECK_PROGS(LYNX, [lynx links w3m])
 
 # Checks for Scheme.
