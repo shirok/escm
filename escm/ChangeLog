@@ -1,3 +1,27 @@
+2003-07-23  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* test/t120_awk.test, test/t140_prst_awk.test: Check config.h.
+
+	* test/Makefile.am (clean-local): Remove ad-hoc temporary files if
+	any.
+
+	* test/Init.sh (progname): Abolished.
+
+	* test/Makefile.am (TESTS): t140*.test was listed twice.
+
+	* test/t120_awk.test, test/t140_prst_awk.test, src/filter.c (usage):
+	Rewrote the short help message.
+
+	* Makefile.am (test-clean): Removed this target.
+	
+	* test/t010_nothing.test: Added code for erasing the log file.
+
+	* test/Init.sh, test/Finish.sh: Moved commands for erasing
+	temporary files from test/Finish.sh to test/Init.sh.
+
+	* src/meta_arg.h, src/meta_arg.c, src/filer.c (meta_progname):
+	This function was abolished. Use argv[0] instead.
+
 2003-07-18  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escm.h, src/filter.c, src/fork.c (escm_popen): The command
