@@ -18,7 +18,7 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-SOURCES = $(2aescm_SOURCES) $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) $(langconf_SOURCES)
+SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) $(langconf_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -41,7 +41,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 noinst_PROGRAMS = langconf$(EXEEXT)
-bin_PROGRAMS = aescm$(EXEEXT) 2aescm$(EXEEXT)
+bin_PROGRAMS = aescm$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -56,33 +56,25 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_2aescm_OBJECTS = classic.$(OBJEXT)
-2aescm_OBJECTS = $(am_2aescm_OBJECTS)
-2aescm_LDADD = $(LDADD)
 am__objects_1 = deflang.$(OBJEXT)
-am_aescm_OBJECTS = escm.$(OBJEXT) misc.$(OBJEXT) $(am__objects_1) \
-	filter.$(OBJEXT) fork.$(OBJEXT) cmdline.$(OBJEXT)
+am_aescm_OBJECTS = escm.$(OBJEXT) filter.$(OBJEXT) $(am__objects_1)
 aescm_OBJECTS = $(am_aescm_OBJECTS)
-am_langconf_OBJECTS = langconf.$(OBJEXT) escm.$(OBJEXT) \
-	cmdline.$(OBJEXT) lang.$(OBJEXT) misc.$(OBJEXT)
+am_langconf_OBJECTS = langconf.$(OBJEXT) escm.$(OBJEXT) lang.$(OBJEXT)
 langconf_OBJECTS = $(am_langconf_OBJECTS)
 langconf_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/classic.Po ./$(DEPDIR)/cmdline.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/deflang.Po ./$(DEPDIR)/escm.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/filter.Po ./$(DEPDIR)/fork.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/lang.Po ./$(DEPDIR)/langconf.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/misc.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/deflang.Po ./$(DEPDIR)/escm.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/filter.Po ./$(DEPDIR)/lang.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/langconf.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(2aescm_SOURCES) $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) \
+SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) $(langconf_SOURCES)
+DIST_SOURCES = $(aescm_SOURCES) $(EXTRA_aescm_SOURCES) \
 	$(langconf_SOURCES)
-DIST_SOURCES = $(2aescm_SOURCES) $(aescm_SOURCES) \
-	$(EXTRA_aescm_SOURCES) $(langconf_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -108,7 +100,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFAULT_LANG = @DEFAULT_LANG@
-DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" -DXERROR=cgi_error @DEFS@
+DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -174,9 +166,8 @@ SUBDIRS = lang
 # Program
 BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c langconf$(EXEEXT)
-langconf_SOURCES = langconf.c escm.c escm.h cmdline.c cmdline.h lang.c misc.c misc.h
-aescm_SOURCES = escm.c escm.h misc.c misc.h $(BUILT_SOURCES) filter.c fork.c fork.h cmdline.c cmdline.h
-2aescm_SOURCES = classic.c
+langconf_SOURCES = langconf.c escm.c escm.h lang.c
+aescm_SOURCES = escm.c escm.h filter.c $(BUILT_SOURCES)
 
 # other language support
 aescm_LDADD = @POLYGLOT_OBJ@
@@ -259,9 +250,6 @@ clean-binPROGRAMS:
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-2aescm$(EXEEXT): $(2aescm_OBJECTS) $(2aescm_DEPENDENCIES) 
-	@rm -f 2aescm$(EXEEXT)
-	$(LINK) $(2aescm_LDFLAGS) $(2aescm_OBJECTS) $(2aescm_LDADD) $(LIBS)
 aescm$(EXEEXT): $(aescm_OBJECTS) $(aescm_DEPENDENCIES) 
 	@rm -f aescm$(EXEEXT)
 	$(LINK) $(aescm_LDFLAGS) $(aescm_OBJECTS) $(aescm_LDADD) $(LIBS)
@@ -275,15 +263,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/classic.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmdline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deflang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/escm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fork.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lang.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/langconf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

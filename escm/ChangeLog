@@ -1,3 +1,22 @@
+2004-10-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/misc.c, src/misc.h, src/cmdline.c, src/cmdline.h: Removed.
+
+	* src/escm.c (escm_error): Moved from misc.c.
+
+	* src/filter.c: Removed CGI features.
+
+2004-10-13  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c (escm_preproc): Rewrote the parser.
+
+	* src/escm.c, src/filter.c (escm_bind_query_string): Always bind
+	the query string to *escm-query-string*.
+
+2004-10-12  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c (escm_bind_query_string): Escape backslashes.
+
 2004-10-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/misc.c, src/misc.h, src/filter.c (cgi_html_header): Replaced

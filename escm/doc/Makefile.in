@@ -52,10 +52,11 @@ CONFIG_CLEAN_FILES = config.scm
 SOURCES =
 DIST_SOURCES =
 man1dir = $(mandir)/man1
-am__installdirs = "$(DESTDIR)$(man1dir)"
+am__installdirs = "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(htmldir)"
 NROFF = nroff
 MANS = $(man_MANS)
-DATA = $(noinst_DATA)
+htmlDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(html_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -133,21 +134,18 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 with_backend = @with_backend@
-ESCM = ../src/aescm
+ESCM = aescm
 POD2MAN = pod2man
-POD2HTML = pod2html
-SUFFIXES = .html .epod .escm .pod .1
-man_MANS = aescm.1 2aescm.1
-HTML_FILES = gimmick.html interpreter.html readme.html install.html
-JA_FILLES = readme.ja.html install.ja.html
-# EXTRA_DIST += $(HTML_FILES) readme.ja.html install.ja.html
-EXTRA_DIST = helper.scm readme.escm gimmick.escm interpreter.escm install.escm aescm.epod 2aescm.epod config.scm.in $(man_MANS)
-CLEANFILES = 
-noinst_DATA = $(HTML_FILES)
+HTMLDUMP = w3m -dump
+SUFFIXES = .1 .html .epod .escm
+man_MANS = aescm.1
+htmldir = $(prefix)/share/doc/aescm
+html_DATA = gimmick.html interpreter.html readme.html install.html
+EXTRA_DIST = $(man_MANS:.1=.epod) $(html_DATA:.html=.escm) $(man_MANS) $(html_DATA)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .html .epod .escm .pod .1
+.SUFFIXES: .1 .html .epod .escm
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -225,6 +223,23 @@ uninstall-man1:
 	  echo " rm -f '$(DESTDIR)$(man1dir)/$$inst'"; \
 	  rm -f "$(DESTDIR)$(man1dir)/$$inst"; \
 	done
+install-htmlDATA: $(html_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(htmldir)" || $(mkdir_p) "$(DESTDIR)$(htmldir)"
+	@list='$(html_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(htmlDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(htmldir)/$$f'"; \
+	  $(htmlDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
+	done
+
+uninstall-htmlDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(html_DATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f '$(DESTDIR)$(htmldir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(htmldir)/$$f"; \
+	done
 tags: TAGS
 TAGS:
 
@@ -263,7 +278,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(MANS) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(man1dir)"; do \
+	for dir in "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(htmldir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -283,7 +298,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f $(CONFIG_CLEAN_FILES)
@@ -295,6 +309,8 @@ clean: clean-am
 
 clean-am: clean-generic clean-local mostlyclean-am
 
+distclean: distclean-am
+	-rm -f Makefile
 distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
@@ -307,7 +323,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-man
+install-data-am: install-htmlDATA install-man
 
 install-exec-am:
 
@@ -333,53 +349,38 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-man
+uninstall-am: uninstall-htmlDATA uninstall-info-am uninstall-man
 
 uninstall-man: uninstall-man1
 
 .PHONY: all all-am check check-am clean clean-generic clean-local \
 	distclean distclean-generic distdir dvi dvi-am html html-am \
 	info info-am install install-am install-data install-data-am \
-	install-exec install-exec-am install-info install-info-am \
-	install-man install-man1 install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-exec install-exec-am install-htmlDATA install-info \
+	install-info-am install-man install-man1 install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am uninstall uninstall-am uninstall-info-am \
-	uninstall-man uninstall-man1
+	pdf-am ps ps-am uninstall uninstall-am uninstall-htmlDATA \
+	uninstall-info-am uninstall-man uninstall-man1
 
 
-$(ESCM) :
-	cd ../src/ && make
-
-doc : $(man_MANS) $(HTML_FILES)
+all :
 
 .epod.1 :
 	$(ESCM) -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" $< > $*.pod
-	$(POD2HTML) $*.pod > $*.html
 	$(POD2MAN) -c "" -r "" $*.pod > $@
 
 .escm.html :
 	LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'en)" $< > $@
 
-readme.ja.html : readme.escm
-	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'ja)" $(top_srcdir)/doc/readme.escm > readme.ja.html
-	w3m -no-graph -dump readme.html > ../README
-	w3m -no-graph -dump readme.ja.html > ../README.ja
-
-install.ja.html : install.escm
-	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'ja)" $(top_srcdir)/doc/install.escm > install.ja.html
-	w3m -no-graph -dump install.html > ../INSTALL
-	w3m -no-graph -dump install.ja.html > ../INSTALL.ja
+document : $(man_MANS) $(html_DATA)
+	$(HTMLDUMP) readme.html > ../README
+	$(HTMLDUMP) install.html > ../INSTALL
 
 clean-local:
 	-rm *~
+	-rm *.tmp
 	-rm *.pod
-
-realclean : clean-local
-	-rm *.1
-	-rm *.html
-
-distclean : realclean
 
 # end of doc/Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

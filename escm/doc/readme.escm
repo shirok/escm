@@ -26,17 +26,13 @@
   <body>
     <p>This document is README for <?scm:d PACKAGE?> <?scm:d VERSION?>
 (either README or doc/readme.html).</p>
-    <p><?scm:d (string-titlecase PACKAGE)?> is a generic tool to 
+    <p><?scm:d (string-titlecase PACKAGE)?> is a filter tool to
 embed code in a document.
-You can use it as filer, as wrapper of an interpreter in a script,
-and as hander CGI program.
 The current version (<?scm:d VERSION?>) is
 in alpha state and specifications may be changed.
 The stable version is <?scm:d escm ?>,
 which is a tool for Scheme.
-This package comes with a little program named
-<a href="2aescm.html">2aescm</a>.
-It is a converter from the original escm format to XMLI format.</p>
+
     <p>The body of <?scm:d PACKAGE?> is a filter
 which converts part outside XML preprocessor instructions
 to code.
@@ -83,18 +79,15 @@ option, you can specify the default scripting languge
 with environment variable <code>ESCM_DEFAULT</code>.</p>
 
     <h2>CGI</h2>
-    <p>You can use this tool as handler CGI program
-or as wrapper of an interpreter in the sharp-bang line of a CGI script.
+    <p>This package comes with a CGI tool named
+<strong>aescm.cgi</strong>,
+which you should install manually.
 The query string by POST method is bound to
 <code>*escm-query-string*</code> (or <code>$escm_query_string</code>,
 <code>EscmQueryString</code>),
 for you cannot directly get it in a CGI script.
 It is also bound if the method is GET.</p>
-
-    <p>To use the tool as handler CGI program,
-copy or hard-link it to the cgi-bin directory
-(/var/www/cgi-bin, /usr/local/apache/cgi-bin, ...).
-You might have to add suffix <em>.cgi</em>.
+<p>You can use it to process a handler CGI program.
 See
 <a href="http://httpd.apache.org/docs-2.0/handler.html">the handler
 document of Apache</a> for settings.</p>

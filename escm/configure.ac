@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.26], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.26])
+AC_INIT([aescm], [0.27], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.27])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
@@ -31,17 +31,13 @@ AC_ESCM_CHECK_BACKEND([gosh guile])
 # Checks for libraries.
 # Checks for header files.
 AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h fcntl.h])
+AC_CHECK_HEADERS([stdlib.h string.h strings.h unistd.h])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
-AC_TYPE_PID_T
+
 # Checks for library functions.
-AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([atexit dup2 strerror strchr strtol getopt_long])
+AC_CHECK_FUNCS([strchr strtol getopt_long])
 
 # polyglot
 AC_OBJEXT

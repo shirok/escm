@@ -1,11 +1,15 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.26 (2004-10-20)
+* Removed CGI features from the filter tool.
+
 Version 0.26 (2004-02-29)
 * Skip the sharp-bang line of the first argument file.
+
 Version 0.25 (2004-02-23)
 * Removed useless features.
 * Support Common Lisp.
+
 Version 0.21 (2003-07-29)
-* FEATURE FREEZE
 * Added 2aescm to convert the original escm format to the XML format.
 * Internationalized.
 * Accept long options.

@@ -15,11 +15,6 @@
 #endif /* HAVE_STDLIB_H */
 #include <ctype.h>
 #include "escm.h"
-#include "misc.h"
-
-/* Used to make error messages. */
-const char *escm_prog = NULL;
-const char *escm_file = NULL;
 
 /* put_string(str, outp) - escape str and put it.
  */
@@ -162,7 +157,6 @@ escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp)
       fputs(lang->literal.suffix, outp);
       fputc('\n', outp);
     }
-    cgi_header_flag = TRUE;
   }
   ungetc(c, inp);
 }
@@ -227,9 +221,9 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
   method = getenv("REQUEST_METHOD");
   if (method[0] == 'P') {
     content_length = getenv("CONTENT_LENGTH");
-    if (content_length == NULL)
-      XERROR("inconsistent environment");
-    else {
+    if (content_length == NULL) {
+      escm_error("inconsistent environment");
+    } else {
       if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
       put_variable(lang, "escm_query_string", outp);
       if (lang->bind.infix) fputs(lang->bind.infix, outp);
@@ -320,7 +314,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  } else {
 	    c = fgetc(inp);
 	    if (c != 'd' || !lang->display.prefix) {
-	      if (c == EOF) XERROR("unterminated instruction");
+	      if (c == EOF) escm_error("unterminated instruction");
 	      if (!prefixed) {
 		fputs(lang->literal.prefix, outp);
 		prefixed = TRUE;
@@ -363,13 +357,13 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
       c = fgetc(inp);
       switch (c) {
       case EOF:
-	XERROR("unterminated instruction");
+	escm_error("unterminated instruction");
 	/* not reached */
       case '\\':
 	c = fgetc(inp);
 	switch (c) {
 	case EOF:
-	  XERROR("unterminated instruction");
+	  escm_error("unterminated instruction");
 	  /* not reached */
 	default:
 	  fputc('\\', outp);
@@ -385,7 +379,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  c = fgetc(inp);
 	  switch (c) {
 	  case EOF:
-	    XERROR("unterminated instruction");
+	    escm_error("unterminated instruction");
 	    /* not reached */
 	  case '>':
 	    prefixed = FALSE;
@@ -398,8 +392,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	    fputc(c, outp);
 	  }
 	  break;
-	} else {
-	  /* no break */
 	}
       default:
 	fputc(c, outp);
@@ -410,5 +402,15 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
   if (prefixed) fputs(lang->literal.suffix, outp);
   fputc('\n', outp);
 }
+
+/*
+ */
+void
+escm_error(const char* message)
+{
+  fprintf(stderr, "escm: %s\n", message);
+  exit(EXIT_FAILURE);
+}
+
 
 /* end of escm.c */

@@ -4,9 +4,7 @@
 
 SUBDIRS = src test doc
 
-EXTRA_DIST = README.ja INSTALL.ja
-
 document :
-	cd doc && make doc
+	cd doc && make document
 
 # end of Makefile.am

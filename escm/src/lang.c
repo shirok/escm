@@ -24,7 +24,6 @@ char *strchr(const char *s, int c);
 #include <ctype.h>
 
 #include "escm.h"
-#include "cmdline.h"
 
 #define HASH_KEY(a, b) ((a) * 128 + (b))
 
@@ -162,7 +161,7 @@ parse_lang(const char *name)
     mylang.id_type = ESCM_ID_LISP;
   else
     mylang.id_type = ESCM_ID_LOWER;
-  mylang.backend = parse_cmdline(data);
+  mylang.backend = data;
   mylang.nil = "\"\"";
 
   while (ptr) {

@@ -12,9 +12,9 @@ I will describe the pecular settings for this tool. Consult the documents of
 Autotool to know other settings, for example, to change the target directory. I
 added three configure options.
 
- ¡¦ --enable-polyglot
- ¡¦ --with-default=LANG
- ¡¦ --with-backend=INTERP
+  â€¢ --enable-polyglot
+  â€¢ --with-default=LANG
+  â€¢ --with-backend=INTERP
 
 --enable-polyglot
 

@@ -28,13 +28,6 @@ from a text to Scheme code,
 which will be evaluated by a backend Scheme interpreter.
 It works with most implementations.
 
-This program can be used
-as a handler CGI program of Apache web servers
-or as if it were an interpreter in a CGI script.
-If it is the case,
-a content header for HTML will be added
-and error messages are to be sent to stdout.
-
 =head2 OPTIONS
 
 =over 2
@@ -43,18 +36,10 @@ and error messages are to be sent to stdout.
 
 Preprocess files and convert them into a Scheme program.
 
-=item -H, --no-header
-
-Print no content header even in a CGI script.
-
-=item -c
-
-Suppress the content header and send error messages to stdout.
-
 =item -e, --eval=EXPR
 
 Evaluate an expression before processing files.
-This option can be used as many times as you want.
+You can use this option upto 16 times.
 
 =item -i, --interp='PROG ARG ...'
 
@@ -112,26 +97,11 @@ The Scheme interpreter and its arguments.
 
 The name and the version of this project.
 
-=item E<42>escm-query-stringE<42>
-
-The query string of a CGI program.
-The request method is either B<POST> or B<GET>.
-
 =back
 
 =head2 ENVIRONMENT VARIABLES
 
 =over 2
-
-=item GATEWAY_INTERFACE
-
-This variable is used to check whether
-the tool is invoked in a CGI or not.
-
-=item PATH_TRANSLATED
-
-The file to be processed
-when the tool is invoked as a handler CGI program.
 
 =item ESCM_DEFAULT
 
@@ -143,21 +113,6 @@ The default backend interpreter.
 
 =back
 
-=head2 HANDLER CGI PROGRAM
-
-You can use this tool as a handler CGI program,
-if your web administrator allows you to override B<FileInfo> directives.
-
-Copy or hard-link B<<?scm:d PACKAGE?>> to
-C<~/public_html/cgi-bin/<?scm:d PACKAGE?>.cgi>.
-Then add these lines to your C<.htaccess>.
-
-  AddHandler escm-handler escm
-  Action escm-handler /~YOURNAME/cgi-bin/aescm.cgi
-
-Access to a file suffixed with C<.escm> will be processed by this tool
-and embedded Scheme code will be evaluated.
-
 =head2 OTHER INTERPRETER LANGUAGES
 
 B<<?scm:d (string-titlecase PACKAGE)?>>
@@ -167,22 +122,6 @@ You can also embed code of most interpreter languages,
 e.g. Awk, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl.
 But you can use this feature
 only when you have run C<configure> script with C<--enable-polyglot> option.
-
-This short example for Awk
-will show you a list of the environment variables.
-
-  #!/usr/local/bin/<?scm:d PACKAGE?> \
-    -l awk
-  <html><head><title>Environment Variables</title></head>
-  <body>
-  <ul>
-  <?awk
-    for (key in ENVIRON) {
-      print "<li>", key, "=>", ENVIRON[key], "</li>"
-    }
-  ?>
-  </ul>
-  </body></html>
 
 =head1 CAVEATS
 
@@ -209,9 +148,6 @@ by an interpreter which may convert character sets.
 
 =head1 CHANGES
 
-In this section, I will describe differences from
-the stable version.
-
 =head2 Syntax
 
 The experimental version has adopted the XML syntax for a preprocessor
@@ -219,35 +155,16 @@ as B<eguile> did
 and eliminated the archaic one
 with C<E<lt>?>, C<E<lt>?=> and C<!E<gt>>.
 
-=head2 Options
-
-=over 2
-
-=item -H
-Added.
-Without this option, a content header for HTML will be automatically
-written out in a CGI.
-
-=item -f
-Added.
-
-=back
-
 =head2 File Arguments
 
 As many files as you specified are to be processed.
 The stable version processes only the first one.
 
-=head2 Meta-Arguments
+=head2 CGI
 
-In place of C<#?> prefix
-has been adopted the meta-argument functionality
-which was introduced by B<scsh>.
-But the syntax is different from that of B<scsh>.
-
-Ours works such as a shell without wildcard expansion,
-so that arguments containing strings quoted either by C<'> or
-by C<E<quot>> will be treated as we expected.
+CGI features have been removed since B<aescm> version 0.27.
+You can use B<aescm.cgi> in the sharp-bang line of
+CGI scripts or as a handler CGI program.
 
 =head1 AUTHOR
 
@@ -262,7 +179,6 @@ B<brl> (L<http://brl.sourceforge.net/>),
 B<scsh> (L<http://scsh.sourceforge.net/>),
 B<guile>,
 B<gosh>,
-B<2aescm>.
 
 =begin html
 <hr />

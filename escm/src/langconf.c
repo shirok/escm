@@ -13,8 +13,6 @@
 #endif /* HAVE_STDLIB_H */
 #include <ctype.h>
 #include "escm.h"
-#include "misc.h"
-#include "cmdline.h"
 
 struct escm_lang* parse_lang(const char* name);
 
@@ -22,9 +20,9 @@ static void
 put_string(const char* str, FILE* outp)
 {
   const char* p = str;
-  fputc('\"', outp);
+  fputc('"', outp);
   while (*p) {
-    if (*p == '\"' || *p == '\\') {
+    if (*p == '"' || *p == '\\') {
       fputc('\\', outp);
       fputc(*p, outp);
     } else if (*p == '\n') {
@@ -35,7 +33,7 @@ put_string(const char* str, FILE* outp)
     }
     p++;
   }
-  fputc('\"', outp);
+  fputc('"', outp);
 }
 static void
 put_string_or_null(const char* str, FILE* outp)
@@ -45,17 +43,6 @@ put_string_or_null(const char* str, FILE* outp)
   } else {
     fputs("NULL", outp);
   }
-}
-static void
-put_list(char** ptr, FILE* outp)
-{
-  int i;
-  for (i = 0; ptr[i]; i++) {
-    fputc(' ', outp);
-    put_string_or_null(ptr[i], outp);
-    fputc(',', outp);
-  }
-  
 }
 
 static void
@@ -105,7 +92,7 @@ main(int argc, const char** argv)
     exit(EXIT_FAILURE);
   }
 #ifdef ESCM_BACKEND
-  lang->backend = parse_cmdline(ESCM_BACKEND);
+  lang->backend = ESCM_BACKEND;
 #endif /* ESCM_BACKEND */
   printf("/* src/deflang.c - generated from %s */\n", argv[1]);
   fputs(
@@ -113,9 +100,6 @@ main(int argc, const char** argv)
 "#include \"config.h\"\n"
 "#endif\n"
 "#include \"escm.h\"\n", stdout);
-  fputs("static char *argv[] = {", stdout);
-  put_list(lang->backend, stdout);
-  fputs("};\n", stdout);
   fputs("struct escm_lang deflang = {\n", stdout);
   /* name */
   fputs("  ", stdout);
@@ -133,7 +117,9 @@ main(int argc, const char** argv)
     fputs("ESCM_ID_LOWER, /* id_type */\n", stdout);
   }
   /* backend */
-  fputs("  argv, /* backend */\n", stdout);
+  fputs("  ", stdout);
+  put_string(lang->backend, stdout);
+  fputs(", /* backend */\n", stdout);
   /* literal */
   put_two("literal", lang->literal, stdout);
   /* display */
