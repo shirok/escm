@@ -1,0 +1,122 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2003 Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# TAGA Yoshitaka <tagga@tsuda.ac.jp>, 2003
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: aescm 0.21\n"
+"POT-Creation-Date: 2003-07-28 00:42+0900\n"
+"PO-Revision-Date: 2003-07-26 09:43+0900\n"
+"Last-Translator: TAGA Yoshitaka <tagga@tsuda.ac.jp>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/escm.c:104
+msgid "inconsistent environment"
+msgstr "環境に不整合があります"
+
+#: src/escm.c:288 src/meta_arg.c:185
+msgid "unterminated string"
+msgstr "文字列に終りがありません"
+
+#: src/escm.c:292
+msgid "unterminated instruction"
+msgstr "命令に終りがありません"
+
+#: src/filter.c:74 src/filter.c:252 src/lang.c:155
+#, c-format
+msgid "can't open - %s"
+msgstr "%s を開くことができません"
+
+#: src/filter.c:164
+#, c-format
+msgid ""
+"Usage: %s [OPTION] ... FILE ...\n"
+"Preprocess embedded scheme code in documents.\n"
+"\n"
+"  -E, --no-eval                convert documents into code\n"
+"  -H, --no-header              print no content header even in a CGI\n"
+"  -c, --classic                -H and error messages go to stdout\n"
+"  -e, --eval=EXPR              evaluate an expression\n"
+"  -f, --footer=FILENAME        specify the footer file\n"
+"  -h, --header=FILENAME        specify the header file\n"
+"  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
+"  -l, --language=LANG          choose the interpreter language\n"
+"  -o, --output=FILENAME        specify the output file\n"
+"      --help                   print this message and exit\n"
+"      --version                print version information and exit\n"
+msgstr ""
+"使い方: %s [オプション] ... ファイル ...\n"
+"文書に埋め込まれた Scheme のコードを前処理.\n"
+"\n"
+"  -E, --no-eval                コードに変換するだけ\n"
+"  -H, --no-header              CGI でもヘッダを出力しない\n"
+"  -c, --classic                -H かつエラー・メッセージは標準出力へ\n"
+"  -e, --eval=式                式を評価する\n"
+"  -f, --footer=ファイル        フッタを指定する\n"
+"  -h, --header=ファイル        ヘッダを指定する\n"
+"  -i, --interp='PROG ARG ...'  バックエンドとして起動するインタープリタ\n"
+"  -l, --language=言語          インタープリタ言語を選択\n"
+"  -o, --output=ファイル        出力するファイルを指定\n"
+"      --help                   このメッセージを出力し、正常終了\n"
+"      --version                ヴァージョン情報を出力し、正常終了\n"
+
+#: src/filter.c:180 src/filter.c:183
+#, c-format
+msgid "Option %s is discarded.\n"
+msgstr "オプション %s は無効です.\n"
+
+#: src/filter.c:185
+#, c-format
+msgid ""
+"\n"
+"Report bugs to <%s>\n"
+msgstr ""
+"\n"
+"バグ報告はこちらへ <%s>\n"
+
+#: src/filter.c:189
+#, c-format
+msgid "%s - developers' version of escm\n"
+msgstr "%s - escm の開発版\n"
+
+#: src/filter.c:190
+#, c-format
+msgid "The default interpreter is '%s'\n"
+msgstr "指定がない場合使用するインタープリタは `%s'\n"
+
+#: src/filter.c:231
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "詳しいことを知るには `%s --help' と起動してください.\n"
+
+#: src/filter.c:319
+msgid "too many arguments"
+msgstr "引数が多すぎます"
+
+#: src/fork.c:62
+#, c-format
+msgid "can't invoke - %s"
+msgstr "%s を起動できません"
+
+#: src/lang.c:159 src/lang.c:168 src/lang.c:172 src/lang.c:176 src/lang.c:189
+#: src/lang.c:193 src/lang.c:197 src/lang.c:200 src/lang.c:204 src/lang.c:206
+#, c-format
+msgid "broken config file - %s"
+msgstr "言語情報ファイルが異常です - %s"
+
+#: src/meta_arg.c:97 src/meta_arg.c:210
+#, c-format
+msgid "can't open %s"
+msgstr "%s を開くことができません"
+
+#: src/meta_arg.c:107
+msgid "syntax error"
+msgstr "構文が異常です"
+
+#: src/meta_arg.c:123 src/meta_arg.c:146 src/meta_arg.c:165 src/meta_arg.c:186
+msgid "unexpected eof"
+msgstr "ファイルが途中で終っています"
