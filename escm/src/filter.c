@@ -225,7 +225,7 @@ main(int argc, char **argv)
   /* write out a content header. */
   if (header_flag && gateway_interface) {
     if (process_flag) cgi_html_header(outp);
-    else cgi_text_header(outp);
+    else fputs("Content-type: text/plain\r\n\r\n", outp);
   }
 
   /* specify the output file if necessary. */

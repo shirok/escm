@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.25], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.25])
+AC_INIT([aescm], [0.26], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.26])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.

@@ -1,5 +1,9 @@
 2004-10-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
+	* src/misc.c (cgi_error): Fixed bugs on the content header.
+
+	* src/misc.c, src/misc.h, src/filter.c (cgi_text_header): Removed.
+
 	* src/escm.c, src/misc.h, src/misc.c: Remove lineno variables.
 
 2004-10-07  TAGA Yoshitaka  <tagga@tsuda.ac.jp>

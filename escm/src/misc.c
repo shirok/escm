@@ -20,11 +20,14 @@ char* getenv(const char* name);
 
 #include "misc.h"
 
-static enum {
-  NONE,
-  TEXT,
-  HTML,
-} header = NONE;
+#ifndef FALSE
+#  define FALSE 0
+#endif /* FALSE */
+#ifndef TRUE
+#  define TRUE (!FALSE)
+#endif /* TRUE */
+
+int cgi_header_flag = FALSE;
 
 /* cgi_html_header(outp)
  */
@@ -33,16 +36,7 @@ cgi_html_header(FILE *outp)
 {
   fputs("Content-type: text/html\r\n\r\n", outp);
   fflush(outp);
-  header = HTML;
-}
-/* cgi_text_header(outp)
- */
-void
-cgi_text_header(FILE *outp)
-{
-  fputs("Content-type: text/plain\r\n\r\n", outp);
-  fflush(outp);
-  header = TEXT;
+  cgi_header_flag = TRUE;
 }
 
 /* cgi_error(fmt, ...) - print a warning message and exit the program.
@@ -56,14 +50,15 @@ void cgi_error(const char *fmt, ...)
   va_start(ap, fmt);
   iscgi = getenv("GATEWAY_INTERFACE");
   fp = iscgi ? stdout : stderr;
-  if (header == HTML) {
+  if (iscgi && !cgi_header_flag) {
     fputs("Content-type: text/html\r\n\r\n", stdout);
     fputs("<html><body><p>", stdout);
+    cgi_header_flag = TRUE;
   }
   fprintf(fp, "%s: ", cgi_prog);
   if (cgi_file) fprintf(fp, "%s: ", cgi_file);
   vfprintf(fp, fmt, ap);
-  if (header == HTML) fputs("</p></body></html>\n", stdout);
+  if (cgi_header_flag) fputs("</p></body></html>\n", stdout);
   exit(iscgi ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 /* end of misc.c */
