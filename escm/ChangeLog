@@ -1,3 +1,7 @@
+2004-02-29  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Skip the sharp-bang line of the first file.
+
 2004-02-23  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escm.c (escm_preproc): Most lines were counted twice.
