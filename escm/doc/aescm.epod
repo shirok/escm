@@ -1,6 +1,6 @@
 <?scm
-  (load (string-append *pwd* "/config.scm"))
-  (load (string-append *pwd* "/helper.scm"))
+  (load (string-append *builddir* "/doc/config.scm"))
+  (load (string-append *srcdir* "/doc/helper.scm"))
 ?>
 
 =head1 NAME
@@ -47,7 +47,7 @@ Preprocess files and convert them into a Scheme program.
 
 Print no content header even in a CGI script.
 
-=item -c, --classic
+=item -c
 
 Suppress the content header and send error messages to stdout.
 
@@ -55,14 +55,6 @@ Suppress the content header and send error messages to stdout.
 
 Evaluate an expression before processing files.
 This option can be used as many times as you want.
-
-=item -f, --footer=FILENAME
-
-Specify the footer file.
-
-=item -h, --header=FILENAME
-
-Specify the header file.
 
 =item -i, --interp='PROG ARG ...'
 
@@ -75,7 +67,7 @@ This option is valid
 if the tool has been configured with
 C<--enable-polyglot> option.
 
-=item -o, --output=FILENAME
+=item -o
 
 Specify the output file.
 
@@ -90,6 +82,15 @@ Print version information.
 =back
 
 =head2 SCHEME VARIABLES
+
+Naming convention can be changed by a language configuration file.
+For example, C<*escm-input-file*> is used if the identifer record is
+B<*lisp*>,
+while it is changed to C<EscmInputFile> if the record is B<Title>,
+C<ESCM_INPUT_FILE> if B<UPPER>,
+and
+C<escm_input_file> if B<lower>.
+The last one is the default.
 
 =over 2
 
@@ -115,6 +116,8 @@ The name and the version of this project.
 
 The query string of a CGI program.
 The request method is either B<POST> or B<GET>.
+
+=back
 
 =head2 ENVIRONMENT VARIABLES
 

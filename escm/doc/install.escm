@@ -1,0 +1,237 @@
+<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
+<!-- $Id$ -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<?scm
+  (load (string-append *builddir* "/doc/config.scm"))
+  (load (string-append *srcdir* "/doc/helper.scm"))
+  (define gauche
+    (link-url "http://sourceforge.net/projects/gauche/"
+              "Gauche"))
+  (define guile
+    (link-url "http://www.gnu.org/software/guile/guile.html"
+               "Guile"))
+  (define scm
+    (link-url "http://swissnet.ai.mit.edu/~jaffer/SCM.html"
+               "SCM"))
+?>
+<html>
+  <head>
+    <title>Installation</title>
+  </head>
+  <body>
+    <h1><?scm:d (case *language*
+                 ((ja) "インストール")
+                 (else "Installation"))?></h1>
+<?scm (case *language*
+((ja) ?>
+    <p>Autotool を使っているので、Scheme で<?scm:d gauche?>
+か<?scm:d guile?>を使うばあい、インストールは簡単です。</p>
+<?scm )(else ?>
+    <p>As this tool utilizes Autotool,
+it is easy to install it
+if the default scripting langauge is Scheme
+and if the backend interpreter is <?scm:d gauche?> or <?scm:d guile?>.</p>
+<?scm )) ?>
+    <blockquote>
+      <pre><code>
+./configure
+make
+make install
+</code></pre>
+    </blockquote>
+<?scm (case *language*
+((ja) ?>
+    <p>この文書ではこのツール独自の設定について説明します。
+通常の設定、例えばインストール先を変更することについては、
+Autotool のドキュメントを参考にしてください。
+次の3つのオプションを追加しています。</p>
+<?scm )(else ?>
+    <p>I will describe the pecular settings for this tool.
+Consult the documents of Autotool
+to know other settings,
+for example, to change the target directory.
+I added three configure options.</p>
+<?scm ))?>
+    <ul>
+      <li><em>--enable-polyglot</em></li>
+      <li><em>--with-default=LANG</em></li>
+      <li><em>--with-backend=INTERP</em></li>
+    </ul>
+
+    <h2>--enable-polyglot</h2>
+<?scm (case *language*
+((ja) ?>
+    <p>
+コンパイル時にデフォルト言語用の設定ファイルをCのソースに変換して組み
+込んでいます。
+実行時に<em>-l</em> オプションを指定したとき
+設定ファイルを読み込ませるには
+<em>--enable-polyglot</em>
+を追加してください。
+デフォルトの言語やインタープリタを変更するには、
+<a href="monoglot">下</a>
+を参考にしてオプションを追加してください。</p>
+<?scm )(else ?>
+<p>
+The default configuration file is converted to a C source file
+and embedded when you compile this tool.
+To specify a computer language with <em>-l</em> option
+and make it read its configuration file,
+add <em>--enable-polyglot</em> option.
+To change the default language
+and/or the backend interpreter,
+see <a href="monoglot">below</a>.</p>
+<?scm ))?>
+
+    <blockquote>
+      <pre>./configure --enable-polyglot</pre>
+    </blockquote>
+
+<?scm (case *language*
+((ja) ?>
+    <p>設定ファイルは $(pkgdatadir)/lang、
+つまり $(prefix)/share/aescm/lang にインストールされます。</p>
+<?scm )(else ?>
+    <p>The language configuration files are to be
+installed to $(pkgdatadir)/lang,
+i.e. $(prefix)/share/aescm/lang.</p>
+<?scm ))?>
+
+    <h2 id="monoglot">--with-default, --with-backend</h2>
+<?scm (case *language*
+((ja) ?>
+    <p>使用する言語設定ファイルを変更するには
+ <em>--with-default</em> オプション、
+インタープリタを変更するには
+<em>--with-backend</em> オプションを使ってください。
+同じ言語でも実装によっては、
+初期化コードや終了用のコードを送る必要があるので、
+設定ファイルが別になっています。
+設定ファイルは src/lang にあります。
+これにはバックエンドを起動するときの引数なども含まれていますが、
+<em>--with-backend</em> で変更することができます。
+</p>
+    <p>Common Lisp と Scheme については下を参考にしてください。
+</p>
+<?scm )(else ?>
+    <p>To specify the default language configuration file,
+use <em>--with-default</em> option,
+and to specify the default backend interpreter,
+use <em>--with-backend</em> option.
+Some interpreters need different configuration files
+form the default ones for their language.
+The configuration files are in src/lang/
+The information on the interpreter is overridden
+by <em>--with-backend</em> option.
+</p>
+    <p>See below for more information on some implementations of
+Common Lisp and Scheme.</p>
+<?scm ))?>
+
+    <h3>Common Lisp</h3>
+<?scm (case *language*
+((ja) ?>
+    <p>Common LispのXML名前空間は <em>lisp</em> です。</p>
+    <p>CMUCL については初期化コードが必要なことや
+起動時の引数が複雑なことから
+設定ファイルが別になっています。</p>
+<?scm )(else ?>
+    <p>The XML name space for Common Lisp is <em>lisp</em>.</p>
+    <p>CMUCL requires a different configuration file,
+for we have to send initialization code
+and specify complicated option arguments.</p>
+<?scm ))?>
+    <dl>
+      <dt>CLISP</dt>
+      <dd><blockquote>
+	  <pre>./configure --with-default=lisp</pre>
+	</blockquote>
+</dd>
+      <dt>CMUCL</dt>
+      <dd><blockquote>
+	  <pre>./configure --with-default=lisp-cmucl</pre>
+	</blockquote>
+</dd>
+    </dl>
+
+    <h3>Scheme</h3>
+<?scm (case *language*
+((ja) ?>
+    <p>Scheme はデフォルトの言語です。
+SchemeのXML名前空間は <em>scm</em> です。
+<?scm:d scm?> は初期化コードが必要なので、
+設定ファイルが別になっています。</p>
+<?scm )(else ?>
+    <p>Scheme is our default language.
+Its XML name space is <em>scm</em>.
+<?scm:d scm?> requires a different configuration file,
+for we have to send initialization code.</p>
+<?scm ))?>
+
+    <dl>
+      <dt>Gauche</dt>
+      <dd><blockquote>
+	  <pre>./configure</pre>
+	</blockquote>
+</dd>
+      <dt>Guile</dt>
+      <dd>
+<?scm (case *language*
+((ja) ?>
+<p>Gauche がインストールされていない場合は次の通りです。</p>
+<?scm )(else ?>
+<p>If Gauche is not installed, type:</p>
+<?scm ))?>
+<blockquote>
+	  <pre>./configure</pre>
+	</blockquote>
+<?scm (case *language*
+((ja) ?>
+<p>Gauche がインストールされている場合は次の通りです。</p>
+<?scm )(else ?>
+<p>If Gauche is installed, type:</p>
+<?scm ))?>
+<blockquote>
+	  <pre>./configure --with-backend=guile</pre>
+	</blockquote>
+</dd>
+      <dt>SCM</dt>
+      <dd><blockquote>
+	  <pre>./configure --with-default=scm-scm</pre>
+	</blockquote>
+</dd>
+      <dt><?scm:d (case *language*
+                  ((ja) "他の実装")
+                  (else "Other Implementations"))?></dt>
+      <dd>
+<?scm (case *language*
+((ja) ?>
+<p>インタープリタと引数を指定してください。
+いくつかの実装については
+doc/<a href="interpreter.html">interpreter.html</a>
+に説明があります。
+これに含まれていないばあいは、
+doc/<a href="gimmick.html">gimmick.html</a>
+を参考にして見付けだしてください。</p>
+<p>以下の例は Scsh 用です。</p>
+
+<?scm )(else ?>
+<p>You have to specify the backend interpreter and its
+command line arguments.
+The command line arguments for some implementations are listed
+in doc/<a href="interpreter.html">interpreter.html</a>.
+If your favorite interpreter is not in the list,
+consult doc/<a href="gimmick.html">gimmick.html</a> to find out
+its argument.</p>
+<p>This example is for Scsh:</p>
+<?scm ))?>
+
+<blockquote>
+	  <pre>./configure --with-backend="scsh -s /dev/stdin"</pre>
+	</blockquote>
+</dd>
+    </dl>
+  </body>
+</html>

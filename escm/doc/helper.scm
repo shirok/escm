@@ -18,7 +18,7 @@
    *sf-group-id* "&amp;type=" (%sf-logo-type)
    "\" width=\"" (%sf-logo-width) "\" height=\"" (%sf-logo-height)
    "\" border=\"0\""
-   "\" alt=\"SourceForge.net Logo\" /></a>"))
+   " alt=\"SourceForge.net Logo\" /></a>"))
 
 ;;; HTML
 ;; (escape-html str) -  escape characters used in HTML tags.
@@ -36,8 +36,10 @@
 (define (link-mail addr)
   (string-append "<a href=\"mailto:" addr "\">" addr "</a>"))
 ;; (link-url addr) - link to a URL.
-(define (link-url url)
-  (string-append "<a href=\"" url "\">" url "</a>"))
+(define (link-url url . anchor)
+  (if anchor
+    (string-append "<a href=\"" url "\">" (car anchor) "</a>")
+    (string-append "<a href=\"" url "\">" url "</a>")))
 
 ;;; Cases
 (define (string-upcase str)

@@ -85,11 +85,13 @@ SUFFIXES = .html .epod .escm .pod .1
 
 man_MANS = aescm.1 2aescm.1
 
-HTML_FILES = gimmick.html interpreter.html
+HTML_FILES = gimmick.html interpreter.html readme.html install.html
 
-EXTRA_DIST = config-h.awk helper.scm readme.escm gimmick.escm interpreter.escm aescm.epod 2aescm.epod
+JA_FILLES = readme.ja.html install.ja.html
 
-CLEANFILES = config-h.scm
+EXTRA_DIST = helper.scm readme.escm gimmick.escm interpreter.escm install.escm aescm.epod 2aescm.epod config.scm.in $(HTML_FILES) readme.ja.html install.ja.html $(man_MANS)
+
+CLEANFILES = 
 
 noinst_DATA = $(HTML_FILES)
 subdir = doc
@@ -267,17 +269,25 @@ uninstall-man: uninstall-man1
 $(ESCM) :
 	cd ../src/ && make
 
-doc : $(man_MANS) $(HTML_FILES)
-	LANG=C && $(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(define *date* \"`date -u`\")" readme.escm > readme.html
-	 w3m -dump readme.html > ../README
+doc : $(man_MANS) $(HTML_FILES) $(JA_FILES)
 
 .epod.1 :
-	$(ESCM) -e "(define *pwd* \"`pwd`\")" $< > $*.pod
+	$(ESCM) -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" $< > $*.pod
 	$(POD2HTML) $*.pod > $*.html
 	$(POD2MAN) -c "" -r "" $*.pod > $@
 
 .escm.html :
-	$(ESCM) -e "(define *pwd* \"`pwd`\")" $< > $@
+	LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'en)" $< > $@
+
+readme.ja.html : readme.escm
+	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'ja)" $(top_srcdir)/doc/readme.escm > readme.ja.html
+	w3m -no-graph -dump readme.html > ../README
+	w3m -no-graph -dump readme.ja.html > ../README.ja
+
+install.ja.html : install.escm
+	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *builddir* \"$(top_builddir)\")" -e "(define *srcdir* \"$(top_srcdir)\")" -e "(define *language* 'ja)" $(top_srcdir)/doc/install.escm > install.ja.html
+	w3m -no-graph -dump install.html > ../INSTALL
+	w3m -no-graph -dump install.ja.html > ../INSTALL.ja
 
 clean-local:
 	-rm *~
@@ -286,6 +296,8 @@ clean-local:
 realclean : clean-local
 	-rm *.1
 	-rm *.html
+
+distclean : realclean
 
 # end of doc/Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

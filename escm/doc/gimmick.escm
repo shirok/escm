@@ -4,79 +4,115 @@
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
+  <?scm
+  (load (string-append *builddir* "/doc/config.scm"))
+  (load (string-append *srcdir* "/doc/helper.scm"))
+  ?>
   <head>
-    <title>Polyglot Feature</title>
     <meta http-equiv="Content-Type" content="text/html" />
+    <title>Using <?scm:d (string-titlecase PACKAGE)?> with Another Computer Language</title>
     <link href="aescm.css" type="text/css" rel="stylesheet" />
     <?xml-stylesheet type="text/css" href="aescm.css"?>
   </head>
-  <?scm
-  (load (string-append *pwd* "/config.scm"))
-  (load (string-append *pwd* "/helper.scm"))
-  ?>
   <body>
-    <h1>Polyglot Feature</h1>
-    <address>TAGA Yoshitaka
-&lt;<?scm:d (link-mail PACKAGE_BUGREPORT)?>&gt;</address>
-    <p>
-<em><?scm:d (string-titlecase PACKAGE)?></em>
-is designed to be interpreter independent.
-This does not mean Scheme interpreter independent.
-You can embed code of most interpreter languages.
-But you can use this feature only when you has run <em>configure</em>
-script with <code>--with-polyglot</code> option.</p>
+    <h1>Using <?scm:d (string-titlecase PACKAGE)?> with Another Computer Language</h1>
 
-    <p>
-Languages you can embed must satisfy the following conditions:
-</p>
     <ol>
-      <li>Strings are bracketted between two <em>&quot;</em>s.
-In them, <em>\\</em> is treated as <em>\</em>,
-<em>\&quot;</em> as <em>&quot;</em>,
-and <em>\n</em> as <em>newline</em>.
-It does not have the upper limit of the length of strings.</li>
-      <li>It has a procedure to write out objects without adding
-<em>newline</em>.</li>
-      <li>It has a way to print out the external expressions
-of any objects other than strings.</li>
-      <li>Commands are processed in order.</li>
+      <li><a href="#language">Interpreter Language</a></li>
+      <li><a href="#interpreter">Backend Interpreter</a></li>
+      <li><a href="#format">Configuration File Format</a></li>
     </ol>
 
+    <h2 id="language">Interpreter Language</h2>
+    <p>
+<em><?scm:d (string-titlecase PACKAGE)?></em> can
+preprocess an interpreter language if it satisfies the following conditions:
+</p>
+    <ol>
+      <li>a string is bracketted between two <em>&quot;</em>s;</li>
+      <li><q>\&quot;</q> means <em>&quot;</em> and <q>\\</q> <em>\</em>
+in a string;</q>
+      <li>it has a procedure to write out a string without adding
+newline;</li>
+      <li>it has a procedure to send a newline or
+<q>\n</q> means a newline in a string;</li>
+      <li>the variable is placed before the value
+in an assignment or binding statement;</li>
+      <li>commands are processed in order.</li>
+    </ol>
+
+    <p>In short, most scripting languages will do.
+The tarball of this version (<?scm:d *escm-version*?>)
+contains the configuration files for
+<a href="#awk">Awk</a>, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl
+and of course <a href="#scm">Scheme</a>.
+I will describe
+the syntax of configuration files <a href="#format">below</a>.
+</p>
+
+    <h2 id="interpreter">Backend Interpreter</h2>
+
+    <p><em><?scm:d (string-titlecase PACKAGE)?></em> and the original
+<em>escm</em> send code to its backend interpreter through a pipe.
+It is ideal if your favorite interpreter works as filter by default.
+But it is not always the case.
+So you must find out command line options
+to prevent from printing prompts and evaluated values.
+</p>
+    <p>The first test must print <em>string</em>.</p>
+    <blockquote>
+      <pre><code>
+echo '(display &quot;string&quot;)' | env -i /usr/local/bin/scheme -options
+</code></pre>
+    </blockquote>
+
+    <p>The second test must print nothing.</p>
+    <blockquote>
+      <pre><code>
+echo '&quot;string&quot;' | env -i /usr/local/bin/scheme -options
+</code></pre>
+    </blockquote>
+
+    <p>The command line options for some popular Schme and Common Lisp
+implementations are listed in doc/<a href="interpreter.html">interpreter.html</a>.</p>
+
+    <h2 id="format">Configuration File Format</h2>
     <p>
 Information on your interpreter language is read
-from a simple configuratioon file, about a dozen of lines at most.
-This distribution comes with the configuration files for
-Awk, C Shell, Octave, Perl, Python, Rugy, Schem, Shell, and Tcl.
+from a simple configuration file, about a dozen of lines at most.
+<strong>The upper limit of the size is 511B.</strong></p>
+
+    <p>
+This distribution comes with configuration files for
+Awk, C Shell, Common Lisp, Perl, Python, Rugy, Schem, Shell, and Tcl.
 They are stored in <code>$(pkgdatadir)/lang</code>
 (maybe in <code>/usr/local/share/<?scm:d PACKAGE?>/lang/</code>).
 </p>
+    <p>Here are those for Awk and Scheme:</p>
 
-    <h2>File format</h2>
-    <p>Here is the most comlicated and longest configuration file.
-This is for <em>Awk</em>.
-
-    <blockquote>
-      <pre>
+    <blockquote id="awk">
+      <pre><code>
 # awk - configurations for the Awk language
 awk -f /dev/stdin
-# initialization
+# init
 BEGIN {
 # assign
 @VAR@ = @VAL@;
 # string
-printf &quot;@STR@&quot;;
+printf "@STR@";
 # display
 printf (@EXP@);
-# finalization
+# finish
  exit;
 }
-</pre>
-    </blockquote>
+</code></pre></blockquote>
 
-    <blockquote>
-      <pre>
+    <blockquote id="scm">
+      <pre><code>
 ;; scm - configurations for the Scheme language
 gosh -b
+;; identifier
+*lisp*
 ;; nil
 #f
 ;; bind
@@ -89,31 +125,27 @@ gosh -b
 (display @EXP@)
 ;; newline
 (newline)
-</pre>
+</code></pre>
     </blockquote>
 
-
-    <h3>File Size</h3>
-    <p>The size of configuration files must be less than
-511 Bytes.</p>
     <h3>Leading Character and Namespace</h3>
     <p>
 The first character of a configuration file is the leading character.
 A line beginning with this character is used to separate records.
-It will be convenient if it is the comment character
+It will be convenient if it is the first comment character
 of your favorite interpreter language.</p>
     <p>
-You must specify the namespace and the subnamespace for display mode
-in the second line as
+You must specify the namespacein the second line as
 <q>&lt;?<em>namesapace</em> ...&gt;</q>.
 </p>
     <h3>Other Records</h3>
     <p>The first line of a record starts with the leading character.
 The first line's second field is the keyword for the record.
-Following lines are data themselves.</p>
+The following lines are data.</p>
     <p>These are the keywords:</p>
     <ul>
       <li><a href="#initialization">initialization</a></li>
+      <li><a href="#identifier">identifier</a></li>
       <li><a href="#nil">nil</a></li>
       <li><a href="#bind">bind</a></li>
       <li><a href="#assign">assign</a></li>
@@ -126,52 +158,61 @@ Following lines are data themselves.</p>
     <h4 id="command">command</h4>
     <p>
 The interpreter and its arguments.
-See <a href="interpreter.html">the document of Scheme interpreters</a>
-to decide the arguments.
-But in most cases, your interpreter will need no arguments,
-for it may be wise enough to switch to a batch mode
-if stdin is a pipe.</p>
+In most cases, your interpreter will need no arguments,
+for it may be sophistiacated enough to switch to a batch mode
+if stdin is connected to a pipe.</p>
 
     <h4 id="initialization">intialization</h4>
     <p>
 The initialization code.
-This may has no lines.</p>
+This record is optional.</p>
+
+    <h4 id="identifier">identifer</h4>
+    <p>Naming convention of idenfiers or variables.
+This should be one of
+<em>*lisp*</em>, <em>UPPER</em>, <em>Title</em> and <em>lower</em>.
+The default is <em>lower</em>.
+</p>
 
     <h4 id="nil">nil</h4>
-    <p>The external representation of a value to be used
-to show it is not a string.</p>
+    <p>An object to be used as false.
+This record is optional.
+If it is omitted,
+an empty string <em>&quot;&quot;</em> is used.</p>
 
     <h4 id="bind">bind</h4>
-    <p>How to bind a variable to a value.
-The left side value is specified by <em>variable-name</em>
-or <em>variable_name</em> depending on the convention of the language.
-The right side value is specifed by <em>value</em>.</p>
-    <p>At least one of this and <a href="#assign">assign</a> record
-is required.</p>
+    <p>Code to bind a variable <em>@VAR@</em> to a value <em>@VAL@</em>.
+This record is optional.
+If it is omitted, <em>@VAR@</em> is assigned to <em>@VAL@</em>.
+</p>
 
     <h4 id="assign">assign</h4>
-    <p>How to assign a variable to a value.
-The left side value is specified by <em>variable-name</em>
-or <em>variable_name</em> depending on the convention of the language.
-The right side value is specifed by <em>value</em>.</p>
-    <p>At least one of this and <a href="#bind">bind</a> record
-is required.</p>
+    <p>
+Code to assign a value <em>@VAL@</em> to a variable <em>@VAR@</em>.
+This record is obligatory.
+</p>
 
     <h4 id="string">string</h4>
     <p>
-How to display a string.
-You must write a form to display a string <em>&quot;string&quot;</em>.</p>
+Code to print a string &quot;@STR@&quot;.
+This record is obligatory.</p>
 
     <h4 id="expression">expression</h4>
     <p>
-How to display an expression.
-You must write a form to display an expression.
-<em>expression</em> is used as keyword to show where it is placed.</p>
+Code to send the external representation of an expression
+<em>@EXP@</em>.
+This record is optional.
+If it is omitted, you cannot use <em>:d</em> subspace.</p>
+
+    <h4 id="newline">newline</h4>
+    <p>
+Code to send a newline.
+This record is optional.
+If it is omitted, <q>\n</q> is added to strings.</p>
 
     <h4 id="finalization">finalization</h4>
     <p>
-The finalization code.
-This may has no lines.</p>
+The finalization code.  This record is optional.</p>
 
     <hr/>
     <div>

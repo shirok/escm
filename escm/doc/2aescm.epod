@@ -1,6 +1,6 @@
 <?scm
-  (load (string-append *pwd* "/config.scm"))
-  (load (string-append *pwd* "/helper.scm"))
+  (load (string-append *builddir* "/doc/config.scm"))
+  (load (string-append *srcdir* "/doc/helper.scm"))
 ?>
 
 =head1 NAME
@@ -20,6 +20,10 @@ with C<E<lt>scm> and C<?E<gt>>.
 C<#?> syntax, used to specify the backend interpreter,
 is translated by an extended meta-argument functionaly.
 
+This tool is not perfect, and you may have to edit
+the output manually.
+This will happen if your code contains C<if>.
+
 =head1 OPTIONS
 
 =over 2
@@ -35,6 +39,34 @@ Specify the output file.
 Without this option, the output is sent to stdout.
 
 =back
+
+=head1 MANUAL EDITING
+
+If your code contains C<if>, you will have to edit the document
+manually.  Here is an example:
+
+  <? (if foo !>if true
+  <? "if not true") !>
+
+This piece is translated into the following code:
+
+  (if foo (display "if true
+  ") "if not true")
+
+B<2aescm> converts the example into these lines:
+
+  <?scm:d "<?scm"?> (if foo ?>if true
+  <?scm:d "<?scm"?> "if not true") ?>
+
+B<aescm> translates them into an illegitimate form:
+
+  (if foo (display "if true")(newline)
+  "if not true")
+
+So you should add C<(begin> and C<)>:
+
+  <?scm:d "<?scm"?> (if foo (begin ?>if true
+  <?scm:d "<?scm"?> ) "if not true") ?>
 
 =head1 AUTHOR
 
