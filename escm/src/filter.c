@@ -116,16 +116,10 @@ main(int argc, char **argv)
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_cgi) {
     escm_redirect(fileno(stderr), fileno(stdout));
-  } else {
-#ifdef ENABLE_NLS
-    setlocale (LC_ALL, "");
-    bindtextdomain (PACKAGE, LOCALEDIR);
-    textdomain (PACKAGE);
-#endif /* ENABLE_NLS */
   }
 
   /* expand meta-arguments if necessary */
-  inp = escm_expand(&argc, &argv, &s_argc, &s_argv,
+  inp = meta_expand(&argc, &argv, &s_argc, &s_argv,
 		    OPTSTR, getenv("PATH_TRANSLATED"));
 
   /* process options */
@@ -136,7 +130,7 @@ main(int argc, char **argv)
 #if defined(HAVE_GETOPT_LONG)
     case 0:
       if (help_flag) {
-	printf(_(
+	printf(
 "Usage: %s [OPTION] ... FILE ...\n"
 "Preprocess embedded scheme code in documents.\n"
 "\n"
@@ -147,14 +141,13 @@ main(int argc, char **argv)
 "  -f, --footer=FILENAME        specify the footer file\n"
 "  -h, --header=FILENAME        specify the header file\n"
 "  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
+#ifdef ENABLE_POLYGLOT
 "  -l, --language=LANG          choose the interpreter language\n"
+#endif /* ENABLE_POLYGLOT */
 "  -o, --output=FILENAME        specify the output file\n"
 "      --help                   print this message and exit\n"
-"      --version                print version information and exit\n"),
+"      --version                print version information and exit\n",
 	       escm_prog);
-#ifndef ENABLE_POLYGLOT
-	printf(_("Option %s is discarded.\n"), "-l");
-#endif /* ENABLE_POLYGLOT */
 	printf(_("\nReport bugs to <%s>\n"), PACKAGE_BUGREPORT);
       } else {
 	interp = getenv("ESCM_BACKEND");
@@ -209,13 +202,11 @@ main(int argc, char **argv)
     }
   }
 
-#ifdef ENABLE_CGI
   /* write out a content header. */
   if (header_flag && escm_cgi) {
     if (process_flag) escm_html_header(lang, outp);
     else escm_text_header(lang, outp);
   }
-#endif /* ENABLE_CGI */
 
   /* specify the output file if necessary. */
   if (output_file) {
@@ -252,21 +243,13 @@ main(int argc, char **argv)
   if (process_flag) {
     escm_bind(lang, "*escm-interpreter*",
 	      interp ? interp : ESCM_BACKEND, outp);
-#ifdef ENABLE_CGI
-    escm_bind(lang, "GATEWAY_INTERFACE", escm_cgi, outp);
     /* set useful global variables if the language is scheme. */
     if (escm_cgi) {
       const char *method;
-      int i;
       method = getenv("REQUEST_METHOD");
-      escm_bind(lang, "REQUEST_METHOD", method, outp);
       if (method[0] == 'P') escm_bind_query_string(lang, outp);
       else escm_bind(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
-      for (i = 0; i < SizeOfArray(env_to_bind); i++) {
-	escm_bind(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
-      }
     }
-#endif /* ENABLE_CGI */
   }
 
   /* evaluate the expressions specified in options */

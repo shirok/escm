@@ -3,8 +3,8 @@ Dummy README for aescm 0.22 - experimental version of escm
 In version 0.22, dangerous or useless features will be removed,
 for example:
 
- * format strings
- * internationalization
- * Scheme binding of environmental variables
+ * format strings (done)
+ * internationalization (done)
+ * Scheme binding of environmental variables (done)
 
 I will also remove some bashism and gmakism.

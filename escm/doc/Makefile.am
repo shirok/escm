@@ -2,9 +2,15 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-ESCM = ../src/aescm
+#
+# Requires GNU Make to generate manpages and html documents.
+# So type `make MAKE=gmake' in some environments.
+#
 
-SUFFIXES = .escm .html .epod .pod
+ESCM = ../src/aescm
+POD2MAN = pod2man
+POD2HTML = pod2html
+SUFFIXES = .1 .html .epod .escm .pod
 
 man_MANS = aescm.1 2aescm.1
 
@@ -14,17 +20,17 @@ $(ESCM) :
 	cd ../src/ && make
 
 config-h.scm : ../src/config.h
-	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
+	$(AWK) -f config-h.awk $< > $@
 
 %.html : %.escm config-h.scm
-	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"$(top_srcdir)/doc/helper.scm\"))" -o $@ $<
-
-%.pod : %.epod config-h.scm
-	$(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"$(top_srcdir)/doc/helper.scm\"))" -o $@ $<
+	LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"$(top_srcdir)/doc/helper.scm\"))" -o $@ $<
 
 %.1 : %.pod
-	-$(POD2HTML) $< > $*.html
-	-$(POD2MAN) -c "" -r "" $< > $@
+	$(POD2HTML) $< > $*.html
+	$(POD2MAN) -c "" -r "" $< > $@
+
+%.pod : %.epod
+	$(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"/doc/helper.scm\"))" $< > $@
 
 EXTRA_DIST = config-h.awk helper.scm
 EXTRA_DIST += readme.escm gimmick.escm interpreter.escm
@@ -36,8 +42,7 @@ noinst_DATA = $(HTML_FILES)
 
 clean-local:
 	-rm *~
-	-rm *.html
-	-rm *.1
+	-rm *.pod
 
 # end of doc/Makefile.am
 

@@ -8,8 +8,8 @@ SUBDIRS = lang
 BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c
 
-deflang.c : lang/@DEFAULT_LANG@ lang.awk
-	$(AWK) -f lang.awk $< > $@
+deflang.c : lang.awk lang/@DEFAULT_LANG@ 
+	$(AWK) -f lang.awk lang/@DEFAULT_LANG@ > $@
 
 bin_PROGRAMS = aescm 2aescm
 aescm_SOURCES  = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES)

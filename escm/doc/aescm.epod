@@ -32,7 +32,7 @@ If it is the case,
 a content header for HTML will be added
 and error messages are to be sent to stdout.
 
-=head1 OPTIONS
+=head2 OPTIONS
 
 =over 2
 
@@ -86,7 +86,7 @@ Print version information.
 
 =back
 
-=head1 SCHEME VARIABLES
+=head2 SCHEME VARIABLES
 
 =over 2
 
@@ -108,43 +108,12 @@ The Scheme interpreter and its arguments.
 
 The name and the version of this project.
 
-=item GATEWAY_INTERFACE
-
-The value of environment variable B<GATEWAY_INTERFACE>
-or false if it is not defined.
-This variable will be used to check whether the script is a CGI or not.
-
-=back
-
-The following variables are defined only when
-B<GATEWAY_INTERFACE> is a true.
-They are false
-if their corresponding environment variables are not defined.
-
-=over 2
-
 =item QUERY_STRING
 
-The query string.
-It is so even if the request method is B<POST>.
+The query string of a CGI program.
+The request method is either B<POST> or B<GET>.
 
-=item REQUEST_METHOD
-
-=item HTTP_HOST
-
-=item HTTP_COOKIE
-
-=item HTTP_ACCEPT_LANGUAGE
-
-=item HTTP_ACCEPT_CHARSET
-
-=item HTTP_REFERER
-
-=item HTTP_USER_AGENT
-
-=back
-
-=head1 ENVIRONMENT
+=head2 ENVIRONMENT VARIABLES
 
 =over 2
 
@@ -168,36 +137,7 @@ The default backend interpreter.
 
 =back
 
-=head1 EXAMPLE
-
-=head2 Filter
-
-This man page itself was converted by B<<?scm:d PACKAGE?>> as:
-
-  <?scm:d PACKAGE?> -e "(define *pwd* \"`pwd`\")" aescm.epod > aescm.pod
-  pod2man -c "" -r "" aescm.pod > aescm.1
-
-=head2 CGI Interpreter
-
-You can use this tool in the sharp-bang line of a CGI script.
-This is a simplistic version of a multilingual greeting.
-The content header will be automatically added.
-
-  #!/usr/local/bin/<?scm:d PACKAGE?>
-  <html><head><title>Hello, world!</title></head>
-  <body><p>
-  <?scm:d "<?scm:d"?>
-     (case (if (not HTTP_ACCEPT_LANGUAGE) 'en
-               (string->symbol (substring HTTP_ACCEPT_LANGUAGE 0 2)))
-	  ((de) "Guten Tag, alles!")
-          ((fr) "Bonjour, tous!")
-          ((ja) "Konnichiwa, Minasan!")
-          ((oc) "Adieu-siatz, lo monde!")
-          (else "Hellow, world!"))
-  ?></p>
-  </body>
-
-=head2 Handler CGI Program
+=head2 HANDLER CGI PROGRAM
 
 You can use this tool as a handler CGI program,
 if your web administrator allows you to override B<FileInfo> directives.
@@ -206,19 +146,19 @@ Copy or hard-link B<<?scm:d PACKAGE?>> to
 C<~/public_html/cgi-bin/<?scm:d PACKAGE?>.cgi>.
 Then add these lines to your C<.htaccess>.
 
-  AddHandler escm-handler schtml
+  AddHandler escm-handler escm
   Action escm-handler /~YOURNAME/cgi-bin/aescm.cgi
 
-Access to a file suffixed with C<.schtml> will be processed by this tool
+Access to a file suffixed with C<.escm> will be processed by this tool
 and embedded Scheme code will be evaluated.
 
-=head2 Other Interpreter Languages
+=head2 OTHER INTERPRETER LANGUAGES
 
 B<<?scm:d (string-titlecase PACKAGE)?>>
 is designed to be interpreter independent.
 This does not mean Scheme interpreter independent.
 You can also embed code of most interpreter languages,
-e.g. Awk, Csh, Octave, Perl, Python, Ruby, Sh, Tcl.
+e.g. Awk, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl.
 But you can use this feature
 only when you have run C<configure> script with C<--enable-polyglot> option.
 
@@ -249,6 +189,12 @@ of B<escm>.
 The stable version is still B<escm 1.1>.
 
 =item *
+B<<?scm:d (string-titlecase PACKAGE)?>>
+may generate a very long string.
+Make it sure that your interpreter might not have
+buffer overflow bugs.
+
+=item *
 A document written in a multibyte character set
 may not be correctly processed
 by an interpreter which may convert character sets.
@@ -265,7 +211,7 @@ the stable version.
 The experimental version has adopted the XML syntax for a preprocessor
 as B<eguile> did
 and eliminated the archaic one
-(C<E<lt>?>, C<E<lt>?=> and C<!E<gt>>).
+with C<E<lt>?>, C<E<lt>?=> and C<!E<gt>>.
 
 =head2 Options
 

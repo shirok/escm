@@ -6,8 +6,6 @@
 #  define META_ARG_H 1
 #include <stdio.h> /* defines NULL and FILE */
 
-#define ESCM 1
-#ifdef ESCM
 #include "escm.h"
 #include "misc.h"
 #define XPROG escm_prog
@@ -15,13 +13,9 @@
 #define XLINENO escm_lineno
 #define XERROR0(str) escm_error(str)
 #define XERROR1(fmt, arg) escm_error(fmt, arg)
-#if defined(ENABLE_CGI)
-#  define META_ACTION 1
-#  define escm_expand meta_expand
-#else
-#  define escm_expand(ic, iv, sc, sv, o, p) meta_expand(ic, iv, sc, sv, o)
-#endif /* defined(ENABLE_CGI) */
-#endif /* ESCM */
+
+/* action handler CGI program */
+#define META_ACTION 1
 
 #ifndef _
 #  define _(str) str

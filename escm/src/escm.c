@@ -104,6 +104,39 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
+/* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
+ * when the method is POST. */
+void
+escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
+{
+  const char *content_length;
+  char *p;
+  long llen;
+  int len;
+  int c;
+
+  content_length = getenv("CONTENT_LENGTH");
+  if (content_length == NULL)
+    escm_error(_("inconsistent environment"));
+  else {
+    if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
+    put_variable(lang, "QUERY_STRING", outp);
+    if (lang->bind.infix) fputs(lang->bind.infix, outp);
+    llen = strtol(content_length, &p, 10);
+    if (*p == '\0') {
+      fputc('\"', outp);
+      len = (int) llen;
+      while ((c = getc(stdin)) != EOF && len-- > 0) {
+	fputc(c, outp);
+      }
+      fputc('\"', outp);
+    } else {
+      fputs(lang->nil, outp);
+    }
+    if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
+    fputc('\n', outp);
+  }
+}
 /* escm_preproc(&lang, inp, outp) - the preprocessor.
  */
 #define push_char(c) {\

@@ -1,8 +1,8 @@
-<?xml version="1.0"?><!-- -*- xml -*- -->
+<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
 <!-- $Id$ -->
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
-     "DTD/xhtml11-flat.dtd">
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
   <head>
     <title>Polyglot Feature</title>
@@ -70,6 +70,26 @@ printf (@EXP@);
 </pre>
     </blockquote>
 
+    <blockquote>
+      <pre>
+;; scm - configurations for the Scheme language
+gosh -b
+;; nil
+#f
+;; bind
+(define @VAR@ @VAL@)
+;; assign
+(set! @VAR@ @VAL@)
+;; string
+(display "@STR@")
+;; display
+(display @EXP@)
+;; newline
+(newline)
+</pre>
+    </blockquote>
+
+
     <h3>File Size</h3>
     <p>The size of configuration files must be less than
 511 Bytes.</p>
@@ -82,7 +102,7 @@ of your favorite interpreter language.</p>
     <p>
 You must specify the namespace and the subnamespace for display mode
 in the second line as
-<q>&lt;?<em>namesapace</em>:<em>subnamespace</em> ...&gt;</q>.
+<q>&lt;?<em>namesapace</em> ...&gt;</q>.
 </p>
     <h3>Other Records</h3>
     <p>The first line of a record starts with the leading character.
@@ -96,6 +116,7 @@ Following lines are data themselves.</p>
       <li><a href="#assign">assign</a></li>
       <li><a href="#string">string</a></li>
       <li><a href="#expression">expression</a></li>
+      <li><a href="#newline">newline</a></li>
       <li><a href="#finalization">finalization</a></li>
     </ul>
 

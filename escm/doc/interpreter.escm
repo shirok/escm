@@ -1,8 +1,8 @@
-<?xml version="1.0"?><!-- -*- xml -*- -->
+<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
 <!-- $Id$ -->
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
-     "DTD/xhtml11-flat.dtd">
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <?scm (load (string-append *pwd* "/config-h.scm"))?>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -61,7 +61,7 @@ A useful trick is to specify stdin (/dev/stdin) as script file.
     <p>Besides, your interpreter must work without
 a user dependent initialization file.
 <em><?scm:d (string-titlecase PACKAGE)?></em> may be used in CGI scripts
-and then the defined environment variables are so different.</p>
+and then the defined environment variables are different.</p>
 
     <p>These two tests will be useful:</p>
     <blockquote>

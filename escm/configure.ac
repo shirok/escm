@@ -12,15 +12,6 @@ AC_SUBST(CFLAGS)
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_AWK
-# AC_PROG_RANLIB
-# AC_PROG_LIBTOOL
-AC_CHECK_PROGS(LYNX, [lynx links w3m])
-AC_CHECK_PROGS(POD2MAN, [pod2man])
-AC_CHECK_PROGS(POD2HTML, [pod2html])
-
-# i18n
-# AM_GNU_GETTEXT([external])
-# AM_ICONV
 
 # The default interpreter language
 AC_ARG_WITH([default], [  --with-default=lang   specify the default language (scm).])
@@ -62,9 +53,6 @@ if test x$enable_polyglot = xyes; then
   AC_DEFINE_UNQUOTED(ENABLE_POLYGLOT, [1], [enable polyglot support.])
 fi
 AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
-
-AC_ARG_ENABLE([cgi],
-   [  --disable-cgi -- not to use as a CGI program.])
 
 AC_CONFIG_FILES([Makefile test/Makefile
 			  doc/Makefile

@@ -38,4 +38,7 @@ void escm_init(const struct escm_lang *lang, FILE *outp);
 void escm_finish(const struct escm_lang *lang, FILE *outp);
 /* escm_preproc(&lang, inp, outp) - the preprocessor. */
 void escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+/* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
+ * when the method is POST. */
+void escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
 #endif /* ESCM_H */

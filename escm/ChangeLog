@@ -1,6 +1,8 @@
 2004-02-03  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
-	* src/escm.h: Removed code on formatted output.
+	* src/escm.h (escm_lang): Added newline field.
+	
+	* Removed code on formatted output.
 
 	* Removed code on i18n.
 	

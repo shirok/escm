@@ -8,8 +8,9 @@ LANG_FILES = awk csh lisp octave perl python ruby scm sh tcl
 if POLYGLOT
 langdir = $(pkgdatadir)/lang
 lang_DATA = $(LANG_FILES)
-EXTRA_DIST = $(LANG_FILES)
 endif
+
+EXTRA_DIST = $(LANG_FILES)
 
 uninstall-local :
 	-rmdir $(pkgdatadir)/lang
