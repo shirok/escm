@@ -22,15 +22,14 @@ const char *escm_prog = NULL;
 const char *escm_file = NULL;
 
 /* put_string(str, outp) - escape str and put it.
- * This function is not used in this file, but will be useful.
  */
 static void
 put_string(const char *str, FILE *outp)
 {
   const char *p = str;
-  fputc('\"', outp);
+  fputc('"', outp);
   while (*p) {
-    if (*p == '\"' || *p == '\\') {
+    if (*p == '"' || *p == '\\') {
       fputc('\\', outp);
       fputc(*p, outp);
     } else if (*p == '\n') {
@@ -41,7 +40,7 @@ put_string(const char *str, FILE *outp)
     }
     p++;
   }
-  fputc('\"', outp);
+  fputc('"', outp);
 }
 /* foo_bar => *foo-bar* */
 static void
@@ -233,14 +232,14 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     if (lang->bind.infix) fputs(lang->bind.infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {
-      fputc('\"', outp);
+      fputc('"', outp);
       len = (int) llen;
       while ((c = getc(stdin)) != EOF && len-- > 0) {
 	/* better replace the next line with an error check. */
-	if (c == '\"' || c == '\\') fputc('\\', outp);
+	if (c == '"' || c == '\\') fputc('\\', outp);
 	fputc(c, outp);
       }
-      fputc('\"', outp);
+      fputc('"', outp);
     } else {
       fputs(lang->nil, outp);
     }
@@ -248,125 +247,162 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
-/* escm_preproc(&lang, inp, outp) - the preprocessor.
+/* escm_preproc(lang, inp, outp)
  */
-#define push_char(c) {\
- if (stackptr == 63) goto empty;\
- stack[stackptr++] = c;\
-}
 void
 escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 {
-  int in_string = FALSE;
+  int prefixed = FALSE;
+  int display = FALSE;
+  int string = FALSE;
+  int c;
+  int i, j;
   enum {
+    OUT,
     LITERAL,
     CODE,
-    DISPLAY,
   } state = LITERAL;
-  int c;
-  const char *p;
-  char stack[64] = "<?";
-  int stackptr = 0, i = 0;
 
-  fputs(lang->literal.prefix, outp);
-  while ((c = getc(inp)) != EOF) {
+  while (state != OUT) {
     if (state == LITERAL) {
-      if (c == '<') {
-	stackptr++;
-	c = getc(inp);
-	if (c != '?') goto empty;
-	stackptr++;
-	p = lang->name;
-	while ((c = getc(inp)) == *p) {
-	  push_char(c);
-	  p++;
-	}
-	if (*p != '\0') goto empty;
-	if (isspace(c)) {
-	  stackptr = 0;
-	  state = CODE;
-	  fputs(lang->literal.suffix, outp);
-	  fputc('\n', outp);
-	  continue;
-	}
-	if (c != ':') goto empty;
-	push_char(':');
-	c = getc(inp);
-	if (c != 'd') goto empty;
-	push_char('d');
-	c = getc(inp);
-	if (isspace(c)) {
-	  if (!lang->display.prefix) goto empty;
-	  stackptr = 0;
-	  state = DISPLAY;
-	  fputs(lang->literal.suffix, outp);
-	  fputc('\n', outp);
-	  fputs(lang->display.prefix, outp);
-	  continue;
-	}
-      empty:
-	for (i = 0; i < stackptr; i++)
-	  fputc(stack[i], outp);
-	stackptr = 0;
-	if (c == EOF) break;
-	else ungetc(c, inp);
-      } else {
-	if (c == '\\' || c == '\"') {
-	  fputc('\\', outp);
-	  fputc(c, outp);
-	} else if (c == '\n') {
-	  if (lang->newline) {
-	    fputs(lang->literal.suffix, outp);
-	    fputs(lang->newline, outp);
-	  } else {
-	    fputc('\\', outp);
-	    fputc('n', outp);
-	    fputs(lang->literal.suffix, outp);
-	  }
-	  fputc('\n', outp);
-	  fputs(lang->literal.prefix, outp);
+      c = fgetc(inp);
+      switch (c) {
+      case EOF:
+	state = OUT;
+	break;
+      case '\n':
+	if (lang->newline) {
+	  if (prefixed) fputs(lang->literal.suffix, outp);
+	  fputs(lang->newline, outp);
 	} else {
-	  fputc(c, outp);	  
+	  if (!prefixed) fputs(lang->literal.prefix, outp);
+	  fputc('\\', outp);
+	  fputc('n', outp);
+	  fputs(lang->literal.suffix, outp);
 	}
+	fputc('\n', outp);
+	prefixed = FALSE;
+	break;
+      case '<':
+	c = fgetc(inp);
+	if (c != '?') {
+	  if (!prefixed) {
+	    fputs(lang->literal.prefix, outp);
+	    prefixed = TRUE;
+	  }
+	  fputc('<', outp);
+	  if (c == EOF) state = OUT;
+	  else ungetc(c, inp);
+	} else {
+	  for (i = 0; lang->name[i]; i++) {
+	    c = fgetc(inp);
+	    if (c == EOF) goto invalid;
+	    else if (c != lang->name[i]) {
+	      ungetc(c, inp);
+	      goto invalid;
+	    }
+	  }
+	  c = fgetc(inp);
+	  if (c == EOF) goto invalid;
+	  else if (isspace(c)) {
+	    display = FALSE;
+	    if (prefixed) fputs(lang->literal.suffix, outp);
+	    state = CODE;
+	  } else if (c != ':') {
+	    ungetc(c, inp);
+	    goto invalid;
+	  } else {
+	    c = fgetc(inp);
+	    if (c != 'd' || !lang->display.prefix) {
+	      if (c == EOF) XERROR("unterminated instruction");
+	      if (!prefixed) {
+		fputs(lang->literal.prefix, outp);
+		prefixed = TRUE;
+	      }
+	      fputc('<', outp);
+	      fputc('?', outp);
+	      fputs(lang->name, outp);
+	      fputc(':', outp);
+	      fputc(c, outp);
+	    } else {
+	      display = TRUE;
+	      if (prefixed) fputs(lang->literal.suffix, outp);
+	      fputs(lang->display.prefix, outp);
+	      state = CODE;
+	    }
+	  }
+	}
+	break;
+
+      invalid:
+	if (!prefixed) {
+	  fputs(lang->literal.prefix, outp);
+	  prefixed = TRUE;
+	}
+	fputc('<', outp);
+	fputc('?', outp);
+	for (j = 0; j < i; j++)
+	  fputc(lang->name[j], outp);
+	break;
+
+      default:
+	if (!prefixed) {
+	  fputs(lang->literal.prefix, outp);
+	  prefixed = TRUE;
+	}
+	if (c == '"' || c == '\\') fputc('\\', outp);
+	fputc(c, outp);
       }
     } else {
-      if (in_string) {
-	if (c == '\\') {
+      c = fgetc(inp);
+      switch (c) {
+      case EOF:
+	XERROR("unterminated instruction");
+	/* not reached */
+      case '\\':
+	c = fgetc(inp);
+	switch (c) {
+	case EOF:
+	  XERROR("unterminated instruction");
+	  /* not reached */
+	default:
 	  fputc('\\', outp);
-	  c = getc(inp);
-	  if (c == EOF) {
-	    fputc('\\', outp);
-	    break;
-	  }
-	} else if (c == '\"') in_string = FALSE;
-	fputc(c, outp);
-      } else {
-	if (c == '?') {
-	  c = getc(inp);
-	  if (c == EOF) break;
-	  else if (c == '>') {
-	    if (state == DISPLAY) fputs(lang->display.suffix, outp);
-	    fputc('\n', outp);
-	    fputs(lang->literal.prefix, outp);
-	    state = LITERAL;
-	    continue;
-	  } else fputc('?', outp);
-	} else if (c == '\"') {
-	  in_string = TRUE;
+	  fputc(c, outp);
 	}
+	break;
+      case '"':
+	fputc('"', outp);
+	string = !string;
+	break;
+      case '?':
+	if (!string) {
+	  c = fgetc(inp);
+	  switch (c) {
+	  case EOF:
+	    XERROR("unterminated instruction");
+	    /* not reached */
+	  case '>':
+	    prefixed = FALSE;
+	    if (display) fputs(lang->display.suffix, outp);
+	    fputc('\n', outp);
+	    state = LITERAL;
+	    break;
+	  default:
+	    fputc('?', outp);
+	    fputc(c, outp);
+	  }
+	  break;
+	} else {
+	  /* no break */
+	}
+      default:
 	fputc(c, outp);
       }
     }
   }
-  if (state == LITERAL) fputs(lang->literal.suffix, outp);
-  else {
-    if (in_string) {
-      fputc('\"', outp);
-      XERROR("unterminated string");
-    }
-    if (state == DISPLAY) fputs(lang->display.suffix, outp);
-    XERROR("unterminated instruction");
-  }
+
+  if (prefixed) fputs(lang->literal.suffix, outp);
   fputc('\n', outp);
 }
+
 /* end of escm.c */
