@@ -19,7 +19,9 @@
 const char *escm_prog = NULL;
 const char *escm_file = NULL;
 int escm_lineno = 0;
+#ifdef ENABLE_CGI
 const char *escm_cgi = NULL;
+#endif /* ENABLE_CGI */
 
 /* put_string(str, outp) - escape str and put it.
  * This function is not used in this file, but will be useful.
@@ -41,11 +43,20 @@ static void
 put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 {
   const char *p;
-  for (p = var; *p; p++) {
-    if (isalnum(*p) || lang->use_hyphen || *p == '_') {
-      fputc(*p, outp);
-    } else if (*p == '-') {
-      fputc('_', outp);
+  if (lang->scm_p) fputs(var, outp);
+  else {
+    int flag = FALSE;
+    for (p = var; *p; p++) {
+      if (!flag) {
+	if (isalpha(*p) || *p == '_') {
+	  fputc(tolower(*p), outp);
+	  flag = TRUE;
+	}
+      } else if (isalnum(*p)) {
+	fputc(tolower(*p), outp);
+      } else if (*p == '-' || *p == '_') {
+	fputc('_', outp);
+      }
     }
   }
 }
@@ -85,6 +96,7 @@ escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE
   if (lang->assign.suffix) fputs(lang->assign.suffix, outp);
   fputc('\n', outp);
 }
+#ifdef ENABLE_CGI
 /* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
  * when the method is POST. */
 void
@@ -118,6 +130,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
+#endif /* ENABLE_CGI */
 /* escm_init(&lang, outp) - initialize the backend interpreter.
  */
 void
@@ -153,13 +166,14 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     LITERAL,
     CODE,
     DISPLAY,
+    FORMAT,
   } state = LITERAL;
   int c;
   const char *p;
   int str_keep_lineno = 0;
   int tag_keep_lineno = 0;
   char stack[64] = "<?";
-  int stackptr = 0, i;
+  int stackptr = 0, i = 0;
 
   fputs(lang->literal.prefix, outp);
   while ((c = getc(inp)) != EOF) {
@@ -202,6 +216,28 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  if (c == '\n') escm_lineno++;
 	  continue;
 	}
+	if (c != ':') goto empty;
+	push_char(':');
+	i = stackptr;
+	for (;;) {
+	  c = getc(inp);
+	  if (c == '\"') goto empty;
+	  else if (isspace(c)) break;
+	  push_char(c);
+	}
+	if (!lang->format.infix) goto empty;
+	state = FORMAT;
+	fputs(lang->literal.suffix, outp);
+	fputc('\n', outp);
+	fputs(lang->format.prefix, outp);
+	tag_keep_lineno = escm_lineno;
+	if (c == '\n') escm_lineno++;
+	for (/**/; i < stackptr; i++) {
+	  fputc(stack[i], outp);
+	}
+	stackptr = 0;
+	fputs(lang->format.infix, outp);
+	continue;
       empty:
 	for (i = 0; i < stackptr; i++)
 	  fputc(stack[i], outp);
@@ -240,6 +276,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  if (c == EOF) break;
 	  else if (c == '>') {
 	    if (state == DISPLAY) fputs(lang->display.suffix, outp);
+	    else if (state == FORMAT) fputs(lang->format.suffix, outp);
 	    fputc('\n', outp);
 	    fputs(lang->literal.prefix, outp);
 	    state = LITERAL;

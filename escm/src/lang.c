@@ -155,6 +155,9 @@ parse_lang(const char *name, const char **interp)
   if (ptr == NULL || mylang.name == NULL || *interp == NULL)
     escm_error(gettext("broken config file - %s"), name);
 
+  if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "scheme") == 0)
+    mylang.scm_p = 1;
+
   mylang.nil = "\"\"";
 
   while (ptr) {
@@ -169,20 +172,21 @@ parse_lang(const char *name, const char **interp)
       if (!parse_form3(data, &(mylang.assign)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
-    case HASH_KEY('i', 'n'): /* initialization */
+    case HASH_KEY('i', 'n'): /* init */
       mylang.init = data;
       break;
     case HASH_KEY('n', 'i'): /* nil */
       mylang.nil = data;
       break;
-    case HASH_KEY('i', 'd'): /* identifier */
-      if (strchr(data, '-')) mylang.use_hyphen = 1;
-      break;
-    case HASH_KEY('f', 'i'): /* finalization */
+    case HASH_KEY('f', 'i'): /* finish */
       mylang.finish = data;
       break;
     case HASH_KEY('d', 'i'): /* display */
-      if (!parse_form2(data, &(mylang.display)))
+      if (data && !parse_form2(data, &(mylang.display)))
+	escm_error(gettext("broken config file - %s"), name);
+      break;
+    case HASH_KEY('f', 'o'): /* format */
+      if (data && !parse_form3(data, &(mylang.format)))
 	escm_error(gettext("broken config file - %s"), name);
       break;
     case HASH_KEY('s', 't'): /* string */

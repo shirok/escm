@@ -4,8 +4,8 @@
 
 # Check the environment, and exit 77 if you skip this test.
 ${PROG} -h > tmp
-grep -e "-l" tmp > /dev/null
-if test x$? = x1; then
+grep "Option -l discarded" tmp > /dev/null
+if test x$? = x0; then
     rm tmp
     echo " -- Skipped" >> 00check.log
     exit 77

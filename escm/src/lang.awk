@@ -5,7 +5,7 @@
 BEGIN {
   leading = "";
   key = "";
-  split("name command identifier initialization nil bind assign string display finalization", data);
+  split("name command init nil bind assign string display format finish", data);
   for (x in data) {
     data[data[x]] = "";
     delete data[x];
@@ -55,23 +55,41 @@ END {
   print "struct escm_lang deflang = {";
   print " ", escape_string(data["name"]), ", /* name */";
 
+  if (data["name"] == "scm" || data["name"] == "scheme") {
+    print " 1 , /* scm_p */";
+  } else {
+    print " 0 , /* scm_p */";
+  }
+
+  print " { /* literal */";
   if (split(data["string"], tmp, sep) != 2) {
     print "string record broken";
     exit 1;
   }
-  print " { /* literal */";
   print "  ", escape_string(tmp[1]), ",";
   print "  ", escape_string(tmp[2]), ",";
   print " },";
 
-  if (split(data["display"], tmp, sep) != 2) {
+  print " { /* display */";
+  n = split(data["display"], tmp, sep);
+  if (n != 0 && n != 2) {
     print "display record broken";
     exit 1;
   }
-  print " { /* display */";
   print "  ", escape_string(tmp[1]), ",";
   print "  ", escape_string(tmp[2]), ",";
-  print " },"
+  print " },";
+
+  print " { /* format */";
+  n = split(data["format"], tmp, sep);
+  if (n != 0 && n != 3) {
+    print "format record broken";
+    exit 1;
+  }
+  print "  ", escape_string(tmp[1]), ",";
+  print "  ", escape_string(tmp[2]), ",";
+  print "  ", escape_string(tmp[3]), ",";
+  print " },";
 
   if (split(data["bind"], tmp, sep) != 3) {
     print "bind record broken";
@@ -93,14 +111,9 @@ END {
   print "  ", escape_string(tmp[3]), ",";
   print " },";
   print " ", escape_string(data["nil"]), ", /* nil */"
-  print " ", escape_string(data["initialization"]), ", /* init */"
-  print " ", escape_string(data["finalization"]), ", /* finish */"
+  print " ", escape_string(data["init"]), ", /* init */"
+  print " ", escape_string(data["finish"]), ", /* finish */"
 
-  if (data["identifier"] && match(data["identifier"], "-")) {
-    print " ", 1, ", /* use_hyphen */";
-  } else {
-    print " ", 0, ", /* use_hyphen */";
-  }
   print "};";
   print "/* end of backend.c */";
 }
