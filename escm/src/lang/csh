@@ -1,0 +1,10 @@
+# configurations for the Csh language
+<?csh:d ...?>
+# interpreter
+csh
+# initialization
+# string
+echo -n "string"
+# expression
+echo -n expression
+# finalization

@@ -1,0 +1,13 @@
+# configurations for the Awk language
+<?awk:d ...?>
+# interpreter
+awk -f /dev/stdin
+# initialization
+BEGIN {
+# string
+printf "string";
+# expression
+printf (expression);
+# finalization
+ exit;
+}

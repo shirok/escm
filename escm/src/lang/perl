@@ -1,0 +1,10 @@
+# configurations for the Perl language
+<?perl:d ...?>
+# interpreter
+perl
+# initialization
+# string
+print "string";
+# expression
+print (expression);
+# finalization

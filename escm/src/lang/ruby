@@ -1,0 +1,10 @@
+# configurations for the Ruby language
+<?ruby:d ...?>
+# interpreter
+ruby
+# initialization
+# string
+print "string"
+# expression
+print (expression)
+# finalization

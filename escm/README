@@ -1,75 +1,53 @@
-Aescm
+   This is README file for aescm 0.16 (README or doc/readme.html).
 
-What is it?
+   Aescm is an experimental version of escm. The stable version is escm 1.1.
 
-Aescm is a filter tool to embed programming codes in documents as PHP, but you
-can use most interpreter languages you like, for example, Awk, Csh, Perl, 
-Python, Ruby, Sh, Tcl and of course its default language Scheme.
+   Seemingly aescm is a filter program to processes embedded Scheme code in
+   documents like ePerl or eRuby. In fact it converts documents into Scheme
+   code and make it evaluated by a backend Scheme interpreter. Scheme code
+   between <?scm and ?> is evaluated and replaced with what is written to
+   stdout while the evaluation. Code between <?scm:d and ?> is evaluated and
+   replaced with the result. See doc/filter.html for detail.
 
-Aescm supports three major styles.
+   Aescm is designed to be interpreter independent, and works with most
+   Scheme implementations. See doc/interpreter.html for detail.
 
-  * <?lang expression ...?>, <?lang:d expression ?> (the default. The XML
-    processor instruction)
-  * <? expression ...!>, <?= expression!> (-a option, as ePerl and the original
-    escm)
-  * <% expression ...%>, <%= expression %> (-s option, as eRuby and server side
-    scripts)
+   Its internal is described in doc/library.html.
 
-Another popular style, at least for Scheme, the BRL (beautiful report language)
-will not be supported, for it goes beyond the range of a simple preprocessor.
+INSTALL
 
-Aescm invokes an interpreter as backend and makes it evaluate embedded codes.
-Code blocks are replaced with their output to stdout.
+   Find out good option arguments for your favorite scheme interprter before
+   running configure script. Options for some implementations are documented
+   in doc/interpreter.html.
 
-    <p>In Scheme, a string appears as <?scm (define foo "string") (write foo)?>.</p>
-    ==>
-    <p>In Scheme, a string appears as "string".</p>
+   Suppose your choice be scheme -s /dev/stdin. Then type:
 
-Expression blocks are converted into their results.
+ ./configure --with-scm="scheme -s /dev/stdin"
+ make
+ make install
 
-    <p>1 + 2 = <?scm:d (+ 1 2)?></p>
-    ==>
-    <p>1 + 2 =3</p>
+   You can enable to embed other interpreter languages than Scheme by
+   specifying --enable-gimmick option, but it is not recommendable. See
+   doc/gimmick.html for detail.
 
-How to install Aescm
+Action Handler
 
-What you need
+   You can compile an action handler version of aescm if you run configure
+   script with --enable-handler option. Specify as
+   --enable-handler=/some/where/else/cgi-bin if your site's CGI directory is
+   not a common one.
 
-  * Your favorite interpreter. It must have a explicit or implicit batch mode
-    (no prompts, no results printed, exit when the eof reaches). See the list
-    of interpreters I've checked.
-  * Unix-like environment. Aescm runs your interpreter as a child process.
-  * Awk. Some C source files are created by Awk.
-  * Scheme interpreter. Scheme codes are embedded in documents. (You may have
-    Guile or Rep if you live in a modern Unix-like environment. If not, install
-    Gauche. It is a masterpiece of Shiro Kawai, the author of the original
-    escm.)
+   See doc/handler.html.
 
-How to compile and install Aescm
+BUGS
 
-Type as usual:
+   This is an experimental version and not thoroughly tested. So it must be
+   buggy.
 
-    gunzip aescm-0.14.tar.gz
-    tar xvf aescm-0.14.tar
-    cd aescm-0.14
-    ./configure
-    make
-    make install
+   If you have found bugs, please inform of them via the bug track system in
+   sourceforge's escm project page or email (tagga@tsuda.ac.jp).
 
-I use Automake 1.5 and Autoconf 2.53. So you may have many warnings and 
-configure may will be run serveral times. But it will not be a real problem.
+     ----------------------------------------------------------------------
 
-The default language support (Scheme's) is automatically incorporated. To use
-other languages, for example Perl and Ruby, run ./configure script with
--with-perl and -with-ruby options. Those options do not appear in the help
-message. See src/data/directory to know what langauges are supported.
-
-To specify the full path of an interpreter, you also use -with-LANG option. But
-in this case, you must also specify options. For example, suppose you dare to
-use Rep stored in /usr/local/bin. You run the configure script as follows:
-
-    ./configure -with-scm="/usr/local/bin/rep --batch -s /dev/stdin"
-
--------------------------------------------------------------------------------
-This document was converted off-line by aescm (version 0.14) on Wed Dec 25
-16:41:29 2002.
+   This file was converted from readme.escm on Mon Jun 9 11:12:37 2003. The
+   backend is /usr/bin/gosh -b.

@@ -1,4 +1,10 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.16 (2003-06-09)
+* Remove backward compatibilities.
+* Clean up code a little.
+* Remove meaningless macros.
+* Add a test suite.
+
 Version 0.15 (2002-12-26)
 * Alpha release.
 

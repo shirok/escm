@@ -1,0 +1,10 @@
+;; configurations for the Scheme language
+<?scm:d ...?>
+;; interpreter
+gosh
+;; initialization
+;; string
+(display "string")
+;; expression
+(display expression)
+;; finalization

@@ -1,0 +1,235 @@
+<?xml version="1.0"?><!-- -*- xml -*- -->
+<!-- $Id$ -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "DTD/xhtml11-flat.dtd">
+<html>
+  <head>
+    <title>The Manpage of the Filter Tool</title>
+  </head>
+  <?scm (load (string-append *pwd* "/config-h.scm"))
+        (load (string-append *pwd* "/helper.scm"))?>
+  <body>
+<?scm (header)?>
+
+    <h1>Filter Tool</h1>
+    <p>This is a substitute for the manpage of
+<em><?scm:d PACKAGE?></em>.</p>
+    <ul>
+      <li><a href="#name">NAME</a></li>
+      <li><a href="#synopsis">SYNOPSIS</a></li>
+      <li><a href="#description">DESCRIPTION</a>
+<ul>
+	  <li><a href="#options">Options</a></li>
+	  <li><a href="#scheme_variables">Scheme Variables</a></li>
+	  <li><a href="#environment">Environment</a></li>
+	  <li><a href="#gimmick">Gimmick</a></li>
+	</ul>
+</li>
+      <li><a href="#example">EXAMPLE</a></li>
+      <li><a href="#caveats">CAVEATS</a></li>
+      <li><a href="#changes">CHANGES</a></li>
+      <li><a href="#author">AUTHOR</a></li>
+      <li><a href="#see_also">SEE ALSO</a></li>
+    </ul>
+
+    <h2 id="name">NAME</h2>
+    <p><strong><?scm:d PACKAGE?></strong> -- preprocess embedded Scheme code in document</p>
+    <h2 id="synopsis">SYNOPSIS</h2>
+    <pre>
+<strong><?scm:d PACKAGE?></strong> <em>[OPTION]</em> ... <em>FILE</em> ...
+</pre>
+    <h2 id="description">DESCRIPTION</h2>
+    <p>Seemingly <em><?scm:d PACKAGE?></em> is a filter program
+to processes embedded Scheme code in documents
+like <em>ePerl</em> or <em>eRuby</em>.
+In fact it converts documents into Scheme code and make 
+it evaluated by a backend Scheme interpreter.
+Scheme code between <em>&lt;?scm</em> and <em>?&gt;</em> is evaluated
+and replaced with what is written to stdout while the evaluation.
+Code between <em>&lt;?scm:d</em> and <em>?&gt;</em> is evaluated
+and replaced with the result.
+At least a blank, that is a whitespace, a tab or a newline, is required
+after <em>&lt;?scm</em> or <em>&lt;?scm:d</em>.</p>
+
+    <p>This tool will be used in a script.
+So the first line of each input file is to be skipped
+if it begins with <em>#</em>, for it may be the sharp-bang line.
+What seem to be meta-argument lines are also skipped.
+But if the input is stdin, the first line is always processed.
+</p>
+
+    <p>This program may be used in a CGI script.
+It is automatically judged whether it is invoked in a CGI script or not.
+If it is the case,
+a content header for HTML,
+that is, <em>Content-header: tex/html\r\n\r\n</em>
+is written out af first,
+and error messages are sent to <code>stdout</code>
+in place of <code>stderr</code>.
+</p>
+
+    <p><em><?scm:d (string-titlecase PACKAGE)?></em> is designed to be interpreter independent,
+and works with most Scheme implementations.
+See <a href="interpreter.html">the document on Scheme Interpreters</a>
+for detail.</p>
+
+    <h3 id="options">Options</h3>
+    <dl>
+      <dt>-E</dt>
+      <dd><p>Preprocess files but the embedded Scheme code is not processed.</p></dd>
+      <dt><a id="H_opt">-H</a></dt>
+      <dd><p>Print no content header even in a CGI script.</p></dd>
+      <dt>-e EXPR</dt>
+      <dd><p>Evaluate an expression before processing files.
+You can specify this option as many as you want.</p></dd>
+      <dt><a id="f_opt">-f FILENAME</dt>
+      <dd><p>Specify the footer file.  This file will be processed
+in the last place.</p></dd>
+      <dt>-i 'PROG ARG ... '</dt>
+      <dd><p>Specify the interpreter with its arguments.</p></dd>
+      <dt>-l LANG</dt>
+      <dd><p>Specify the interpreter language to be used.
+This option is valid if the tool is compiled with
+the gimmick feature. See <a href="#gimmick">below</a> for detail.</p></dd>
+      <dt>-o FILENAME</dt>
+      <dd><p>Specify the output file.</p></dd>
+      <dt>-h</dt>
+      <dd><p>Print a short help message.</p></dd>
+      <dt>-v</dt>
+      <dd><p>Print version information.</p></dd>
+    </dl>
+
+    <h3 id="scheme_variables">Scheme Variables</h3>
+    <dl>
+      <dt>*escm-input-file*</dt>
+      <dd><p>List of the input files.
+It is <code>null</code> if the input is stdin.</p></dd>
+      <dt>*escm-output-file*</dt>
+      <dd><p>The name of the output file.
+It is <code>#f</code> if the output is stdout.</p></dd>
+      <dt>*escm-interpreter*</dt>
+      <dd><p>The Scheme interpreter and its arguments.</p></dd>
+      <dt>*escm-version*</dt>
+      <dd>The name and the version of this project.</dd>
+    </dl>
+
+    <h3 id="environment">Environment</h3>
+    <dl>
+      <dt><code>GATEWAY_INTERFACE</code></dt>
+      <dd><p>This variable is used to check whether
+the tool is invoked in a CGI script or not.</p></dd>
+    </dl>
+
+    <h3 id="gimmick">Gimmick</h3>
+    <p>
+As I have written,
+this tool is designed to be interpreter independent.
+This does not mean Scheme interpreter independent.
+You can embed code of most interpreter languages.
+But this feature is enabled only when you have run <em>configure</em>
+script with <code>-with-gimmick</code> option.
+See <a href="gimmick.html">the document on the gimmick feature</a>
+for detail.</p>
+
+    <h2 id="example">EXAMPLE</h2>
+    <p>Here is a trivial example. The script shows the server software.</p>
+    <p>The first file is the script itself.
+The second is <em>header.escm</em>, and the third <em>footer.escm</em>.
+When the CGI script is invoked, the chunks of scheme code are evaluated,
+replaced with their results, and <em>header.escm</em>, the script,
+<em>footer.escm</em> are concatenated in that order.</p>
+
+    <blockquote>
+    <pre>
+#!/usr/local/bin/<?scm:d PACKAGE?> \
+ header.escm -f footer.escm \
+ -e '(define title "Server")'
+<?scm:d (escape-html
+"<h1>Server</h1>
+<p>Our server is <q><?scm:d (sys-getenv \"SERVER_SOFTWARE\")?></q>.</p>
+")?></pre>
+    </blockquote>
+
+    <blockquote>
+    <pre><?scm:d (escape-html
+"<html><head><title><?scm:d title?></title></head>
+<body><p>Welcome to Escm!</p><hr />
+")?></pre></blockquote>
+
+    <blockquote>
+    <pre><?scm:d (escape-html
+"<hr /><p>This document was generated from
+<?scm:d (car *escm-input-file*)?> by <?scm:d *escm-version*?>
+and <?scm:d *escm-interpreter*?>.</p>")?>
+&lt;/body&gt;&lt;html&gt;
+</pre>
+    </blockquote>
+
+    <h2 id="caveats">CAVEATS</h2>
+    <ul>
+      <li><p><em><?scm:d (string-titlecase PACKAGE)?></em>
+is an experimental version
+of <em>escm</em>.
+The stable version is <strong>escm 1.1.</strong></p></li>
+      <li><p>The current implementation of the <a href="#gimmick">gimmick</a>
+feature has many security problems.
+It is strongly recommended
+<strong>not to use this program in CGI scripts
+if the gimmick feature is enabled</strong>.
+This feature is on
+if description on <code>-l</code> option
+is found in the help message shown by <code>-h</code>.
+</p></li>
+      <li>Make it sure that your interpreter supports the encoding
+of your document.</li>
+    </ul>
+
+     <h2 id="changes">CHANGES</h2>
+    <p>In this section, I will describe differences from
+the stable version.</p>
+    <h3>Syntax</h3>
+<p>This tool adopted the XML syntax for a preprocessor
+as <em>eguile</em> did
+and eliminated the archaic one
+(<em>&lt;?</em>, <em>&lt;?=</em> and <em>!&gt;</em>).
+The syntax for script languages (<em>&lt;%</em> and <em>%&gt;</em>),
+which is used in previous experimental versions, was also eliminated.</p>
+
+    <h3>Options</h3>
+    <ul>
+      <li><p>Deleted <code>-c</code> option.
+It is automatically judged
+whether it is invoked in a CGI script or not.</p></li>
+      <li><p>Added <code><a href="#H_opt">-H</a></code> option.
+Without this option, a content header for HTML is automatically
+written out in a CGI script.</p></li>
+      <li><p>Added <code><a href="#f_opt">-f</a></code> option.</p></li>
+    </ul>
+
+    <h3>File Arguments</h3>
+<p>As many files as you specified are to be processed.
+The stable version processes only the first one.</p>
+    
+    <h3>Meta-Arguments</h3>
+    <p>In place of <em>#?</em> prefix
+is adopted the meta-argument functionality
+which was introduced by <em>scsh</em>.</p>
+    <p>The syntax I have adopted is different from that of <em>scsh</em>.
+Mine works such as a shell without wildcard expansion,
+so that arguments containing strings quoted either by <em>'</em> or
+by <em>&quot;</em> will be treated as we expected.</p>
+
+    <h2 id="author">AUTHOR</h2>
+    <address>
+Shiro Kawai (the original and stable <em>escm</em>),<br/>
+TAGA Yoshitaka
+&lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
+
+    <h2 id="see_also">SEE ALSO</h2>
+    <ul>
+      <li><a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm</a></li>
+      <li>eguile</li>
+    </ul>
+  </body>
+</html>

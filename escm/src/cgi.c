@@ -1,42 +1,143 @@
-/* cgi.c - miscellaneous functions for CGI
+/****************************************************
+ * cgi.c - CGI utilities
  * $Id$
- *
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
- * See `COPYING' on the license.
- */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
+ ****************************************************/
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-#include "cgi.h"
 
-/* cgi_error(fmt, ...) - print an error message and exit. */
-void
-cgi_error(char *fmt, ...)
+#include <stdio.h>
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif /* HAVE_STRING_H */
+#include <errno.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+
+#include "escm.h"
+
+enum cgi_header_type {
+  CGI_HEADER_NONE,
+  CGI_HEADER_PLAIN,
+  CGI_HEADER_HTML,
+};
+
+static int in_cgi = FALSE;
+static int cached = FALSE;
+static enum cgi_header_type header_type = CGI_HEADER_NONE;
+
+/* escm_is_cgi() - return TRUE if invoked in a CGI script, FALSE otherwise.
+ */
+int
+escm_is_cgi(void)
 {
-  FILE *fp;
-  int cgi_p;
-  va_list args;
-
-  va_start(args, fmt);
-  cgi_p = is_cgi();
-  fp = cgi_p ? stdout : stderr;
-  if (cgi_p) fputs("Content-type: text/plain\r\n\r\n", fp);
-  vfprintf(fp, fmt, args);
-  va_end(args);
-  if (errno) fprintf(fp, ": %s\n", strerror(errno));
-  else fputc('\n', fp);
-  exit(cgi_p ? 0 : 1);
+  if (cached) return in_cgi;
+  cached = TRUE;
+  if (getenv("GATEWAY_INTERFACE")) in_cgi = TRUE;
+  return in_cgi;
 }
 
-/* is_cgi() - return a true if in a CGI script */
+/* escm_stderr2stdout() - redirect stderr to stdout.
+ */
 int
-is_cgi(void)
+escm_stderr2stdout(void)
 {
-  return getenv("GATEWAY_INTERFACE") ? 1 : 0;
+  return dup2(fileno(stdout), fileno(stderr)) < 0 ? FALSE : TRUE;
+}
+/* escm_html_header() - send an HTML content-type header.
+ */
+void
+escm_html_header(void)
+{
+  if (header_type == CGI_HEADER_NONE) {
+    header_type = CGI_HEADER_HTML;
+    printf("Content-type: text/html\r\n\r\n");
+    fflush(stdout);
+  }
+}
+/* escm_plain_header() - send a plain text content-type header.
+ */
+void
+escm_plain_header(void)
+{
+  if (header_type == CGI_HEADER_NONE) {
+    header_type = CGI_HEADER_PLAIN;
+    printf("Content-type: text/plain\r\n\r\n");
+    fflush(stdout);
+  }
+}
+
+/* plain_warning(fp, prog, tag, msg) - warning in plain text format.
+ */
+static void
+plain_warning(FILE *fp, const char *prog, const char *tag, const char *msg)
+{
+  fflush(fp);
+  fputs(prog, fp);
+  fputs(" - ", fp);
+  fputs(tag, fp);
+  fputs(": ", fp);
+  fputs(msg, fp);
+  fputc('\n', fp);
+}
+/* html_warning(fp, prog, tag, msg) - warning in HTML format.
+ */
+static void
+html_warning(FILE *fp, const char *prog, const char *tag, const char *msg)
+{
+  fflush(fp);
+  fputs("<p><em>", fp);
+  fputs(prog, fp);
+  fputs("</em> - <strong>", fp);
+  fputs(tag, fp);
+  fputs(":</strong> ", fp);
+  fputs(msg, fp);
+  fputs("</p>", fp);
+  fputc('\n', fp);
+}
+/* escm_warning(prog, msg) - print a warning message.
+ * The message is specified by strerror(errno) if msg is NULL.
+ */
+void
+escm_warning(const char *prog, const char *msg)
+{
+  if (msg == NULL) msg = strerror(errno);
+  if (escm_is_cgi()) {
+    if (header_type == CGI_HEADER_HTML) {
+      html_warning(stdout, prog, "warning", msg);
+    } else {
+      if (header_type == CGI_HEADER_NONE) escm_plain_header();
+      plain_warning(stdout, prog, "warning", msg);
+    }
+  } else {
+    plain_warning(stderr, prog, "warning", msg);
+  }
+}
+
+/* escm_error(prog, msg) - print a warning message and exit the program.
+ * The message is specified by strerror(errno) if msg is NULL.
+ */
+void escm_error(const char *prog, const char *msg)
+{
+  if (msg == NULL) msg = strerror(errno);
+  if (escm_is_cgi()) {
+    if (header_type == CGI_HEADER_HTML) {
+      html_warning(stdout, prog, "error", msg);
+      printf("</body></html>\n");
+      exit(EXIT_SUCCESS);
+    } else {
+      if (header_type == CGI_HEADER_NONE) escm_plain_header();
+      plain_warning(stdout, prog, "error", msg);
+      exit(EXIT_SUCCESS);
+    }
+  } else {
+    plain_warning(stderr, prog, "error", msg);
+    exit(EXIT_FAILURE);
+  }
 }
 /* end of cgi.c */

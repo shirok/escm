@@ -1,0 +1,177 @@
+<?xml version="1.0"?><!-- -*- xml -*- -->
+<!-- $Id$ -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "DTD/xhtml11-flat.dtd">
+<html>
+  <head>
+    <title>The Manpage of the Library</title>
+  </head>
+  <?scm (load (string-append *pwd* "/config-h.scm"))
+        (load (string-append *pwd* "/helper.scm"))?>
+  <body>
+<?scm (header)?>
+
+    <h1>Library</h1>
+    <p>This is a substitute for the manpage of
+<em><?scm:d PACKAGE?> library</em>.</p>
+    <ul>
+      <li><a href="#name">NAME</a></li>
+      <li><a href="#synopsis">SYNOPSIS</a></li>
+      <li><a href="#description">DESCRIPTION</a>
+<ul>
+	  <li><a href="#struct">Structure</a></li>
+	  <li><a href="#functions">Functions</a></li>
+	</ul>
+      <li><a href="#caveats">CAVEATS</a></li>
+      <li><a href="#author">AUTHOR</a></li>
+      <li><a href="#see_also">SEE ALSO</a></li>
+    </ul>
+    <h2 id="name">NAME</h2>
+    <p><strong>escm</strong> -- preprocess embedded Scheme code in document</p>
+    <h2 id="synopsis">SYNOPSIS</h2>
+    <blockquote><pre><code>
+#include &lt;escm.h&gt;
+struct escm_lang scm_lang;
+FILE *outp = popen(&quot;scheme -s /dev/stdout&quot;, &quot;w&quot;);
+escm_init(&scm_lang, outp);
+escm_preproc(&scm_lang, stdin, outp);
+escm_finish(&scm_lang, outp);
+pclose(outp);
+</code></pre></blockquote>
+
+    <h2 id="description">DESCRIPTION</h2>
+    <p>Seemingly <em>escm</em> is a filter
+to processes embedded code in documents
+like <em>ePerl</em> or <em>eRuby</em>.
+In fact it converts documents into code and make 
+it evaluated by a backend interpreter.
+Code between <em>&lt;?NAME</em> and <em>?&gt;</em> is evaluated
+and replaced with what is written to stdout while the evaluation.
+Code between <em>&lt;?NAME:SUBNAME</em> and <em>?&gt;</em> is evaluated
+and replaced with the result
+where <em>NAME</em> and <em>SUBNAME</em> are specified
+in <code>struct escm_lang.</code>
+At least a blank, that is a whitespace, a tab or a newline, is required
+after <em>&lt;?NAME</em> or <em>&lt;?NAME:SUBNAME</em>.</p>
+
+    <p>
+Languages you can embed must satisfy the following conditions:
+</p>
+    <ol>
+      <li>Strings are bracketted between two <em>&quot;</em>.
+In them, <em>\\</em> is treated as <em>\</em>,
+<em>\&quot;</em> as <em>&quot;</em>,
+and <em>\n</em> as <em>newline</em>.
+It does not have the upper limit of the length of strings.</li>
+      <li>It has a procedure to write out objects without adding
+<em>newline</em>.</li>
+      <li>It has a way to print out the external expressions
+of any objects other than strings.</li>
+      <li>Commands are processed in order.</li>
+    </ol>
+
+    <h3 id="struct">Structure</h3>
+    <blockquote><pre>
+struct escm_lang {
+  const char *<a href="#st_name">name</a>;
+  const char *<a href="#st_lit_pre">literal_prefix</a>;
+  const char *<a href="#st_lit_suf">literal_suffix</a>;
+  const char *<a href="#st_dis_pre">display_prefix</a>;
+  const char *<a href="#st_dis_suf">display_suffix</a>;
+  const char *<a href="#st_init">init</a>;
+  const char *<a href="#st_fin">finish</a>;
+};
+</pre>
+    </blockquote>
+    <p>Here are descriptions of fields.</p>
+    <dl>
+      <dt>const char *<a id="st_name">name</a></dt>
+      <dd>Pointer to a string which holds the namespace and the
+subname space for display blocks.
+They are separated by a colon like <code>scm:d</code>.</dd>
+      <dt>const char *<a id="st_lit_pre">literal_prefix</a></dt>
+      <dd>Pointer to string used a the prefix for literal part.
+<code>(display &quot;</code> in Scheme.</dd>
+      <dt>const char *<a id="st_lit_suf">literal_suffix</a></dt>
+      <dd>Pointer to string used a the suffix for literal part.
+<code>&quot;)</code> in Scheme.</dd>
+      <dt>const char *<a id="st_dis_pre">display_prefix</a></dt>
+      <dd>Pointer to string used a the prefix for part
+in which an evaluated result is displayed.
+<code>(display </code> in Scheme.</dd>
+      <dt>const char *<a id="st_dis_suf">display_suffix</a></dt>
+      <dd>Pointer to string used a the suffix for part
+in which an evaluated result is displayed.
+<code>)</code> in Scheme.</dd>
+      <dt>const char *<a id="st_init">init</a></dt>
+      <dd>Initialization code. This can be <code>NULL</code>.</dd>
+      <dt>const char *<a id="st_finish">finish</a></dt>
+      <dd>Finalization code. This can be <code>NULL</code>.</dd>
+    </dl>
+
+    <h3 id="functions">Functions</h3>
+    <ul>
+      <li>void <a href="#escm_init">escm_init</a>(struct escm_lang *lang, FILE *outp)</li>
+      <li>void <a href="#escm_finish">escm_finish</a>(struct escm_lang *lang, FILE *outp)</li>
+      <li>int <a href="#escm_preproc">escm_preproc</a>(struct escm_lang *lang, FILE *inp, FILE *outp)</li>
+      <li>void <a href="#escm_put_string">escm_put_string</a>(const char *str, FILE *outp)</li>
+      <li>int <a href="#escm_is_cgi">escm_is_cgi</a>(void)</li>
+      <li>int <a href="#escm_stderr2stdout">escm_stderr2stdout</a>(void)</li>
+      <li>void <a href="#escm_html_header">escm_html_header</a>(void)</li>
+      <li>void <a href="#escm_plain_header">escm_plain_header</a>(void)</li>
+      <li>void <a href="#escm_warning">escm_warning</a>(const char *prog, const char *msg)</li>
+      <li>void <a href="#escm_error">escm_error</a>(const char *prog, const char *msg)</li>
+    </ul>
+
+    <dl>
+      <dt>void <a id="escm_init">escm_init</a>(struct escm_lang *lang, FILE *outp)</dt>
+      <dd><p>Initializa the backend interpreter with
+<code>lang-&gt;init</code>.</p></dd>
+      <dt>void <a id="escm_finish">escm_finish</a>(struct escm_lang *lang, FILE *outp)</dt>
+      <dd><p>Finalize the backend interpreter with
+<code>lang-&gt;finish</code>.</p></dd>
+      <dt>int <a id="escm_preproc">escm_preproc</a>(struct escm_lang *lang, FILE *inp, FILE *outp)</dt>
+      <dd><p>Preprocess input stream <code>inp</code> according
+to information of <code>lang</code>
+and write the result to output stream <code>outp</code></p>.</dd>
+      <dt>void <a id="escm_put_string">escm_put_string</a>(const char *str, FILE *outp)</dt>
+      <dd><p>Write to output stream <code>outp</code>
+string <code>str</code> converted into its external representation.
+It is bracketted between two <em>&quot;'s and
+<em>newline</em>, <em>\</em> and <em>&quot;</em> are quoted.
+</p></dd>
+      <dt>int <a id="escm_is_cgi">escm_is_cgi</a>(void)</dt>
+      <dd><p>Return a true if <code>GATEWAY_INTERFACE</code> is set,
+otherwise the false.</p></dd>
+      <dt>int <a id="escm_stderr2stdout">escm_stderr2stdout</a>(void)</dt>
+      <dd><p>Redirect <code>stderr</code> to <code>stdout</code>.</p></dd>
+      <dt>void <a id="escm_html_header">escm_html_header</a>(void)</dt>
+      <dd><p>Write out an HTML header.</p></dd>
+      <dt>void <a id="escm_plain_header">escm_plain_header</a>(void)</dt>
+      <dd><p>Write out a plain text header.</p></dd>
+      <dt>void <a id="escm_warning">escm_warning</a>(const char *prog, const char *msg)</dt>
+      <dd><p>Write out warning message <code>msg</code>
+prefixed with <q><code><em>prog</em>: </code></q>
+to <code>stdout</code> or <code>stderr</code> according to its context.</p></dd>
+      <dt>void <a id="escm_error">escm_error</a>(const char *prog, const char *msg)</dt>
+      <dd><p>Write out error message <code>msg</code>
+prefixed with <q><code><em>prog</em>: </code></q>
+to <code>stdout</code> or <code>stderr</code> according to its context.
+Then exit the program.
+The status is <code>EXIT_SUCESS</code> or <code>EXIT_FAILURE</code>.</p></dd>
+    </dl>
+
+    <h2 id="author">AUTHOR</h2>
+    <address>
+Shiro Kawai (the original and stable <em>escm</em>),<br/>
+TAGA Yoshitaka
+&lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
+
+    <h2 id="see_also">SEE ALSO</h2>
+    <ul>
+      <li><a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm</a> program</li>
+      <li>eguile</li>
+    </ul>
+  </body>
+</html>

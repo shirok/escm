@@ -1,0 +1,131 @@
+<?xml version="1.0"?><!-- -*- xml -*- -->
+<!-- $Id$ -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "DTD/xhtml11-flat.dtd">
+<html>
+  <head>
+    <title>Gimmick Feature</title>
+  </head>
+  <?scm (load (string-append *pwd* "/config-h.scm"))
+        (load (string-append *pwd* "/helper.scm"))?>
+  <body>
+<?scm (header)?>
+
+    <h1>Gimmick Feature</h1>
+    <address>TAGA Yoshitaka
+&lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
+    <p>
+<em><?scm:d (string-titlecase PACKAGE)?></em>
+is designed to be interpreter independent.
+This does not mean Scheme interpreter independent.
+You can embed code of most interpreter languages.
+But this feature is enabled only when you has run <em>configure</em>
+script with <code>-with-gimmick</code> option.
+If you find description on <code>-l</code> option
+in the help message shown by <code>-h</code>, this feature is on.</p>
+    <p>The current implementation is quick and dirty, and has many
+security problems. <strong>Do not enable this feature
+if you want to use this tool in CGI scripts.</strong>
+Moreover, if your communty has a native embedding tool
+such as <em>ePerl</em> or <em>eRuby</em>, it will be more
+efficient than this one.</p>
+
+    <p>
+Languages you can embed must satisfy the following conditions:
+</p>
+    <ol>
+      <li>Strings are bracketted between two <em>&quot;</em>.
+In them, <em>\\</em> is treated as <em>\</em>,
+<em>\&quot;</em> as <em>&quot;</em>,
+and <em>\n</em> as <em>newline</em>.
+It does not have the upper limit of the length of strings.</li>
+      <li>It has a procedure to write out objects without adding
+<em>newline</em>.</li>
+      <li>It has a way to print out the external expressions
+of any objects other than strings.</li>
+      <li>Commands are processed in order.</li>
+    </ol>
+    <p>
+Information on your interpreter language is read
+from a simple configuratioon file, about a dozen of lines at most.
+This distribution comes with the configuration files for
+<a href="../src/lang/awk">Awk</a>,
+<a href="../src/lang/csh">Csh</a>,
+<a href="../src/lang/perl">Perl</a>,
+<a href="../src/lang/python">Python</a>,
+<a href="../src/lang/ruby">Ruby</a>,
+<a href="../src/lang/scheme">Scheme</a>,
+<a href="../src/lang/sh">Sh</a>,
+and
+<a href="../src/lang/tcl">Tcl</a>.
+They are stored in <code>$(pkgdatadir)/lang</code>
+(maybe in <code>/usr/local/share/<?scm:d PACKAGE?>/lang/</code>).
+</p>
+
+    <h2>File format</h2>
+    <p>Here is the most comlicated and longest configuration file.
+This is for <em>Awk</em>.
+
+    <blockquote>
+      <pre><?scm:d (escape-html
+"# configurations for the Awk language
+<?awk:d ...?>
+# interpreter
+awk -f /dev/stdin
+# initialization
+BEGIN {
+# string
+printf \"string\";
+# expression
+printf (expression);
+# finalization
+ exit;
+}
+")?></pre>
+    </blockquote>
+    <h3>File Size</h3>
+    <p>The size of configuration files must be less than
+511 Bytes.</p>
+    <h3>Leading Character and Namespace</h3>
+    <p>
+The first character of a configuration file is the leading character.
+Lines beginnging with this character are used to separate records.
+It will be convenient if it is the first character to begin comments
+in your favorite interpreter language.</p>
+    <p>
+You must specify the namespace and the subnamespace for display mode
+in the second line as
+<q>&lt;?<em>namesapace</em>:<em>subnamespace</em> ...&gt;</q>.
+</p>
+    <h3>Interpreter</h3>
+    <p>
+The second record is the interpreter and its arguments.
+See <a href="interpreter.html">the document of Scheme interpreters</a>
+to decide the arguments.
+But in most cases, your interpreter will need no arguments,
+for it may be wise enough to switch to a batch mode
+if stdin is a pipe.</p>
+
+    <h3>Intialization</h3>
+    <p>
+The third record is the initialization code.
+This may has no lines.</p>
+
+    <h3>Display a String</h3>
+    <p>
+The fourth record tells how to display a string.
+You must write a form to display a string <em>&quot;string&quot;</em>.</p>
+
+    <h3>Display an Expression</h3>
+    <p>
+The fifth record tells how to display an expression.
+You must write a form to display an expression.
+<em>expression</em> is used as keyword to show where it is placed.</p>
+
+    <h3>Finalization</h3>
+    <p>
+The last record is the finalization code.
+This may has no lines.</p>
+  </body>
+</html>

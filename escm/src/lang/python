@@ -1,0 +1,11 @@
+# configurations for the Python language
+<?python:d ...?>
+# interpreter
+python
+# initialization
+import sys
+# string
+sys.stdout.write("string")
+# expression
+sys.stdout.write("%s" % (expression))
+# finalization

@@ -1,10 +1,13 @@
 # Makefile.am
 # $Id$
+# Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-CLEANFILES = aclocal.m4~
+SUBDIRS = src test doc
 
-SUBDIRS = src doc .
+README : $(top_srcdir)/doc/readme.html
+	$(LYNX) -dump $< > $@
 
-EXTRA_DIST = awk/ scm/ depcomp
+$(top_srcdir)/doc/readme.html :
+	cd $(top_srcdir)/doc && make readme.html
 
 # end of Makefile.am

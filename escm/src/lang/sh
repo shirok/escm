@@ -1,0 +1,10 @@
+# configurations for the Sh language
+<?sh:d ...?>
+# interpreter
+sh
+# initialization
+# string
+echo -n -e "string"
+# expression
+echo -n -e expression
+# finalization

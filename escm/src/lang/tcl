@@ -1,0 +1,10 @@
+# configurations for the Sh language
+<?tcl:d ...?>
+# interpreter
+tclsh
+# initialization
+# string
+puts -nonewline "string"
+# expression
+puts -nonewline expression
+# finalization

@@ -1,32 +1,27 @@
 # doc/Makefile.am
 # $Id$
+# Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-noinst_DATA = interpreters.html readme.html shebang.html todo.html
-noinst_DATA += config.scm
-EXTRA_DIST = interpreters.escm readme.escm shebang.escm todo.escm
-EXTRA_DIST += helper.scm aescm.css aescm.epod
-CLEANFILES = $(noinst_DATA) manual.html
+ESCM = $(top_builddir)/src/aescm
 
-man_MANS = aescm.1
+SUFFIXES = .escm .html
 
-SUFFIXES = .1 .pod .html .escm .epod
+$(ESCM) :
+	cd $(top_builddir)/src/ && make
 
-ESCM = ../src/aescm
+config-h.scm : $(top_builddir)/src/config.h $(ESCM)
+	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
 
-config.scm : ../src/config.h
-	awk -f ../awk/config-h.awk $< > $@
+%.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
+	-LANG=C && $(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
 
-%.pod : %.epod config.scm
-	$(ESCM) $< > $@
+EXTRA_DIST = config-h.awk helper.scm @ESCM_DOC_FILES@
 
-%.1 : %.pod
-	pod2man -c "" $< > $@
-	pod2html $< > manual.html
+CLEANFILES = config-h.scm @HTML_DOC_FILES@
 
-%.html : %.escm config.scm
-	$(ESCM) $< > $@
+noinst_DATA = $(CLEANFILES)
 
-../README : readme.html config.scm
-	$(LYNX) -dump $< > $@
+TESTS =
 
 # end of doc/Makefile.am
+
