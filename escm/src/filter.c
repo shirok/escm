@@ -21,6 +21,22 @@
 #include "meta_arg.h"
 #include "escm.h"
 
+/* Will be moved elesewhere. */
+static char * env_to_bind[] = {
+  /* "GATEWAY_INTERFACE", */
+  "HTTP_ACCEPT_LANGUAGE",
+  "HTTP_ACCEPT_CHARSET",
+  "HTTP_COOKIE",
+  "HTTP_HOST",
+  "HTTP_REFERER",
+  "HTTP_USER_AGENT",
+  /* "QUERY_STRING", */
+  "REMOTE_ADDR",
+  /* "REQUEST_METHOD", */
+};
+
+#define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
+
 #ifdef ESCM_LANG_DIR
 /* defined in lang.c */
 struct escm_lang * parse_lang(const char *name, const char **interp);
@@ -73,7 +89,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   FILE *inp;
 
   inp = fopen(file, "r");
-  if (inp == NULL) escm_error("can't open - %s", file);
+  if (inp == NULL) escm_error(gettext("can't open - %s"), file);
 
   escm_file = file;
   escm_assign(lang, "*escm-input-file*", file, outp);
@@ -176,11 +192,16 @@ main(int argc, char **argv)
 #endif /* ENABLE_HANDLER */
   lang = &deflang;
 
+  /* Check the environment. */
+  escm_cgi = getenv("GATEWAY_INTERFACE");
+  opts.interpreter = getenv("ESCM_BACKEND");
+  opts.langname = getenv("ESCM_DEFAULT");
+
   /* for error messages */
   escm_prog = meta_progname(argv[0]);
 
   /* redirect stderr to stdout if it is invoked as CGI. */
-  if (escm_is_cgi()) {
+  if (escm_cgi) {
     if (dup2(fileno(stdout), fileno(stderr)) < 0) escm_error(NULL);
 #ifdef ENABLE_HANDLER
     path_translated = getenv("PATH_TRANSLATED");
@@ -202,12 +223,12 @@ main(int argc, char **argv)
   parse_opts(argc, argv, &opts);
 
   /* write out a content header. */
-  if (opts.header && escm_is_cgi()) escm_header(lang, outp);
+  if (opts.header && escm_cgi) escm_header(lang, outp);
 
   /* specify the output file if necessary. */
   if (opts.outfile) {
     if (freopen(opts.outfile, "w", stdout) == NULL)
-      escm_error("can't open - %s", opts.outfile);
+      escm_error(gettext("can't open - %s"), opts.outfile);
   }
 
 #ifdef ESCM_LANG_DIR
@@ -223,10 +244,26 @@ main(int argc, char **argv)
 
   /* initialization */
   escm_init(lang, outp);
-  escm_bind(lang, "*escm-interpreter*",
-	    opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
-  escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
+  escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
   escm_bind(lang, "*escm-input-file*", NULL, outp);
+  escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
+  if (opts.process) {
+    escm_bind(lang, "*escm-interpreter*",
+	      opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
+    escm_bind(lang, "GATEWAY_INTERFACE", escm_cgi, outp);
+    /* set useful global variables if the language is scheme. */
+    if (escm_cgi) {
+      const char *method;
+      int i;
+      method = getenv("REQUEST_METHOD");
+      escm_bind(lang, "REQUEST_METHOD", method, outp);
+      if (method[0] == 'P') escm_bind_query_string(lang, outp);
+      else escm_bind(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
+      for (i = 0; i < SizeOfArray(env_to_bind); i++) {
+	escm_bind(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
+      }
+    }
+  }
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {

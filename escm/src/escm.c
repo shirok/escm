@@ -15,25 +15,11 @@
 #endif /* HAVE_STDLIB_H */
 #include "escm.h"
 
-#define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
-
 /* Used to make error messages. */
 const char *escm_prog = NULL;
 const char *escm_file = NULL;
 int escm_lineno = 0;
-
-static char * env_to_bind[] = {
-  "GATEWAY_INTERFACE",
-  "HTTP_ACCEPT_LANGUAGE",
-  "HTTP_ACCEPT_CHARSET",
-  "HTTP_COOKIE",
-  "HTTP_HOST",
-  "HTTP_REFERER",
-  "HTTP_USER_AGENT",
-  /* "QUERY_STRING", */
-  "REMOTE_ADDR",
-  "REQUEST_METHOD",
-};
+const char *escm_cgi = NULL;
 
 /* put_string(str, outp) - escape str and put it.
  * This function is not used in this file, but will be useful.
@@ -99,10 +85,10 @@ escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE
   if (lang->assign_suffix) fputs(lang->assign_suffix, outp);
   fputc('\n', outp);
 }
-/* escm_init(&lang, outp) - initialize the backend interpreter.
- */
-static void
-cgi_post(const struct escm_lang *lang, FILE *outp)
+/* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
+ * when the method is POST. */
+void
+escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
 {
   const char *content_length;
   char *p;
@@ -112,7 +98,7 @@ cgi_post(const struct escm_lang *lang, FILE *outp)
 
   content_length = getenv("CONTENT_LENGTH");
   if (content_length == NULL)
-    escm_bind(lang, "QUERY_STRING", NULL, outp);
+    escm_error(gettext("inconsistent environment"));
   else {
     if (lang->bind_prefix) fputs(lang->bind_prefix, outp);
     put_variable(lang, "QUERY_STRING", outp);
@@ -132,26 +118,14 @@ cgi_post(const struct escm_lang *lang, FILE *outp)
     fputc('\n', outp);
   }
 }
+/* escm_init(&lang, outp) - initialize the backend interpreter.
+ */
 void
 escm_init(const struct escm_lang *lang, FILE *outp)
 {
   if (lang->init) {
     fputs(lang->init, outp);
     fputc('\n', outp);
-  }
-  /* set useful global variables if the language is scheme. */
-  escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
-  if (!escm_is_cgi()) {
-    escm_bind(lang, "GATEWAY_INTERFACE", NULL, outp);
-  } else {
-    const char *method;
-    int i;
-    method = getenv("REQUEST_METHOD");
-    if (method[0] == 'P') cgi_post(lang, outp);
-    else escm_bind(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
-    for (i = 0; i < SizeOfArray(env_to_bind); i++) {
-      escm_bind(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
-    }
   }
 }
 /* escm_finish(&lang, outp) - finalize the backend interpreter.
@@ -175,7 +149,7 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     CODE,
     DISPLAY,
   } state = LITERAL;
-  int c;
+  int c, sw;
   const char *p, *q;
   int str_keep_lineno = 0;
   int tag_keep_lineno = 0;
@@ -195,30 +169,48 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	p = lang->name;
 	while ((c = getc(inp)) == *p)
 	  p++;
-	if (isspace(c)) {
-	  if (*p == '\0') {
-	    state = DISPLAY;
-	    fputs(lang->literal_suffix, outp);
-	    fputc('\n', outp);
-	    fputs(lang->display_prefix, outp);
-	    tag_keep_lineno = escm_lineno;
-	    if (c == '\n') escm_lineno++;
-	    continue;
-	  } else if (*p == ':') {
+	if (*p != '\0') {
+	  fputs("<?", outp);
+	  for (q = lang->name; q < p; q++)
+	    fputc(*q, outp);
+	  if (c == EOF) break;
+	  ungetc(c, inp);
+	} else {
+	  if (isspace(c)) {
 	    state = CODE;
 	    fputs(lang->literal_suffix, outp);
 	    fputc('\n', outp);
 	    tag_keep_lineno = escm_lineno;
 	    if (c == '\n') escm_lineno++;
-	    continue;
+	  } else if (c != ':') {
+	    fputs("<?", outp);
+	    fputs(lang->name, outp);
+	    if (c == EOF) break;
+	    ungetc(c, inp);
+	  } else {
+	    sw = getc(inp);
+	    if (sw == EOF) c = EOF;
+	    else c = getc(inp);
+	    if (isspace(c)) {
+	      if (sw == 'd') {
+		state = DISPLAY;
+		fputs(lang->literal_suffix, outp);
+		fputc('\n', outp);
+		fputs(lang->display_prefix, outp);
+		tag_keep_lineno = escm_lineno;
+		if (c == '\n') escm_lineno++;
+		continue;
+	      }
+	    }
+	    fputs("<?", outp);
+	    fputs(lang->name, outp);
+	    fputc(':', outp);
+	    if (sw == EOF) break;
+	    else fputc(sw, outp);
+	    if (c == EOF) break;
+	    ungetc(c, inp);
 	  }
 	}
-	fputc('<', outp);
-	fputc('?', outp);
-	for (q = lang->name; q < p; q++)
-	  fputc(*q, outp);
-	if (c == EOF) break;
-	ungetc(c, inp);
       } else {
 	if (c == '\\' || c == '\"') {
 	  fputc('\\', outp);
@@ -269,11 +261,11 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     if (in_string) {
       fputc('\"', outp);
       escm_lineno = str_keep_lineno;
-      escm_error("unterminated string");
+      escm_error(gettext("unterminated string"));
     }
     if (state == DISPLAY) fputs(lang->display_suffix, outp);
     escm_lineno = tag_keep_lineno;
-    escm_error("unterminated instruction");
+    escm_error(gettext("unterminated instruction"));
   }
   fputc('\n', outp);
 }
