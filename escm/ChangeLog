@@ -1,3 +1,8 @@
+2003-07-11  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* configure.ac, acinclude.m4, src/Makefile.am, src/filter.c: Can
+	disable the tool from being used as a handler CGI program.
+	* doc/readme.escm: Updates.
+	
 2003-07-08  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* doc/Makefile.am: The date is in UTC.
 	* src/escm.c: Added HTTP_USER_AGENT to the list of environment
@@ -7,7 +12,7 @@
 
 2003-07-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* configure.ac, acinclude.m4, src/Makefile.am, src/filter.c,
-	src/fork.c: Enabled to make default another language than scheme.
+	src/fork.c: Can make default another language than scheme.
 	
 2003-07-05  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 	* src/escm.c, test/100span.test: Each line in literal mode is

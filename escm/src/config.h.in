@@ -1,5 +1,8 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* "Whether to use it as a handler CGI program." */
+#undef ENABLE_HANDLER
+
 /* Command line to invoke the backend interpreter. */
 #undef ESCM_BACKEND
 

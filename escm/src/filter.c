@@ -28,7 +28,8 @@ struct escm_lang * parse_lang(const char *name, const char **interp);
 static void
 usage(void)
 {
-  printf("Usage: " PACKAGE " [OPTION] ... FILE ...
+  printf(
+"Usage: " PACKAGE " [OPTION] ... FILE ...
 Process embedded scheme code in documents.
   -E                  only preprocess files
   -H                  print no content header even in a CGI script
@@ -43,8 +44,12 @@ Process embedded scheme code in documents.
 "  -o FILENAME         specify the output file
   -h                  print this message
   -v                  print version information
-
-Report bugs to <" PACKAGE_BUGREPORT ">.\n");
+"
+#ifdef ENABLE_HANDLER
+"You can also use this tool as a handler CGI program.
+"
+#endif /* ENABLE_HANDLER */
+"Report bugs to <" PACKAGE_BUGREPORT ">.\n");
 }
 
 /* version() - print version information.
@@ -177,22 +182,30 @@ main(int argc, char **argv)
     TRUE, /* header */
   };
   struct escm_lang *lang;
+#ifdef ENABLE_HANDLER
   const char *path_translated = NULL;
+#endif /* ENABLE_HANDLER */
   lang = &lang_scm;
 
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_is_cgi()) {
     if (dup2(fileno(stdout), fileno(stderr)) < 0)
       escm_error("Can't redirect stderr to stdout.");
+#ifdef ENABLE_HANDLER
     path_translated = getenv("PATH_TRANSLATED");
+#endif /* ENABLE_HANDLER */
   }
 
   /* expand meta-arguments if necessary */
+#ifdef ENABLE_HANDLER
   if (argc == 1 && path_translated) {
     ret = meta_args_replace(&argc, &argv, path_translated, 1);
   } else {
+#endif /* ENABLE_HANDLER */
     ret = meta_args(&argc, &argv);
+#ifdef ENABLE_HANDLER
   }
+#endif /* ENABLE_HANDLER */
   if (ret == META_ARGS_ERRNO_ERROR) escm_error(NULL);
   else if (ret == META_ARGS_SYNTAX_ERROR)
     escm_error("Syntax error while parse meta argument lines");

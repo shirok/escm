@@ -55,6 +55,11 @@ if test x$enable_gimmick = xyes; then
 fi
 AM_CONDITIONAL(GIMMICK, test "$enable_gimmick" = "yes")
 
+# handler CGI program
+AC_ARG_ENABLE([handler],
+   [  --enable-handler -- use as a handler CGI program (yes).])
+AC_ESCM_CHECK_HANDLER
+
 # Documents
 ESCM_DOC_FILES="`cd doc && echo -n *.escm`"
 HTML_DOC_FILES=`echo $ESCM_DOC_FILES | sed -e "s/\.escm/.html/g"`

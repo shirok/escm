@@ -66,7 +66,8 @@ for detail.</p>
 
     <p>This program can be used as a handler CGI program
 of Apache web servers.
-Install it manually in <em>cgi-bin</em> directory if you want to.
+The tool will be automatically installed in <em>cgi-bin</em> directory.
+You may have to add a suffix.
 Consult
 <a href="aescm.html#action handler">the example in the man page.</a></p>
 

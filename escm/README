@@ -3,35 +3,39 @@
    Aescm is an experimental version of escm. The stable version is still escm
    1.1.
 
-   Seemingly aescm is a filter program to processes embedded Scheme code in
-   documents like ePerl or eRuby. In fact it converts documents into Scheme
-   code and make it evaluated by a backend Scheme interpreter. Scheme code
-   between <?scm and ?> is evaluated and replaced with what is written to
-   stdout while the evaluation. Code between <?scm:d and ?> is evaluated and
+   Aescm is a filter program to preprocesses embedded Scheme code in
+   documents like eperl or eruby. Scheme code between <?scm and ?> is
+   evaluated and replaced with what is written to (current-output-port) while
+   the evaluation. An expression between <?scm:d and ?> is evaluated and
    replaced with the result.
 
-   Aescm is designed to be interpreter independent, and works with most
-   Scheme implementations.
+   The body of aescm is a simple converter from a text to Scheme code, which
+   will be sent to a Scheme interpreter. Because of this architecture, it
+   works with most implementations.
 
-INSTALL
+INSTALLATION
 
-   Find out good option arguments for your favorite scheme interprter before
-   running configure script. Options for some implementations are documented
-   in doc/interpreter.html.
+   If your favorite interpreter is Gauche or if it is Guile and you have not
+   installed Gauche, then type as usual:
 
-   Suppose your choice be scheme -s /dev/stdin. Then type:
-
- ./configure --with-backend="scheme -s /dev/stdin"
+ ./configure
  make
  make install
 
-   You can enable to embed other interpreter languages than Scheme by
-   specifying --enable-gimmick option. The distribution comes with the
-   configuration files for Awk, Csh, Perl, Python, Ruby, Sh, and Tcl. See
-   doc/gimmick.html for detail.
+   If it is not the case, you should specify the interpreter and its option
+   arguments for a batch mode when you run configure script. The options for
+   some implementations are listed in doc/interpreter.html.
 
-   You can also use this program as an action handler of Apache. You should
-   intall it manually if you want to. Consult the example in the man page.
+   Suppose your choice be scheme -s /dev/stdin. Then run as:
+
+ ./configure --with-backend="scheme -s /dev/stdin"
+
+   You can also embed other interpreter languages than Scheme if you run
+   configure with --enable-gimmick option. See doc/gimmick.html for detail.
+
+   This program can be used as a handler CGI program of Apache web servers.
+   The tool will be automatically installed in cgi-bin directory. You may
+   have to add a suffix. Consult the example in the man page.
 
 BUGS
 
@@ -43,8 +47,8 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Mon Jul 7 01:43:20 JST 2003.
-   The backend is /home/tagga/bin/gosh -b.
+   This file was converted from readme.escm on Fri Jul 11 01:49:30 UTC 2003.
+   The backend is /usr/bin/gosh -b.
 
      ----------------------------------------------------------------------
 

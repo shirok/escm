@@ -11,14 +11,13 @@ man_MANS = aescm.1
 $(ESCM) :
 	cd $(top_builddir)/src/ && make
 
-config-h.scm : $(top_builddir)/src/config.h $(ESCM)
+$(top_builddir)/doc/config-h.scm : $(top_builddir)/src/config.h $(ESCM)
 	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
 
-%.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
+%.html : %.escm config-h.scm $(top_builddir)/doc/helper.scm
 	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
 
-
-aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm
+aescm.pod : aescm.epod $(top_builddir)/doc/config-h.scm $(top_srcdir)/doc/helper.scm
 	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
 
 aescm.1 : aescm.pod

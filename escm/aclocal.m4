@@ -1,4 +1,4 @@
-# aclocal.m4 generated automatically by aclocal 1.5
+# aclocal.m4t generated automatically by aclocal 1.5
 
 # Copyright 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
@@ -15,6 +15,7 @@ dnl acinclude.m4
 dnl $Id$
 dnl Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
+# --with-backend="prog arg ..."
 AC_DEFUN([AC_ESCM_CHECK_BACKEND],
 [dnl
 if test "$with_backend" = "no"; then
@@ -40,7 +41,64 @@ AC_DEFINE_UNQUOTED(ESCM_BACKEND, ["$backend_prog"],
 backend_args=`echo $backend_prog | sed -e "s/  */\", \"/g"`
 AC_DEFINE_UNQUOTED(ESCM_BACKEND_ARGV, ["$backend_args"], [argv for the backend interpreter])
 ])
+
+# --enable-handler
+AC_DEFUN([AC_ESCM_CHECK_HANDLER],
+[dnl
+ENABLE_HANDLER=1
+if test x$enable_handler = xno; then
+   enable_handler=no
+   ENABLE_HANDLER=
+elif test x$enable_handler = xyes || test x$enable_handler = x; then
+   if test -d $prefix/public_html; then
+      CGIBIN=$prefix/public_html/cgi-bin
+   elif test -d $prefix/cgi-bin; then
+      CGIBIN=$prefix/cgi-bin
+   else
+      for x in /Local/Library/WebServer/CGI-Executables /Library/WebServer/CGI-Executables /opt/apache/share/cgi-bin /boot/home/apache/cgi-bin /usr/local/apache/cgi-bin /usr/local/httpd/cgi-bin /usr/local/www/cgi-bin /usr/local/share/apache/cgi-bin /usr/share/apache/cgi-bin /var/apache/cgi-bin /var/www/cgi-bin; do
+	  if test -d $x; then
+	     CGIBIN=$x
+	     break
+          fi
+      done
+   fi
+else
+   CGIBIN=$enable_handler
+fi
+AC_SUBST(CGIBIN)
+AM_CONDITIONAL(HANDLER, test "$enable_handler" != "no")
+if test x$ENABLE_HANDLER != x; then
+   AC_DEFINE_UNQUOTED(ENABLE_HANDLER, [1], ["Whether to use it as a handler CGI program."])
+fi
+])
 dnl end of acinclude.m4
+
+# serial 3
+
+# AM_CONDITIONAL(NAME, SHELL-CONDITION)
+# -------------------------------------
+# Define a conditional.
+#
+# FIXME: Once using 2.50, use this:
+# m4_match([$1], [^TRUE\|FALSE$], [AC_FATAL([$0: invalid condition: $1])])dnl
+AC_DEFUN([AM_CONDITIONAL],
+[ifelse([$1], [TRUE],
+        [errprint(__file__:__line__: [$0: invalid condition: $1
+])dnl
+m4exit(1)])dnl
+ifelse([$1], [FALSE],
+       [errprint(__file__:__line__: [$0: invalid condition: $1
+])dnl
+m4exit(1)])dnl
+AC_SUBST([$1_TRUE])
+AC_SUBST([$1_FALSE])
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])
 
 # Do all the work for Automake.  This macro actually does too much --
 # some checks are only needed if your package does certain things.
@@ -494,33 +552,6 @@ AC_SUBST(am__quote)
 AC_MSG_RESULT($_am_result)
 rm -f confinc confmf
 ])
-
-# serial 3
-
-# AM_CONDITIONAL(NAME, SHELL-CONDITION)
-# -------------------------------------
-# Define a conditional.
-#
-# FIXME: Once using 2.50, use this:
-# m4_match([$1], [^TRUE\|FALSE$], [AC_FATAL([$0: invalid condition: $1])])dnl
-AC_DEFUN([AM_CONDITIONAL],
-[ifelse([$1], [TRUE],
-        [errprint(__file__:__line__: [$0: invalid condition: $1
-])dnl
-m4exit(1)])dnl
-ifelse([$1], [FALSE],
-       [errprint(__file__:__line__: [$0: invalid condition: $1
-])dnl
-m4exit(1)])dnl
-AC_SUBST([$1_TRUE])
-AC_SUBST([$1_FALSE])
-if $2; then
-  $1_TRUE=
-  $1_FALSE='#'
-else
-  $1_TRUE='#'
-  $1_FALSE=
-fi])
 
 # Like AC_CONFIG_HEADER, but automatically create stamp file.
 
