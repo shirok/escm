@@ -30,7 +30,7 @@ input
 out
 EOF
 
-${PROG} -l ${srcdir}/../src/lang/awk input -o out 2> err
+${PROG} -l ${srcdir}/../src/lang/awk -o out input 2> err
 
 . $srcdir/Finish.sh
 
