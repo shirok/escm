@@ -1,4 +1,4 @@
-   This is README file for aescm 0.19 (README or doc/readme.html).
+   This is README file for aescm 0.20 (README or doc/readme.html).
 
    Aescm is an experimental version of escm. The stable version is still escm
    1.1.
@@ -21,7 +21,7 @@ INSTALL
 
    Suppose your choice be scheme -s /dev/stdin. Then type:
 
- ./configure --with-scm="scheme -s /dev/stdin"
+ ./configure --with-backend="scheme -s /dev/stdin"
  make
  make install
 
@@ -43,8 +43,8 @@ BUGS
 
      ----------------------------------------------------------------------
 
-   This file was converted from readme.escm on Tue Jul 1 02:03:09 2003. The
-   backend is /home/tagga/bin/gosh -b.
+   This file was converted from readme.escm on Mon Jul 7 01:43:20 JST 2003.
+   The backend is /home/tagga/bin/gosh -b.
 
      ----------------------------------------------------------------------
 

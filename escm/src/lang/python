@@ -4,9 +4,9 @@
 python
 # initialization
 import sys
-# false
+# nil
 0
-# define
+# assign
 variable_name = value
 # string
 sys.stdout.write("string")

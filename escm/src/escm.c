@@ -57,23 +57,36 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
     }
   }
 }
-/* escm_define(lang, var, val, outp) - define var to val in lang
+/* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void
-escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
-  if (lang->define_prefix) fputs(lang->define_prefix, outp);
+  if (lang->bind_prefix) fputs(lang->bind_prefix, outp);
   put_variable(lang, var, outp);
-  fputs(lang->define_infix, outp);
-  if (val == NULL) fputs(lang->false, outp);
+  if (lang->bind_infix) fputs(lang->bind_infix, outp);
+  if (val == NULL) fputs(lang->nil, outp);
   else put_string(val, outp);
-  if (lang->define_suffix) fputs(lang->define_suffix, outp);
+  if (lang->bind_suffix) fputs(lang->bind_suffix, outp);
+  fputc('\n', outp);
+}
+/* escm_assign(lang, var, val, outp) - assign var to val in lang
+ */
+void
+escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+{
+  if (lang->assign_prefix) fputs(lang->assign_prefix, outp);
+  put_variable(lang, var, outp);
+  if (lang->assign_infix) fputs(lang->assign_infix, outp);
+  if (val == NULL) fputs(lang->nil, outp);
+  else put_string(val, outp);
+  if (lang->assign_suffix) fputs(lang->assign_suffix, outp);
   fputc('\n', outp);
 }
 /* escm_init(&lang, outp) - initialize the backend interpreter.
  */
 static void
-cgi_post(struct escm_lang *lang, FILE *outp)
+cgi_post(const struct escm_lang *lang, FILE *outp)
 {
   const char *content_length;
   char *p;
@@ -83,11 +96,11 @@ cgi_post(struct escm_lang *lang, FILE *outp)
 
   content_length = getenv("CONTENT_LENGTH");
   if (content_length == NULL)
-    escm_define(lang, "QUERY_STRING", NULL, outp);
+    escm_bind(lang, "QUERY_STRING", NULL, outp);
   else {
-    fputs(lang->define_prefix, outp);
+    if (lang->bind_prefix) fputs(lang->bind_prefix, outp);
     put_variable(lang, "QUERY_STRING", outp);
-    fputs(lang->define_infix, outp);
+    if (lang->bind_infix) fputs(lang->bind_infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {
       fputc('\"', outp);
@@ -97,41 +110,48 @@ cgi_post(struct escm_lang *lang, FILE *outp)
       }
       fputc('\"', outp);
     } else {
-      fputs(lang->false, outp);
+      fputs(lang->nil, outp);
     }
-    fputs(lang->define_suffix, outp);
+    if (lang->bind_suffix) fputs(lang->bind_suffix, outp);
+    fputc('\n', outp);
   }
 }
 void
-escm_init(struct escm_lang *lang, FILE *outp)
+escm_init(const struct escm_lang *lang, FILE *outp)
 {
-  if (lang->init) fputs(lang->init, outp);
+  if (lang->init) {
+    fputs(lang->init, outp);
+    fputc('\n', outp);
+  }
   /* set useful global variables if the language is scheme. */
-  escm_define(lang, "*escm-version*", PACKAGE " " VERSION, outp);
+  escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
   if (!escm_is_cgi()) {
-    escm_define(lang, "GATEWAY_INTERFACE", NULL, outp);
+    escm_bind(lang, "GATEWAY_INTERFACE", NULL, outp);
   } else {
     const char *method;
     int i;
     method = getenv("REQUEST_METHOD");
     if (method[0] == 'P') cgi_post(lang, outp);
-    else escm_define(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
+    else escm_bind(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
     for (i = 0; i < SizeOfArray(env_to_bind); i++) {
-      escm_define(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
+      escm_bind(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
     }
   }
 }
 /* escm_finish(&lang, outp) - finalize the backend interpreter.
  */
 void
-escm_finish(struct escm_lang *lang, FILE *outp)
+escm_finish(const struct escm_lang *lang, FILE *outp)
 {
-  if (lang->finish) fputs(lang->finish, outp);
+  if (lang->finish) {
+    fputs(lang->finish, outp);
+    fputc('\n', outp);
+  }
 }
 /* escm_preproc(&lang, inp, outp) - the preprocessor.
  */
 int
-escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp)
+escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 {
   int ret = TRUE;
   int in_string = FALSE;
@@ -187,6 +207,9 @@ escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp)
 	} else if (c == '\n') {
 	  fputc('\\', outp);
 	  fputc('n', outp);
+	  fputs(lang->literal_suffix, outp);
+	  fputc('\n', outp);
+	  fputs(lang->literal_prefix, outp);
 	} else {
 	  fputc(c, outp);	  
 	}

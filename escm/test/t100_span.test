@@ -17,12 +17,12 @@
 # Then invoke the program as above.
 
 cat <<EOF > input
-123<?scm (if #t ?>abc
-def<?scm ?>ghi
-jkl<?scm )?>mno
-123<?scm (if #f ?>abc
-def<?scm ?>ghi
-jkl<?scm )?>mno
+123<?scm (if #t (begin ?>abc
+def<?scm ) (begin ?>ghi
+jkl<?scm ))?>mno
+123<?scm (if #f (begin ?>abc
+def<?scm )(begin ?>ghi
+jkl<?scm ))?>mno
 EOF
 
 cat <<EOF > out-ok

@@ -1,4 +1,11 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.20 (2003-07-??)
+* The default language can be another language than Scheme.
+* Change keywords for language configuration files.
+
+Version 0.19 (2003-07-01)
+* Bugfixes.
+
 Version 0.18 (2003-06-23)
 * The filter program can be used as a handler.
 

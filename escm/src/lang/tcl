@@ -3,9 +3,9 @@
 # command
 tclsh
 # initialization
-# false
+# nil
 0
-# define
+# assign
 set variable_name value
 # string
 puts -nonewline "string"

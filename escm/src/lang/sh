@@ -3,9 +3,9 @@
 # command
 sh
 # initialization
-# false
+# nil
 false
-# define
+# assign
 variable_name=value
 # string
 echo -n -e "string"

@@ -4,9 +4,9 @@
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# false
+# nil
 0
-# define
+# assign
 variable_name = value;
 # string
 printf "string";

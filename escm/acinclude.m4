@@ -2,47 +2,29 @@ dnl acinclude.m4
 dnl $Id$
 dnl Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-AC_DEFUN([AC_ESCM_CHECK_SCM],
+AC_DEFUN([AC_ESCM_CHECK_BACKEND],
 [dnl
-if test "$with_scm" = "no"; then
-  AC_MSG_ERROR([Required a scheme interpreter.])
+if test "$with_backend" = "no"; then
+  AC_MSG_ERROR([The backend interpreter required.])
 fi
-if test "$with_scm" = "yes" -o "$with_scm" = ""; then
-  with_scm=
-  AC_CHECK_PROGS(with_scm, $1)
+if test "$with_backend" = "yes" -o "$with_backend" = ""; then
+  with_backend=
+  AC_CHECK_PROGS(with_backend, $1)
 fi
-scm_path=`echo $with_scm | sed -e "s/ .*//"`
-scm_args=`echo $with_scm | sed -e "s/^[[^ ]]*//"`
+backend_path=`echo $with_backend | sed -e "s/ .*//"`
+backend_args=`echo $with_backend | sed -e "s/^[[^ ]]*//"`
 # add the default arguments.
-if test "$scm_path" = "gosh" -a "$scm_args" = ""; then
-  scm_args=" -b"
-elif test "$scm_path" = "guile" -a "$scm_args" = ""; then
-  scm_args=" -s /dev/stdin"
-elif test "$scm_path" = "rep" -a "$scm_args" = ""; then
-  scm_args=" -s /dev/stdin"
+if test "$backend_path" = "gosh" -a "$backend_args" = ""; then
+  backend_args=" -b"
+elif test "$backend_path" = "guile" -a "$backend_args" = ""; then
+  backend_args=" -s /dev/stdin"
 fi
-scm_path=`which $scm_path`
-AC_CHECK_FILE($scm_path)
-scm_prog="$scm_path$scm_args"
-AC_DEFINE_UNQUOTED(ESCM_SCM, ["$scm_prog"],
-	[Command line to invoke the scheme interpreter.])
-AC_MSG_CHECKING([for its goodness for escm])
-escm_ret=`echo "\"string\"" | env -i $scm_prog 2>&1`
-if test x$? != x0 || test "$escm_ret" != ""; then
-   AC_MSG_RESULT([fail (code).])
-else
-   AC_MSG_RESULT([good (code).])
-fi
-AC_MSG_CHECKING([for its goodness for escm])
-escm_ret=`echo "(display \"string\")" | env -i $scm_prog 2>&1`
-if test x$? != x0 || test "$escm_ret" != "string"; then
-   AC_MSG_RESULT([fail (display and literal).])
-else
-   AC_MSG_RESULT([good (display and literal).])
-fi
-scm_args=`echo $scm_prog | sed -e "s/  */\", \"/g"`
-AC_DEFINE_UNQUOTED(ESCM_SCM_ARGV, ["$scm_args"], [argv for a Scheme interpreter])
+backend_path=`which $backend_path`
+AC_CHECK_FILE($backend_path)
+backend_prog="$backend_path$backend_args"
+AC_DEFINE_UNQUOTED(ESCM_BACKEND, ["$backend_prog"],
+	[Command line to invoke the backend interpreter.])
+backend_args=`echo $backend_prog | sed -e "s/  */\", \"/g"`
+AC_DEFINE_UNQUOTED(ESCM_BACKEND_ARGV, ["$backend_args"], [argv for the backend interpreter])
 ])
-
-
 dnl end of acinclude.m4

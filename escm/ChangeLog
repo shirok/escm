@@ -1,5 +1,18 @@
+2003-07-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* configure.ac, acinclude.m4, src/Makefile.am, src/filter.c,
+	src/fork.c: Enabled to make default another language than scheme.
+	
+2003-07-05  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+	* src/escm.c, test/100span.test: Each line in literal mode is
+	converted into a form.
+	* doc/aescm.epod: Divided a very long string.
+	* test/150comment.test: Removed the test for multiline comment.
+	* src/escm.h, src/escm.c, src/filter.c, src/lang.c, src/lang.awk,
+	src/lang/*: escm_define() is replaced with escm_bind() and
+	escm_assign() and false with nil.
+
 2003-06-30  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
-	* doc/gimmick.escm, src/lang/*, src/lang.c, src/escm.h: Remove
+	* doc/gimmick.escm, src/lang/*, src/lang.c, src/escm.h: Removed
 	true field.
 	* src/lang.awk, src/Makefile.am, src/escm.c: Automatically generate
 	the default language structure.

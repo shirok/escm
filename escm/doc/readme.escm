@@ -41,7 +41,7 @@ doc/<a href="interpreter.html">interpreter.html</a>.</p>
 Then type:</p>
     <blockquote>
       <pre>
-./configure --with-scm=&quot;<em>scheme -s /dev/stdin</em>&quot;
+./configure --with-backend=&quot;<em>scheme -s /dev/stdin</em>&quot;
 make
 make install
 </pre>

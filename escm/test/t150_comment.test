@@ -18,13 +18,10 @@
 
 cat <<EOF > input
 abc<?scm ; ?>def
-abc<?scm #| ?>def
-ABC<?scm |# ?>DEF
 EOF
 
 cat <<EOF > out-ok
 abcdef
-abcDEF
 EOF
 
 ${PROG} input 1> out 2> err

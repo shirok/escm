@@ -3,9 +3,9 @@
 # command
 perl
 # initialization
-# false
+# nil
 0
-# define
+# assign
 $variable_name = value;
 # string
 print "string";

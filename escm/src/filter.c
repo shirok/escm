@@ -53,7 +53,7 @@ static void
 version(void)
 {
   fputs(PACKAGE_STRING " - experimental version of escm\n", stdout);
-  fputs("The default interpreter is '" ESCM_SCM "'\n", stdout);
+  fputs("The default interpreter is '" ESCM_BACKEND "'\n", stdout);
 }
 
 /* proc_file_fp(lang, inp, outp) - process a file. The inpuf file
@@ -78,7 +78,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   inp = fopen(file, "r");
   if (inp == NULL) escm_error(NULL);
 
-  escm_define(lang, "*escm-input-file*", file, outp);
+  escm_assign(lang, "*escm-input-file*", file, outp);
 
   ret = meta_skip_shebang(inp);
   if (ret == META_ARGS_SYNTAX_ERROR)
@@ -111,9 +111,9 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
 
   for (;;) {
 #ifdef ESCM_LANG_DIR
-    c = getopt(argc, argv, "EH:e:f:i:l:o:hv");
+    c = getopt(argc, argv, "EHe:f:i:l:o:hv");
 #else
-    c = getopt(argc, argv, "EH:e:f:i:o:hv");
+    c = getopt(argc, argv, "EHe:f:i:o:hv");
 #endif /* ESCM_LANG_DIR */
     if (c == -1) break;
     switch (c) {
@@ -220,10 +220,12 @@ main(int argc, char **argv)
 
   /* initialization */
   escm_init(lang, outp);
-  escm_define(lang, "*escm-interpreter*",
-	      opts.interpreter ? opts.interpreter : ESCM_SCM, outp);
-  escm_define(lang, "*escm-output-file*", opts.outfile, outp);
-  escm_define(lang, "*escm-input-file*", NULL, outp);
+  if (opts.process)
+    escm_bind(lang, "*escm-interpreter*",
+	      opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
+  else escm_bind(lang, "*escm-interpreter*", NULL, outp);
+  escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
+  escm_bind(lang, "*escm-input-file*", NULL, outp);
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {
@@ -232,7 +234,8 @@ main(int argc, char **argv)
   }
 
   /* write out a content header. */
-  if (opts.header && escm_is_cgi())
+  if ((opts.header && escm_is_cgi()) ||
+      (!opts.process && !opts.header && !escm_is_cgi()))
     escm_header(lang, outp);
 
   /* process files */

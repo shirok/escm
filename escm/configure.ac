@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.19], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.19])
+AC_INIT([aescm], [0.20], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.20])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
@@ -16,9 +16,20 @@ AC_PROG_AWK
 # AC_PROG_LIBTOOL
 AC_CHECK_PROGS(LYNX, [lynx links w3m])
 
-# Checks for Scheme.
-AC_ARG_WITH([scm], [  --with-scm="scheme arg ... "   specify the Scheme interpreter (gosh).])
-AC_ESCM_CHECK_SCM([gosh guile rep])
+# The default interpreter language
+AC_ARG_WITH([default-language], [  --with-default-language=lang   specify the default language (scm).])
+if test x$with_default_language == xyes || test x$with_default_language == x; then
+   DEFAULT_LANG=scm
+elif test x$with_default_language == xno; then
+   AC_MSG_ERROR([The default language required.])
+else
+   DEFAULT_LANG=$with_default_language
+fi
+AC_SUBST(DEFAULT_LANG)
+
+# Checks for the backend interpreter.
+AC_ARG_WITH([backend], [  --with-backend="interpreter arg ... "   specify the backend interpreter (gosh).])
+AC_ESCM_CHECK_BACKEND([gosh guile])
 
 # Checks for libraries.
 # Checks for header files.

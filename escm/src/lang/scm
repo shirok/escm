@@ -3,10 +3,12 @@
 ;; command
 gosh -b
 ;; initialization
-;; false
+;; nil
 #f
-;; define
+;; bind
 (define variable-name value)
+;; assign
+(set! variable-name value)
 ;; string
 (display "string")
 ;; expression

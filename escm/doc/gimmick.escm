@@ -70,9 +70,9 @@ This is for <em>Awk</em>.
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# false
+# nil
 0
-# define
+# assign
 variable_name = value;
 # string
 printf \"string\";
@@ -104,12 +104,13 @@ Following lines are data themselves.</p>
     <p>These are the keywords:</p>
     <ul>
       <li><a href="#command">command</a></li>
-      <li><a href="#define">define</a></li>
-      <li><a href="#expression">expression</a></li>
-      <li><a href="#false">false</a></li>
-      <li><a href="#finalization">finalization</a></li>
       <li><a href="#initialization">initialization</a></li>
+      <li><a href="#nil">nil</a></li>
+      <li><a href="#bind">bind</a></li>
+      <li><a href="#assign">assign</a></li>
       <li><a href="#string">string</a></li>
+      <li><a href="#expression">expression</a></li>
+      <li><a href="#finalization">finalization</a></li>
     </ul>
 
     <h4 id="command">command</h4>
@@ -121,11 +122,35 @@ But in most cases, your interpreter will need no arguments,
 for it may be wise enough to switch to a batch mode
 if stdin is a pipe.</p>
 
-    <h4 id="define">define</h4>
-    <p>How to set a variable to a value.
+    <h4 id="initialization">intialization</h4>
+    <p>
+The initialization code.
+This may has no lines.</p>
+
+    <h4 id="nil">nil</h4>
+    <p>The external representation of a value to be used
+to show it is not a string.</p>
+
+    <h4 id="bind">bind</h4>
+    <p>How to bind a variable to a value.
 The left side value is specified by <em>variable-name</em>
 or <em>variable_name</em> depending on the convention of the language.
 The right side value is specifed by <em>value</em>.</p>
+    <p>At least one of this and <a href="#assign">assign</a> record
+is required.</p>
+
+    <h4 id="assign">assign</h4>
+    <p>How to assign a variable to a value.
+The left side value is specified by <em>variable-name</em>
+or <em>variable_name</em> depending on the convention of the language.
+The right side value is specifed by <em>value</em>.</p>
+    <p>At least one of this and <a href="#bind">bind</a> record
+is required.</p>
+
+    <h4 id="string">string</h4>
+    <p>
+How to display a string.
+You must write a form to display a string <em>&quot;string&quot;</em>.</p>
 
     <h4 id="expression">expression</h4>
     <p>
@@ -133,24 +158,10 @@ How to display an expression.
 You must write a form to display an expression.
 <em>expression</em> is used as keyword to show where it is placed.</p>
 
-    <h4 id="false">false</h4>
-    <p>The external representation of a value to be used
-to show it is not a string.</p>
-
     <h4 id="finalization">finalization</h4>
     <p>
 The finalization code.
 This may has no lines.</p>
-
-    <h4 id="initialization">intialization</h4>
-    <p>
-The initialization code.
-This may has no lines.</p>
-
-    <h4 id="string">string</h4>
-    <p>
-How to display a string.
-You must write a form to display a string <em>&quot;string&quot;</em>.</p>
 
     <hr/>
     <div>

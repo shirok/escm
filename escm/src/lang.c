@@ -49,6 +49,7 @@ read_conf(const char *lang)
   return TRUE;
 }
 
+#define HASH_KEY(a, b) ((a) * 128 + (b))
 /* hash_key = get_data(lead_char, &ptr, &data)
  */
 static int 
@@ -70,8 +71,7 @@ get_data(int lead, char **pptr, char **pdata)
     if (!*ptr || *ptr == '\n' || *ptr == ' ' || *ptr == '\t')
       return -1; /* error */
   }
-  if (!*ptr) return -1; /* error */
-  c = *ptr;
+  c = HASH_KEY(ptr[-2], ptr[-1]);
   for (/**/; *ptr != '\n'; ptr++) {
     if (!*ptr) return -1; /* error */
   }
@@ -111,7 +111,7 @@ parse_name(char *p, char **pname)
   return TRUE;
 }
 static int
-parse_define(char *data, char **prefix, char **infix, char **suffix, int *flag)
+parse_bind(char *data, char **prefix, char **infix, char **suffix, int *flag)
 {
   char *p;
 
@@ -165,8 +165,9 @@ parse_lang(const char *name, const char **interp)
 {
   int c;
   char *ptr, *data;
+  int flag1, flag2;
 
-  if (!read_conf(name)) escm_error(NULL);
+  if (!read_conf(name)) escm_error("Can't open config file for %s", name);
   ptr = buffer;
   c = get_data(buffer[0], &ptr, &data);
   if (c == -1) escm_error("syntax error for %s", name);
@@ -179,27 +180,31 @@ parse_lang(const char *name, const char **interp)
     case -1:
       escm_error("syntax error for %s", name);
       /* not reached */
-    case 'f': /* define */
-      if (!parse_define(data, &(mylang.define_prefix), &(mylang.define_infix), &(mylang.define_suffix), &(mylang.use_hyphen)))
+    case HASH_KEY('b', 'i'): /* bind */
+      if (!parse_bind(data, &(mylang.bind_prefix), &(mylang.bind_infix), &(mylang.bind_suffix), &flag1))
 	escm_error("syntax error for %s", name);
       break;
-    case 'i': /* initialization */
+    case HASH_KEY('a', 's'): /* assign */
+      if (!parse_bind(data, &(mylang.assign_prefix), &(mylang.assign_infix), &(mylang.assign_suffix), &flag2))
+	escm_error("syntax error for %s", name);
+      break;
+    case HASH_KEY('i', 'n'): /* initialization */
       mylang.init = data;
       break;
-    case 'l': /* false */
-      mylang.false = data;
+    case HASH_KEY('n', 'i'): /* nil */
+      mylang.nil = data;
       break;
-    case 'm': /* command */
+    case HASH_KEY('c', 'o'): /* command */
       *interp = data;
       break;
-    case 'n': /* finalization */
+    case HASH_KEY('f', 'i'): /* finalization */
       mylang.finish = data;
       break;
-    case 'p': /* expression */
+    case HASH_KEY('e', 'x'): /* expression */
       if (!parse_expression(data, &(mylang.display_prefix), &(mylang.display_suffix)))
 	escm_error("syntax error for %s", name);
       break;
-    case 'r': /* string */
+    case HASH_KEY('s', 't'): /* string */
       if (!parse_string(data, &(mylang.literal_prefix), &(mylang.literal_suffix)))
 	escm_error("syntax error for %s", name);
       break;
@@ -207,6 +212,19 @@ parse_lang(const char *name, const char **interp)
       escm_error("syntax error for %s", name);
     }
   }
+  if (!mylang.bind_infix) {
+    mylang.bind_prefix = mylang.assign_prefix;
+    mylang.bind_infix = mylang.assign_infix;
+    mylang.bind_suffix = mylang.assign_suffix;
+    flag1 = flag2;
+  }
+  if (!mylang.assign_infix) {
+    mylang.assign_prefix = mylang.bind_prefix;
+    mylang.assign_infix = mylang.bind_infix;
+    mylang.assign_suffix = mylang.bind_suffix;
+    flag2 = flag1;
+  }
+  mylang.use_hyphen = flag1;
   return &mylang;
 }
 /* end of lang.c */

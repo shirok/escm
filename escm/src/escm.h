@@ -23,11 +23,14 @@ struct escm_lang {
   char *literal_suffix;
   char *display_prefix;
   char *display_suffix;
-  char *define_prefix;
-  char *define_infix;
-  char *define_suffix;
+  char *bind_prefix;
+  char *bind_infix;
+  char *bind_suffix;
+  char *assign_prefix;
+  char *assign_infix;
+  char *assign_suffix;
   int use_hyphen;
-  char *false;
+  char *nil;
   char *init;            /* initialization code */
   char *finish;          /* finalization code */
 };
@@ -36,13 +39,15 @@ extern struct escm_lang lang_scm;
 
 /* escm.c  */
 /* escm_init(&lang, outp) - initialize the backend interpreter. */
-void escm_init(struct escm_lang *lang, FILE *outp);
+void escm_init(const struct escm_lang *lang, FILE *outp);
 /* escm_finish(&lang, outp) - finalize the backend interpreter. */
-void escm_finish(struct escm_lang *lang, FILE *outp);
+void escm_finish(const struct escm_lang *lang, FILE *outp);
 /* escm_preproc(&lang, inp, outp) - the preprocessor. */
-int escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp);
-/* escm_define(lang, var, val, outp) - define var to val. */
-void escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
+int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+/* escm_bind(lang, var, val, outp) - bind var to val. */
+void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
+/* escm_assign(lang, var, val, outp) - assign var to val. */
+void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
 /* cgi.c */
 /* escm_header(lang, outp) - send an HTML content-type header. */

@@ -3,9 +3,8 @@
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
 # Program
-BUILT_SOURCES = scm.c
-CLEANFILES = scm.c
-DEFAULT_LANG = scm
+BUILT_SOURCES = deflang.c
+CLEANFILES = deflang.c
 
 bin_PROGRAMS = aescm
 aescm_SOURCES = escm.c escm.h cgi.c fork.c $(BUILT_SOURCES)
@@ -18,7 +17,7 @@ AM_CFLAGS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\"
 endif
 EXTRA_DIST = lang.awk lang/
 
-scm.c : lang/$(DEFAULT_LANG) lang.awk
+deflang.c : lang/@DEFAULT_LANG@ lang.awk
 	$(AWK) -f lang.awk $< > $@
 
 install-data-local :

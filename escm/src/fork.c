@@ -23,7 +23,7 @@
 #endif /* HAVE_SYS_WAIT_H */
 #include "escm.h"
 
-static char *scm_argv[] = { ESCM_SCM_ARGV, NULL };
+static char *scm_argv[] = { ESCM_BACKEND_ARGV, NULL };
 
 FILE *
 escm_popen(const char * prog)
