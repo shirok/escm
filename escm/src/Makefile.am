@@ -7,6 +7,7 @@ SUBDIRS = lang
 # Program
 BUILT_SOURCES = deflang.c
 CLEANFILES = deflang.c
+
 deflang.c : lang/@DEFAULT_LANG@ lang.awk
 	$(AWK) -f lang.awk $< > $@
 
@@ -27,10 +28,8 @@ else
 AM_CFLAGS = -DESCM=1
 endif
 
-
-
-# handler CGI program
-if HANDLER
+# as a CGI program
+if CGI
 cgibindir = @CGIBIN@
 cgibin_PROGRAMS = aescm
 endif

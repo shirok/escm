@@ -1,4 +1,4 @@
-# aclocal.m4t generated automatically by aclocal 1.5
+# aclocal.m4 generated automatically by aclocal 1.5
 
 # Copyright 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
@@ -42,14 +42,13 @@ backend_args=`echo $backend_prog | sed -e "s/  */\", \"/g"`
 AC_DEFINE_UNQUOTED(ESCM_BACKEND_ARGV, ["$backend_args"], [argv for the backend interpreter])
 ])
 
-# --enable-handler
-AC_DEFUN([AC_ESCM_CHECK_HANDLER],
+# --enable-cgi
+AC_DEFUN([AC_ESCM_CHECK_CGI],
 [dnl
-ENABLE_HANDLER=1
-if test x$enable_handler = xno; then
-   enable_handler=no
-   ENABLE_HANDLER=
-elif test x$enable_handler = xyes || test x$enable_handler = x; then
+if test x$enable_cgi = xno; then
+   ENABLE_CGI=
+elif test x$enable_cgi = xyes || test x$enable_cgi = x; then
+   ENABLE_CGI=1
 #   if test -d $prefix/public_html; then
 #      CGIBIN=$prefix/public_html/cgi-bin
 #   elif test -d $prefix/cgi-bin; then
@@ -64,12 +63,12 @@ elif test x$enable_handler = xyes || test x$enable_handler = x; then
       done
    fi
 else
-   CGIBIN=$enable_handler
+   CGIBIN=$enable_cgi
 fi
 AC_SUBST(CGIBIN)
-AM_CONDITIONAL(HANDLER, test "$enable_handler" != "no")
-if test x$ENABLE_HANDLER != x; then
-   AC_DEFINE_UNQUOTED(ENABLE_HANDLER, [1], ["Whether to use it as a handler CGI program."])
+AM_CONDITIONAL(CGI, test "$enable_cgi" != "no")
+if test x$ENABLE_CGI != x; then
+   AC_DEFINE_UNQUOTED(ENABLE_CGI, [1], ["Whether to use it as a CGI program."])
 fi
 ])
 dnl end of acinclude.m4

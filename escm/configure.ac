@@ -1,8 +1,8 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.20], [tagga@tsuda.ac.jp])
-AM_INIT_AUTOMAKE([aescm], [0.20])
+AC_INIT([aescm], [0.21], [tagga@tsuda.ac.jp])
+AM_INIT_AUTOMAKE([aescm], [0.21])
 AM_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
@@ -42,25 +42,27 @@ AC_TYPE_SIZE_T
 AC_TYPE_PID_T
 # Checks for library functions.
 AC_FUNC_FORK
+AC_FUNC_MALLOC
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([atexit dup2 strerror strstr strrchr strtol])
+AC_CHECK_FUNCS([atexit dup2 strerror strchr strtol])
 
 # polyglot
 AC_OBJEXT
 AC_ARG_ENABLE([polyglot],
-   [  --enable-polyglot -- enable a polyglot support (no).])
+   [  --enable-polyglot -- enable polyglot support (no).])
 if test x$enable_polyglot = xyes; then
   POLYGLOT_OBJ=lang.$OBJEXT
   AC_SUBST(POLYGLOT_OBJ)
+  AC_DEFINE_UNQUOTED(ENABLE_POLYGLOT, [1], [enable polyglot support.])
 fi
 AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
 LANG_FILES="`cd src/lang && echo -n [[a-z]]*`"
 AC_SUBST(LANG_FILES)
 
-# handler CGI program
-AC_ARG_ENABLE([handler],
-   [  --enable-handler -- use as a handler CGI program (yes).])
-AC_ESCM_CHECK_HANDLER
+# CGI program
+AC_ARG_ENABLE([cgi],
+   [  --enable-cgi -- use as a CGI program (yes).])
+AC_ESCM_CHECK_CGI
 
 # Documents
 ESCM_DOC_FILES="`cd doc && echo -n *.escm`"
@@ -68,6 +70,5 @@ HTML_DOC_FILES=`echo $ESCM_DOC_FILES | sed -e "s/\.escm/.html/g"`
 AC_SUBST(ESCM_DOC_FILES)
 AC_SUBST(HTML_DOC_FILES)
 
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile test/Makefile
-	         src/lang/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile test/Makefile src/lang/Makefile])
 AC_OUTPUT

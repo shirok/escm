@@ -21,10 +21,8 @@
 is designed to be interpreter independent.
 This does not mean Scheme interpreter independent.
 You can embed code of most interpreter languages.
-But this feature is enabled only when you has run <em>configure</em>
-script with <code>-with-polyglot</code> option.
-If you find description on <code>-l</code> option
-in the help message shown by <code>-h</code>, this feature is on.</p>
+But you can use this feature only when you has run <em>configure</em>
+script with <code>--with-polyglot</code> option.</p>
 
     <p>
 Languages you can embed must satisfy the following conditions:
@@ -41,6 +39,7 @@ It does not have the upper limit of the length of strings.</li>
 of any objects other than strings.</li>
       <li>Commands are processed in order.</li>
     </ol>
+
     <p>
 Information on your interpreter language is read
 from a simple configuratioon file, about a dozen of lines at most.
@@ -55,26 +54,23 @@ They are stored in <code>$(pkgdatadir)/lang</code>
 This is for <em>Awk</em>.
 
     <blockquote>
-      <pre><?scm:d (escape-html
-"# configurations for the Awk language
-<?awk:d ...?>
-# command
+      <pre>
+# awk - configurations for the Awk language
 awk -f /dev/stdin
 # initialization
 BEGIN {
-# nil
-0
 # assign
-variable_name = value;
+@VAR@ = @VAL@;
 # string
-printf \"string\";
-# expression
-printf (expression);
+printf &quot;@STR@&quot;;
+# display
+printf (@EXP@);
 # finalization
  exit;
 }
-")?></pre>
+</pre>
     </blockquote>
+
     <h3>File Size</h3>
     <p>The size of configuration files must be less than
 511 Bytes.</p>
@@ -95,7 +91,6 @@ The first line's second field is the keyword for the record.
 Following lines are data themselves.</p>
     <p>These are the keywords:</p>
     <ul>
-      <li><a href="#command">command</a></li>
       <li><a href="#initialization">initialization</a></li>
       <li><a href="#nil">nil</a></li>
       <li><a href="#bind">bind</a></li>

@@ -21,6 +21,7 @@
 #include "meta_arg.h"
 #include "escm.h"
 
+#ifdef ENABLE_CGI
 /* Will be moved elesewhere. */
 static char * env_to_bind[] = {
   /* "GATEWAY_INTERFACE", */
@@ -34,41 +35,38 @@ static char * env_to_bind[] = {
   "REMOTE_ADDR",
   /* "REQUEST_METHOD", */
 };
+#endif /* ENABLE_CGI */
 
 #define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
 
-#ifdef ESCM_LANG_DIR
+#ifdef ENABLE_POLYGLOT
 /* defined in lang.c */
 struct escm_lang * parse_lang(const char *name, const char **interp);
-#endif /* ESCM_LANG_DIR */
+#endif /* ENABLE_POLYGLOT */
 
 /* usage() - print a short help message.
  */
 static void
 usage(void)
 {
-  printf(
-"Usage: " PACKAGE " [OPTION] ... FILE ...
+  printf(gettext("Usage: %s [OPTION] ... FILE ...
 Process embedded scheme code in documents.
   -E                  only preprocess files
   -H                  print no content header even in a CGI script
   -e EXPR             evaluate an expression
   -f FILENAME         specify the footer file
   -i 'PROG ARG ... '  explicitly specify the interpreter
-"
-#ifdef ESCM_LANG_DIR
-"  -l LANG             specify another interpreter language than scheme
-"
-#endif /* ESCM_LANG_DIR */
-"  -o FILENAME         specify the output file
+  -l LANG             specify another interpreter language than scheme
+  -o FILENAME         specify the output file
   -h                  print this message
-  -v                  print version information
-"
-#ifdef ENABLE_HANDLER
-"You can also use this tool as a handler CGI program.
-"
-#endif /* ENABLE_HANDLER */
-"Report bugs to <" PACKAGE_BUGREPORT ">.\n");
+  -v                  print version information"), escm_prog);
+#ifndef ENABLE_CGI
+  printf(gettext("\nOption %s is discarded."), "-H");
+#endif /* ENABLE_CGI */
+#ifndef ENABLE_POLYGLOT
+  printf(gettext("\nOption %s is discarded."), "-l");
+#endif /* ENABLE_POLYGLOT */
+  printf(gettext("\n\nReport bugs to <%s>\n"), PACKAGE_BUGREPORT);
 }
 
 /* version() - print version information.
@@ -120,19 +118,17 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
   int c;
 
   for (;;) {
-#ifdef ESCM_LANG_DIR
     c = getopt(argc, argv, "EHe:f:i:l:o:hv");
-#else
-    c = getopt(argc, argv, "EHe:f:i:o:hv");
-#endif /* ESCM_LANG_DIR */
     if (c == -1) break;
     switch (c) {
     case 'E':
       opt->process = FALSE;
       break;
+#ifdef ENABLE_CGI
     case 'H':
       opt->header = FALSE;
       break;
+#endif /* ENABLE_CGI */
     case 'e':
       opt->n_expr++;
       opt->expr = (char**)realloc(opt->expr, sizeof(char*) * opt->n_expr);
@@ -145,11 +141,11 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
     case 'i':
       opt->interpreter = optarg;
       break;
-#ifdef ESCM_LANG_DIR
+#ifdef ENABLE_POLYGLOT
     case 'l':
       opt->langname = optarg;
       break;
-#endif /* ESCM_LANG_DIR */
+#endif /* ENABLE_POLYGLOT */
     case 'o':
       opt->outfile = optarg;
       break;
@@ -187,43 +183,52 @@ main(int argc, char **argv)
     TRUE, /* header */
   };
   struct escm_lang *lang;
-#ifdef ENABLE_HANDLER
+#ifdef ENABLE_CGI
   const char *path_translated = NULL;
-#endif /* ENABLE_HANDLER */
+#endif /* ENABLE_CGI */
   lang = &deflang;
 
   /* Check the environment. */
+#ifdef ENABLE_CGI
   escm_cgi = getenv("GATEWAY_INTERFACE");
+#endif /* ENABLE_CGI */
   opts.interpreter = getenv("ESCM_BACKEND");
+#ifdef ENABLE_POLYGLOT
   opts.langname = getenv("ESCM_DEFAULT");
+#endif /* ENABLE_POLYGLOT */
 
   /* for error messages */
   escm_prog = meta_progname(argv[0]);
 
+#ifdef ENABLE_CGI
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_cgi) {
     if (dup2(fileno(stdout), fileno(stderr)) < 0) escm_error(NULL);
-#ifdef ENABLE_HANDLER
     path_translated = getenv("PATH_TRANSLATED");
-#endif /* ENABLE_HANDLER */
   }
+#endif /* ENABLE_CGI */
 
   /* expand meta-arguments if necessary */
-#ifdef ENABLE_HANDLER
+#ifdef ENABLE_CGI
   if (argc == 1 && path_translated) {
     ret = meta_args_replace(&argc, &argv, path_translated, 1);
   } else {
-#endif /* ENABLE_HANDLER */
+#endif /* ENABLE_CGI */
     ret = meta_args(&argc, &argv);
-#ifdef ENABLE_HANDLER
+#ifdef ENABLE_CGI
   }
-#endif /* ENABLE_HANDLER */
+#endif /* ENABLE_CGI */
 
   /* process options */
   parse_opts(argc, argv, &opts);
 
+#ifdef ENABLE_CGI
   /* write out a content header. */
-  if (opts.header && escm_cgi) escm_header(lang, outp);
+  if (opts.header && escm_cgi) {
+    if (opts.process) escm_html_header(lang, outp);
+    else escm_text_header(lang, outp);
+  }
+#endif /* ENABLE_CGI */
 
   /* specify the output file if necessary. */
   if (opts.outfile) {
@@ -231,10 +236,10 @@ main(int argc, char **argv)
       escm_error(gettext("can't open - %s"), opts.outfile);
   }
 
-#ifdef ESCM_LANG_DIR
+#ifdef ENABLE_POLYGLOT
   /* select the language if necessary. */
   if (opts.langname) lang = parse_lang(opts.langname, &(opts.interpreter));
-#endif /* ESCM_LANG_DIR */
+#endif /* ENABLE_POLYGLOT */
 
   /* invoke the interpreter. */
   if (opts.process) {
@@ -250,6 +255,7 @@ main(int argc, char **argv)
   if (opts.process) {
     escm_bind(lang, "*escm-interpreter*",
 	      opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
+#ifdef ENABLE_CGI
     escm_bind(lang, "GATEWAY_INTERFACE", escm_cgi, outp);
     /* set useful global variables if the language is scheme. */
     if (escm_cgi) {
@@ -263,6 +269,7 @@ main(int argc, char **argv)
 	escm_bind(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
       }
     }
+#endif /* ENABLE_CGI */
   }
 
   /* evaluate the expressions specified in options */

@@ -1,7 +1,10 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* "Whether to use it as a handler CGI program." */
-#undef ENABLE_HANDLER
+/* "Whether to use it as a CGI program." */
+#undef ENABLE_CGI
+
+/* enable polyglot support. */
+#undef ENABLE_POLYGLOT
 
 /* Command line to invoke the backend interpreter. */
 #undef ESCM_BACKEND
@@ -24,6 +27,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if your system has a working `malloc' function. */
+#undef HAVE_MALLOC
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -33,6 +39,9 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
 /* Define to 1 if you have the `strerror' function. */
 #undef HAVE_STRERROR
 
@@ -41,12 +50,6 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
-
-/* Define to 1 if you have the `strrchr' function. */
-#undef HAVE_STRRCHR
-
-/* Define to 1 if you have the `strstr' function. */
-#undef HAVE_STRSTR
 
 /* Define to 1 if you have the `strtol' function. */
 #undef HAVE_STRTOL
