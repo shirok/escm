@@ -10,4 +10,7 @@ README : $(top_srcdir)/doc/readme.html
 $(top_srcdir)/doc/readme.html :
 	cd $(top_srcdir)/doc && make readme.html
 
+test-clean :
+	cd $(top_srcdir)/test && make clean
+
 # end of Makefile.am

@@ -54,9 +54,9 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 void
 escm_literal(const struct escm_lang *lang, const char *str, FILE *outp)
 {
-  if (lang->literal_prefix) fputs(lang->literal_prefix, outp);
+  if (lang->literal.prefix) fputs(lang->literal.prefix, outp);
   fputs(str, outp);
-  if (lang->literal_suffix) fputs(lang->literal_suffix, outp);
+  if (lang->literal.suffix) fputs(lang->literal.suffix, outp);
   fputc('\n', outp);
 }
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
@@ -64,12 +64,12 @@ escm_literal(const struct escm_lang *lang, const char *str, FILE *outp)
 void
 escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
-  if (lang->bind_prefix) fputs(lang->bind_prefix, outp);
+  if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
   put_variable(lang, var, outp);
-  if (lang->bind_infix) fputs(lang->bind_infix, outp);
+  if (lang->bind.infix) fputs(lang->bind.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
   else put_string(val, outp);
-  if (lang->bind_suffix) fputs(lang->bind_suffix, outp);
+  if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
   fputc('\n', outp);
 }
 /* escm_assign(lang, var, val, outp) - assign var to val in lang
@@ -77,12 +77,12 @@ escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *
 void
 escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
-  if (lang->assign_prefix) fputs(lang->assign_prefix, outp);
+  if (lang->assign.prefix) fputs(lang->assign.prefix, outp);
   put_variable(lang, var, outp);
-  if (lang->assign_infix) fputs(lang->assign_infix, outp);
+  if (lang->assign.infix) fputs(lang->assign.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
   else put_string(val, outp);
-  if (lang->assign_suffix) fputs(lang->assign_suffix, outp);
+  if (lang->assign.suffix) fputs(lang->assign.suffix, outp);
   fputc('\n', outp);
 }
 /* escm_bind_query_string(lang, outp) - bind the query string to QUERY_STRING
@@ -100,9 +100,9 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
   if (content_length == NULL)
     escm_error(gettext("inconsistent environment"));
   else {
-    if (lang->bind_prefix) fputs(lang->bind_prefix, outp);
+    if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
     put_variable(lang, "QUERY_STRING", outp);
-    if (lang->bind_infix) fputs(lang->bind_infix, outp);
+    if (lang->bind.infix) fputs(lang->bind.infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {
       fputc('\"', outp);
@@ -114,7 +114,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
     } else {
       fputs(lang->nil, outp);
     }
-    if (lang->bind_suffix) fputs(lang->bind_suffix, outp);
+    if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
     fputc('\n', outp);
   }
 }
@@ -140,6 +140,11 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
 }
 /* escm_preproc(&lang, inp, outp) - the preprocessor.
  */
+#define push_char(c) {\
+ if (stackptr == 31) goto empty;\
+ stack[stackptr++] = c;\
+}
+#define myfputs(s, fp) { if (s) fputs(s, fp); }
 void
 escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 {
@@ -149,68 +154,60 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     CODE,
     DISPLAY,
   } state = LITERAL;
-  int c, sw;
-  const char *p, *q;
+  int c;
+  const char *p;
   int str_keep_lineno = 0;
   int tag_keep_lineno = 0;
+  char stack[64] = "<?";
+  int stackptr = 0, i;
 
-  fputs(lang->literal_prefix, outp);
+  fputs(lang->literal.prefix, outp);
   while ((c = getc(inp)) != EOF) {
     if (c == '\n') escm_lineno++;
     if (state == LITERAL) {
       if (c == '<') {
+	stackptr++;
 	c = getc(inp);
-	if (c != '?') {
-	  fputc('<', outp);
-	  if (c == EOF) break;
-	  ungetc(c, inp);
+	if (c != '?') goto empty;
+	stackptr++;
+	p = lang->name;
+	while ((c = getc(inp)) == *p) {
+	  push_char(c);
+	  p++;
+	}
+	if (*p != '\0') goto empty;
+	if (isspace(c)) {
+	  stackptr = 0;
+	  state = CODE;
+	  fputs(lang->literal.suffix, outp);
+	  fputc('\n', outp);
+	  tag_keep_lineno = escm_lineno;
+	  if (c == '\n') escm_lineno++;
 	  continue;
 	}
-	p = lang->name;
-	while ((c = getc(inp)) == *p)
-	  p++;
-	if (*p != '\0') {
-	  fputs("<?", outp);
-	  for (q = lang->name; q < p; q++)
-	    fputc(*q, outp);
-	  if (c == EOF) break;
-	  ungetc(c, inp);
-	} else {
-	  if (isspace(c)) {
-	    state = CODE;
-	    fputs(lang->literal_suffix, outp);
-	    fputc('\n', outp);
-	    tag_keep_lineno = escm_lineno;
-	    if (c == '\n') escm_lineno++;
-	  } else if (c != ':') {
-	    fputs("<?", outp);
-	    fputs(lang->name, outp);
-	    if (c == EOF) break;
-	    ungetc(c, inp);
-	  } else {
-	    sw = getc(inp);
-	    if (sw == EOF) c = EOF;
-	    else c = getc(inp);
-	    if (isspace(c)) {
-	      if (sw == 'd') {
-		state = DISPLAY;
-		fputs(lang->literal_suffix, outp);
-		fputc('\n', outp);
-		fputs(lang->display_prefix, outp);
-		tag_keep_lineno = escm_lineno;
-		if (c == '\n') escm_lineno++;
-		continue;
-	      }
-	    }
-	    fputs("<?", outp);
-	    fputs(lang->name, outp);
-	    fputc(':', outp);
-	    if (sw == EOF) break;
-	    else fputc(sw, outp);
-	    if (c == EOF) break;
-	    ungetc(c, inp);
-	  }
+	if (c != ':') goto empty;
+	push_char(':');
+	c = getc(inp);
+	if (c != 'd') goto empty;
+	push_char('d');
+	c = getc(inp);
+	if (isspace(c)) {
+	  if (!lang->display.prefix) goto empty;
+	  stackptr = 0;
+	  state = DISPLAY;
+	  fputs(lang->literal.suffix, outp);
+	  fputc('\n', outp);
+	  fputs(lang->display.prefix, outp);
+	  tag_keep_lineno = escm_lineno;
+	  if (c == '\n') escm_lineno++;
+	  continue;
 	}
+      empty:
+	for (i = 0; i < stackptr; i++)
+	  fputc(stack[i], outp);
+	stackptr = 0;
+	if (c == EOF) break;
+	else ungetc(c, inp);
       } else {
 	if (c == '\\' || c == '\"') {
 	  fputc('\\', outp);
@@ -219,9 +216,9 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  escm_lineno++;
 	  fputc('\\', outp);
 	  fputc('n', outp);
-	  fputs(lang->literal_suffix, outp);
+	  fputs(lang->literal.suffix, outp);
 	  fputc('\n', outp);
-	  fputs(lang->literal_prefix, outp);
+	  fputs(lang->literal.prefix, outp);
 	} else {
 	  fputc(c, outp);	  
 	}
@@ -242,9 +239,9 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  c = getc(inp);
 	  if (c == EOF) break;
 	  else if (c == '>') {
-	    if (state == DISPLAY) fputs(lang->display_suffix, outp);
+	    if (state == DISPLAY) fputs(lang->display.suffix, outp);
 	    fputc('\n', outp);
-	    fputs(lang->literal_prefix, outp);
+	    fputs(lang->literal.prefix, outp);
 	    state = LITERAL;
 	    continue;
 	  } else fputc('?', outp);
@@ -256,14 +253,14 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
       }
     }
   }
-  if (state == LITERAL) fputs(lang->literal_suffix, outp);
+  if (state == LITERAL) fputs(lang->literal.suffix, outp);
   else {
     if (in_string) {
       fputc('\"', outp);
       escm_lineno = str_keep_lineno;
       escm_error(gettext("unterminated string"));
     }
-    if (state == DISPLAY) fputs(lang->display_suffix, outp);
+    if (state == DISPLAY) fputs(lang->display.suffix, outp);
     escm_lineno = tag_keep_lineno;
     escm_error(gettext("unterminated instruction"));
   }

@@ -27,23 +27,26 @@ extern int escm_lineno;
 /* Used here and there. */
 extern const char *escm_cgi;
 
+struct escm_form_two {
+  char *prefix;
+  char *suffix;
+};
+struct escm_form_three {
+  char *prefix;
+  char *infix;
+  char *suffix;  
+};
 /* language information structure */
 struct escm_lang {
   char *name;            /* the name space with the subname */
-  char *literal_prefix;
-  char *literal_suffix;
-  char *display_prefix;
-  char *display_suffix;
-  char *bind_prefix;
-  char *bind_infix;
-  char *bind_suffix;
-  char *assign_prefix;
-  char *assign_infix;
-  char *assign_suffix;
-  int use_hyphen;
+  struct escm_form_two literal;
+  struct escm_form_two display;
+  struct escm_form_three bind;
+  struct escm_form_three assign;
   char *nil;
   char *init;            /* initialization code */
   char *finish;          /* finalization code */
+  int use_hyphen;
 };
 
 extern struct escm_lang deflang;

@@ -1,4 +1,17 @@
+2003-07-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c (escm_preproc): Use a short stack to keep
+	characters while checking whether they are a good tag.
+
+	* Makefile.am (test-clean): Added test-clean target to erase the
+	log file in test/.
+
+	* src/lang.awk, src/lang.c, src/escm.h, src/escm.c: Changed
+	struct escm_lang.
+
 2003-07-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/lang/*, src/lang.awk, src/lang.c: Renamed keywords to @XXX@.
 
 	* src/lang/*, src/lang.awk, src/lang.c (parse_lang): Suppressed
 	name and command records.
