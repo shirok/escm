@@ -84,6 +84,7 @@ main(int argc, char **argv)
   int n_expr = 0;
   char *gateway_interface = NULL;
   char *path_translated = NULL;
+  char** backend_argv = NULL;
 
 #define OPTSTR "EHce:i:l:o:"
 #if defined(HAVE_GETOPT_LONG)
@@ -155,10 +156,8 @@ main(int argc, char **argv)
 	       escm_prog);
 	printf("\nReport bugs to <%s>\n", PACKAGE_BUGREPORT);
       } else {
-	interp = getenv("ESCM_BACKEND");
-	if (!interp) interp = ESCM_BACKEND;
 	printf("%s - developers' version of escm\n", PACKAGE_STRING);
-	printf("The default interpreter is '%s'\n", interp);
+	printf("The default interpreter is '%s'\n", deflang.backend[0]);
       }
       exit(EXIT_SUCCESS);
       /* not reached */
@@ -233,8 +232,12 @@ main(int argc, char **argv)
 
   /* invoke the interpreter. */
   if (process_flag) {
-    if (interp) outp = escm_popen(parse_cmdline(interp));
-    else outp = escm_popen(lang->backend);
+    if (interp) {
+      backend_argv = parse_cmdline(interp);
+    } else {
+      backend_argv = lang->backend;
+    }
+    outp = escm_popen(backend_argv);
     /* outp will never be NULL. See fork.c */
   }
 
@@ -250,8 +253,7 @@ main(int argc, char **argv)
   }
   escm_bind(lang, "escm_output_file", output_file, outp);
   if (process_flag) {
-    escm_bind(lang, "escm_interpreter",
-	      interp ? interp : ESCM_BACKEND, outp);
+    escm_bind(lang, "escm_interpreter", backend_argv[0], outp);
     if (gateway_interface) {
       const char *method;
       method = getenv("REQUEST_METHOD");

@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include "escm.h"
 #include "misc.h"
+#include "cmdline.h"
 
 struct escm_lang* parse_lang(const char* name);
 
@@ -103,18 +104,18 @@ main(int argc, const char** argv)
     fprintf(stderr, "Invalid language configuration: %s\n", argv[1]);
     exit(EXIT_FAILURE);
   }
+#ifdef ESCM_BACKEND
+  lang->backend = parse_cmdline(ESCM_BACKEND);
+#endif /* ESCM_BACKEND */
   printf("/* src/deflang.c - generated from %s */\n", argv[1]);
   fputs(
 "#ifdef HAVE_CONFIG_H\n"
 "#include \"config.h\"\n"
 "#endif\n"
-"#include \"escm.h\"\n"
-"#ifdef ESCM_BACKEND_ARGV\n"
-"static char *argv[] = { ESCM_BACKEND_ARGV, NULL };\n"
-"#else\n", stdout);
+"#include \"escm.h\"\n", stdout);
   fputs("static char *argv[] = {", stdout);
   put_list(lang->backend, stdout);
-  fputs("}\n#endif\n", stdout);
+  fputs("};\n", stdout);
   fputs("struct escm_lang deflang = {\n", stdout);
   /* name */
   fputs("  ", stdout);
