@@ -164,6 +164,42 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
   }
 }
 
+void
+escm_cgi_put(struct escm_lang *lang, FILE *outp)
+{
+  const char *content_length;
+  const char *p;
+  long llen;
+  int len;
+  int c;
+
+  content_length = getenv("CONTENT_LENGTH");
+  if (content_length == NULL) escm_define(lang, "escm-cgi-post", "", outp);
+  else {
+    fputs(lang->define_prefix, outp);
+    for (p = "escm-cgi-post"; *p; p++) {
+      if (*p == '-' && !lang->use_hyphen) {
+	fputc('_', outp);
+      } else {
+	fputc(*p, outp);
+      }
+    }
+    fputs(lang->define_infix, outp);
+    llen = strtol(content_length, &p, 10);
+    if (*p == '\0') {
+      fputc('\"', outp);
+      len = (int) llen;
+      while ((c = getc(stdin)) != EOF && len-- > 0) {
+	fputc(c, outp);
+      }
+      fputc('\"', outp);
+    } else {
+      fputs("\"\"", outp);
+    }
+    fputs(lang->define_suffix, outp);
+  }
+}
+
 /* main function
  */
 int
@@ -231,6 +267,7 @@ main(int argc, char **argv)
   escm_define(lang, "escm-output-file", opts.outfile, outp);
   escm_define(lang, "escm-input-file",
 	      input_file ? input_file : argv[optind], outp);
+  escm_cgi_put(&lang_scm, outp);
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {
