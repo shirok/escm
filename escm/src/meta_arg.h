@@ -4,7 +4,6 @@
  */
 #ifndef META_ARG_H
 #  define META_ARG_H 1
-#include <stdio.h> /* defines NULL and FILE */
 
 #include "escm.h"
 #include "misc.h"
@@ -14,21 +13,10 @@
 #define XERROR0(str) escm_error(str)
 #define XERROR1(fmt, arg) escm_error(fmt, arg)
 
-/* action handler CGI program */
-#define META_ACTION 1
-
 #ifndef _
 #  define _(str) str
 #endif /* !_ */
 
-#ifdef META_ACTION
-FILE * meta_expand(int *pinterpc, char ***pinterpv,
-		   int *pscriptc, char ***pscriptv,
-		   char *optstr, char *path);
-#else /* !META_ACTION */
-FILE * meta_expand(int *pinterpc, char ***pinterpv,
-		   int *pscriptc, char ***pscriptv,
-		   char *optstr);
-#endif /* META_ACTION */
-
+FILE * meta_expand(int *pinterpc, char ***pinterpv, int *pscriptc, char ***pscriptv, char *optstr);
+FILE * meta_expand_path(char *path, int *pinterpc, char ***pinterpv);
 #endif /* !META_ARG_H */

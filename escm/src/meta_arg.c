@@ -2,7 +2,8 @@
  * $Id$
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  *
- * fp = meta_expand(&argc, &argv, &scr_argc, &src_argv, optstr);
+ * fp = meta_expand(&argc, &argv, &scr_argc, &src_argv);
+ * fp = meta_expand_path(path, &argc, &argv);
  */
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
@@ -72,7 +73,6 @@ static int xlineno = 0;
 }
 #endif /* XERROR0 */
 
-/* fp = expand_args(fp) */
 #define ADD_CHAR(c) {\
   if (size == i) {\
      size += BUFSIZ;\
@@ -81,9 +81,9 @@ static int xlineno = 0;
   buf[i++] = (char) (c);\
 }
 
-/* fp = expand_args(script, &argc, &argv) */
-static FILE *
-expand_args(char *script, int *pargc, char ***pargv)
+/* fp = meta_expand_path(script, &argc, &argv) */
+FILE *
+meta_expand_path(char *script, int *pargc, char ***pargv)
 {
   enum {
     OUTSIDE,
@@ -225,14 +225,7 @@ skip_shebang(const char *script)
 
 /* fp = meta_expand(&interpc, &interpv, &scriptc, &scriptv, optstr); */
 FILE *
-meta_expand(int *pinterpc, char ***pinterpv,
-	    int *pscriptc, char ***pscriptv,
-#ifdef META_ACTION
-	    char *optstr, char *path
-#else /* !META_ACTION */
-	    char *optstr
-#endif /* META_ACTION */
-	    )
+meta_expand(int *pinterpc, char ***pinterpv, int *pscriptc, char ***pscriptv, char *optstr)
 {
   char **argv;
   int argc, i, which = 1;
@@ -245,59 +238,39 @@ meta_expand(int *pinterpc, char ***pinterpv,
 
   XPROG = argv[0];
   if (argc <= 1) { /* no shebang script file. */
-#ifndef META_ACTION
     return NULL;
-#else /* META_ACTION */
-    if (!path) return NULL;
-    fp = expand_args(path, pinterpc, pinterpv);
-    if (!fp) {
-      *pinterpc = 2;
-      *pinterpv = XMALLOC(char *, 3);
-      (*pinterpv)[0] = argv[0];
-      (*pinterpv)[1] = path;
-      (*pinterpv)[2] = NULL;
-    } else if (*pinterpv != argv) {
-      *pscriptc = 1;
-      *pscriptv = XMALLOC(char *, 2);
-      (*pscriptv)[0] = path;
-      (*pscriptv)[1] = NULL;
-    }
-    return fp;
-#endif /* !META_ACTION */
   } else if (argc == 2) {
     if (argv[1][0] == '-') { /* no shebang script file. */
       return NULL;
-    } else {
-      goto script_without_meta_args;
     }
   } else {
     if (argv[1][0] == '\\' && argv[1][1] == '\0') { /* meta-arguments */
-      fp = expand_args(argv[2], pinterpc, pinterpv);
+      fp = meta_expand_path(argv[2], pinterpc, pinterpv);
       if (*pinterpv != argv) {
 	*pscriptc = argc - 2;
 	*pscriptv = argv + 2;
       }
       return fp;
-    } else if (argv[1][0] != '-') {
-      goto script_without_meta_args;
-    } else if (argv[2][0] == '-') { /* no shebang script file. */
-      return NULL;
-    } else {
-      /* check if argv[2] is an option argument. */
+    } else if (argv[1][0] == '-') {
+      if (argv[1][1] == '\0' || argv[1][1] == '-') return NULL;
       char *p, *q;
       for (p = argv[1] + 1; *p; p++) {
 	q = strchr(optstr, *p);
-	if (!q) {
-	  return NULL; /* getopt() will cause an error. */
-	} else if (q[1] == ':') {
-	  if (p[1] == '\0') return NULL;
-	  break;
+	if (!*q) {
+	  return NULL; /* cause an error */
+	} else if (*(q + 1) == ':') {
+	  if (*(p + 1) == '\0') {
+	    return NULL; /* has an argument */
+	  } else {
+	    break;
+	  }
 	}
       }
       which = 2;
+    } else if (argv[2][0] == '-') { /* no shebang script file. */
+      return NULL;
     }
   }
- script_without_meta_args:
   fp = skip_shebang(argv[which]);
   if (!fp) return NULL;
   *pinterpc = which;
@@ -318,7 +291,7 @@ int main(int argc, char *argv[])
   int i;
   FILE *fp;
 
-  fp = meta_interp(&argc, &argv, &s_argc, &s_argv, "ab:");
+  fp = meta_expand(&argc, &argv, &s_argc, &s_argv);
   printf("interp\n");
   for (i = 0; i < argc; i++) {
     printf("%d => %s\n", i, argv[i]);

@@ -83,6 +83,8 @@ main(int argc, char **argv)
   char *interp = NULL;
   char **expr = NULL;
   int n_expr = 0;
+  char *path_translated = NULL;
+
 #define OPTSTR "EHce:f:h:i:l:o:"
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
@@ -109,6 +111,9 @@ main(int argc, char **argv)
 
   /* Check the environment. */
   escm_cgi = getenv("GATEWAY_INTERFACE");
+  if (escm_cgi) {
+    path_translated = getenv("PATH_TRANSLATED");
+  }
 
   /* Set the program name. */
   escm_prog = argv[0];
@@ -119,8 +124,13 @@ main(int argc, char **argv)
   }
 
   /* expand meta-arguments if necessary */
-  inp = meta_expand(&argc, &argv, &s_argc, &s_argv,
-		    OPTSTR, getenv("PATH_TRANSLATED"));
+  if (path_translated) {
+    s_argc = 1;
+    inp = meta_expand_path(path_translated, &argc, &argv);
+  } else {
+    inp = meta_expand(&argc, &argv, &s_argc, &s_argv, OPTSTR);
+  }
+
 
   /* process options */
   for (;;) {
@@ -241,18 +251,24 @@ main(int argc, char **argv)
   /* initialization */
   escm_init(lang, outp);
   escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
-  if (inp == 0) escm_bind(lang, "*escm-input-file*", NULL, outp);
-  else escm_bind(lang, "*escm-input-file*", s_argv[0], outp);
+  if (inp == NULL) {
+    escm_bind(lang, "*escm-input-file*", NULL, outp);
+  } else if (path_translated) {
+    escm_bind(lang, "*escm-input-file*", path_translated, outp);
+  } else {
+    escm_bind(lang, "*escm-input-file*", s_argv[0], outp);
+  }
   escm_bind(lang, "*escm-output-file*", output_file, outp);
   if (process_flag) {
     escm_bind(lang, "*escm-interpreter*",
 	      interp ? interp : ESCM_BACKEND, outp);
-    /* set useful global variables if the language is scheme. */
     if (escm_cgi) {
       const char *method;
       method = getenv("REQUEST_METHOD");
       if (method[0] == 'P') escm_bind_query_string(lang, outp);
       else escm_bind(lang, "*escm-query-string*", getenv("QUERY_STRING"), outp);
+    } else {
+      escm_bind(lang, "*escm-query-string*", NULL, outp);
     }
   }
 
@@ -264,7 +280,15 @@ main(int argc, char **argv)
 
   if (header_file) proc_file_name(lang, header_file, outp);
   /* process files */
-  if (!inp) {
+  if (path_translated) {
+    if (argc > optind) escm_error(_("too many arguments"));
+    if (inp == NULL) {
+      inp = fopen(path_translated, "r");
+      escm_lineno = 1;
+      if (inp == NULL) escm_error(_("can't open - %s"), path_translated);
+    }
+    escm_preproc(lang, inp, outp);
+  } else if (!inp) { /* filter */
     if (argc == optind) {
       escm_file = "stdin";
       escm_lineno = 1;
@@ -273,7 +297,7 @@ main(int argc, char **argv)
       for (i = optind; i < argc; i++)
 	proc_file_name(lang, argv[i], outp);
     }
-  } else {
+  } else { /* wrapper of an interpreter */
     if (argc > optind || s_argc != 1) escm_error(_("too many arguments"));
     escm_preproc(lang, inp, outp);
   }
