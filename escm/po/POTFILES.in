@@ -1,6 +1,0 @@
-src/escm.c
-src/filter.c
-src/fork.c
-src/lang.c
-src/meta_arg.c
-src/misc.c
