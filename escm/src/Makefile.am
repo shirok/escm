@@ -6,7 +6,7 @@ SUBDIRS = lang
 
 # Program
 BUILT_SOURCES = deflang.c
-CLEANFILES = deflang.c langconf$(EXEEXT)
+CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT)
 
 noinst_PROGRAMS = langconf
 langconf_SOURCES = langconf.c escm.c escm.h lang.c

@@ -42,7 +42,7 @@ in an assignment or binding statement;</li>
     </ol>
 
     <p>In short, most scripting languages will do.
-The tarball of this version (<?scm:d *escm-version*?>)
+The tarball of this version (<?scm:d PACKAGE_VERSION?>)
 contains the configuration files for
 <a href="#awk">Awk</a>, Csh, Common Lisp, Perl, Python, Ruby, Sh, Tcl
 and of course <a href="#scm">Scheme</a>.

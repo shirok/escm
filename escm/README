@@ -1,6 +1,6 @@
-This document is README for aescm 0.27 (either README or doc/readme.html).
+This document is README for aescm 0.30 (either README or doc/readme.html).
 
-Aescm is a filter tool to embed code in a document. The current version (0.27)
+Aescm is a filter tool to embed code in a document. The current version (0.30)
 is in alpha state and specifications may be changed. The stable version is escm
 1.1, which is a tool for Scheme.
 
@@ -9,6 +9,12 @@ instructions to code. It sends the code to an interpreter which has been
 invoked as child process. As you can change conversion rules flexibly, you will
 be able to use this tool with your favorite interpreter of your favorite
 scripting language.
+
+aescm 0.30 is a downgraded version. Many experimental features have been
+removed, and the tool was divided into a filter tool and a CGI tool. By
+default, only the filter tool is compiled and installed. The CGI tool must be
+installed manually. See cgi.html for information on installation and
+configurations of the CGI tool.
 
 Installation
 
@@ -19,11 +25,11 @@ installed, type as usual:
     ./configure
     make
     make install
-
+    
 
 With this setting, only Scheme code is preprocessed. You cannot use SCM, for it
 requires different translation rules from those of other Scheme interpreters.
-If you want to use this tool with other scripting languages, add
+If you want to use this tool with other scripting languages, add 
 --enable-polyglot option to configure. See INSTALL(doc/install.html) for more
 information. You can change the default computer language and the default
 backend.
@@ -40,9 +46,9 @@ default scripting languge with environment variable ESCM_DEFAULT.
 CGI
 
 This package comes with a CGI tool named aescm.cgi, which you should install
-manually. The query string by POST method is bound to *escm-query-string* (or
-$escm_query_string, EscmQueryString), for you cannot directly get it in a CGI
-script. It is also bound if the method is GET.
+manually. The query string by POST method is bound to escm_query_string, for
+you cannot directly get it in a CGI script. It is also bound if the method is
+GET.
 
 You can use it to process a handler CGI program. See the handler document of
 Apache for settings.
@@ -56,6 +62,6 @@ edit them to change translation rules. and backend interpreters. To edit or add
 a configuration file consult doc/gimmick.html.
 
 
-This document was converted from readme.escm on Fri Oct 15 03:56:32 UTC 2004.
-The backend interpreter is /home/tagga/bin/gosh. Please send bug reports or
+This document was converted from readme.escm on Fri Dec 3 10:47:15 UTC 2004.
+The backend interpreter is /home/tagga/bin/gosh -b. Please send bug reports or
 comments to the mailing list or tagga@tsuda.ac.jp.

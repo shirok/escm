@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "AESCM 1"
-.TH AESCM 1 "2004-10-15" "" ""
+.TH AESCM 1 "2004-12-03" "" ""
 .SH "NAME"
 aescm \-\- preprocess embedded Scheme code in documents
 .SH "SYNOPSIS"
@@ -180,27 +180,19 @@ Print a short help message.
 Print version information.
 .Sh "\s-1SCHEME\s0 \s-1VARIABLES\s0"
 .IX Subsection "SCHEME VARIABLES"
-Naming convention can be changed by a language configuration file.
-For example, \f(CW\*(C`*escm\-input\-file*\*(C'\fR is used if the identifer record is
-\&\fB*lisp*\fR,
-while it is changed to \f(CW\*(C`EscmInputFile\*(C'\fR if the record is \fBTitle\fR,
-\&\f(CW\*(C`ESCM_INPUT_FILE\*(C'\fR if \fB\s-1UPPER\s0\fR,
-and
-\&\f(CW\*(C`escm_input_file\*(C'\fR if \fBlower\fR.
-The last one is the default.
-.IP "*escm-input-file*" 2
-.IX Item "*escm-input-file*"
+.IP "escm_input_file" 2
+.IX Item "escm_input_file"
 The name of the file which the tool is currently processing.
 The value is false if the input is stdin.
-.IP "*escm-output-file*" 2
-.IX Item "*escm-output-file*"
+.IP "escm_output_file" 2
+.IX Item "escm_output_file"
 The name of the output file.
 It is false if the output is stdout.
-.IP "*escm-interpreter*" 2
-.IX Item "*escm-interpreter*"
+.IP "escm_interpreter" 2
+.IX Item "escm_interpreter"
 The Scheme interpreter and its arguments.
-.IP "*escm-version*" 2
-.IX Item "*escm-version*"
+.IP "escm_version" 2
+.IX Item "escm_version"
 The name and the version of this project.
 .Sh "\s-1ENVIRONMENT\s0 \s-1VARIABLES\s0"
 .IX Subsection "ENVIRONMENT VARIABLES"
@@ -243,7 +235,7 @@ As many files as you specified are to be processed.
 The stable version processes only the first one.
 .Sh "\s-1CGI\s0"
 .IX Subsection "CGI"
-\&\s-1CGI\s0 features have been removed since \fBaescm\fR version 0.27.
+\&\s-1CGI\s0 features have been removed since \fBaescm\fR version 0.30.
 You can use \fBaescm.cgi\fR in the sharp-bang line of
 \&\s-1CGI\s0 scripts or as a handler \s-1CGI\s0 program.
 .SH "AUTHOR"

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
+  "http://www.w3.org/TR/xhtml-basic/DTD/xhtml-basic10.dtd">
+<html>
+  <head>
+    <title>aescm.cgi</title>
+  </head>
+<?scm
+  (load (string-append *builddir* "/doc/config.scm"))
+  (load (string-append *srcdir* "/doc/helper.scm"))
+?>
+  <body>
+    <h1>aescm.cgi</h1>
+    <h2>CGI features</h2>
+
+    <ol>
+      <li><p>The tool can be used
+as an interpreter in the sharp-bang line in a CGI script
+or as an action handler CGI script.</p></li>
+      <li><p>The sharp-bang line of the document will be skipped.</p></li>
+      <li><p>An HTML content header will be added if the document
+begins with character &lt;.</p></li>
+      <li><p>The query string will be bound to variable
+<code>escm_query_string</code>.</p></li>
+    </ol>
+
+    <h2>Installation</h2>
+
+    <p>Use <strong>configure</strong> script
+to deliver the settings to the tool.
+You cannot change the backend either by environment variables
+or by optional arguments.</p>
+    <blockquote>
+      <pre>./configure --backend=&quot;scsh -s /dev/stdin&quot;</pre>
+    </blockquote>
+
+    <p>Move to the <strong>src</strong> directory and
+compile the tool.</p>
+
+    <blockquote>
+      <pre>mv src
+make aescm.cgi</pre>
+    </blockquote>
+
+    <p>Copy the program to a CGI script directory.</p>
+    <blockquote>
+      <pre>cp aescm.cgi ~/public_html/cgi-bin/</pre>
+    </blockquote>
+
+    <h2>Handler CGI script</h2>
+
+    <p>To make <strong><?scm:d PACKAGE?></strong> process
+all documents with suffix <em>escm</em>
+under a certain directory,
+add these lines to <strong>.htaccess</strong>:
+</p>
+
+    <blockquote>
+      <pre>AddHandler escm-handler .escm
+Action escm-handler /~<strong>login</strong>/cgi-bin/aescm.cgi
+</pre>
+    </blockquote>
+
+  </body>
+</html>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-default-dtd-file:"~/share/xml/xhtml-basic/xhtml-basic10.dtd"
+coding:utf-8
+sgml-declaration:"~/share/xml/xhtml-basic/xml1.dcl"
+End:
+-->

@@ -1,6 +1,9 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
-Version 0.26 (2004-10-20)
-* Removed CGI features from the filter tool.
+Version 0.30 (2004-12-04)
+* Separated a CGI tool from the filter tool.
+* The CGI tool adds an HTML header only if the document begins with <.
+* No conversions of variable names will take place.
+* Removed the metaswitch feature.
 
 Version 0.26 (2004-02-29)
 * Skip the sharp-bang line of the first argument file.

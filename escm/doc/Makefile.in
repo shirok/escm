@@ -134,13 +134,13 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 with_backend = @with_backend@
-ESCM = aescm
+ESCM = $(top_builddir)/src/aescm
 POD2MAN = pod2man
 HTMLDUMP = w3m -dump
 SUFFIXES = .1 .html .epod .escm
 man_MANS = aescm.1
 htmldir = $(prefix)/share/doc/aescm
-html_DATA = gimmick.html interpreter.html readme.html install.html
+html_DATA = gimmick.html interpreter.html readme.html install.html cgi.html
 EXTRA_DIST = $(man_MANS:.1=.epod) $(html_DATA:.html=.escm) $(man_MANS) $(html_DATA)
 all: all-am
 

@@ -22,8 +22,8 @@
   </head>
   <body>
     <h1>Installation</h1>
-    <p>As this tool utilizes Autotool,
-it is easy to install it
+    <p>Installation will be done
+as usual
 if the default scripting langauge is Scheme
 and if the backend interpreter is <?scm:d gauche?> or <?scm:d guile?>.</p>
     <blockquote>

@@ -26,12 +26,13 @@
   <body>
     <p>This document is README for <?scm:d PACKAGE?> <?scm:d VERSION?>
 (either README or doc/readme.html).</p>
+
     <p><?scm:d (string-titlecase PACKAGE)?> is a filter tool to
 embed code in a document.
 The current version (<?scm:d VERSION?>) is
 in alpha state and specifications may be changed.
 The stable version is <?scm:d escm ?>,
-which is a tool for Scheme.
+which is a tool for Scheme.</p>
 
     <p>The body of <?scm:d PACKAGE?> is a filter
 which converts part outside XML preprocessor instructions
@@ -42,6 +43,16 @@ As you can change conversion rules flexibly,
 you will be able to use this tool
 with your favorite interpreter
 of your favorite scripting language.</p>
+
+    <p><?scm:d PACKAGE?> 0.30 is a <strong>downgraded</strong> version.
+Many experimental features have been removed,
+and the tool was divided into
+a filter tool and a CGI tool.
+By default, only the filter tool is compiled and installed.
+The CGI tool must be installed manually.
+See <a href="cgi.html">cgi.html</a> for information
+on installation and configurations of the CGI tool.
+</p>
 
     <h2>Installation</h2>
     <p>If you want to use <?scm:d gauche?>
@@ -61,13 +72,13 @@ for it requires different translation rules
 from those of other Scheme interpreters.
 If you want to use this tool with other scripting languages,
 add <em>--enable-polyglot</em> option to <code>configure</code>.
-See INSTALL(doc/<a href="intall.html">install.html</a>)
+See INSTALL(doc/<a href="install.html">install.html</a>)
 for more information.
 You can change the default computer language
 and the default backend.</p>
 
     <h2>Environment Variables</h2>
-    <p>You can specify the backend interpreter
+     <p>You can specify the backend interpreter
 by setting it with options
 to environment vairable <code>ESCM_BACKEND</code>.
 Command line options for some popular Schme implementations
@@ -83,8 +94,7 @@ with environment variable <code>ESCM_DEFAULT</code>.</p>
 <strong>aescm.cgi</strong>,
 which you should install manually.
 The query string by POST method is bound to
-<code>*escm-query-string*</code> (or <code>$escm_query_string</code>,
-<code>EscmQueryString</code>),
+<code>escm_query_string</code>,
 for you cannot directly get it in a CGI script.
 It is also bound if the method is GET.</p>
 <p>You can use it to process a handler CGI program.
@@ -105,9 +115,9 @@ To edit or add a configuration file
 consult doc/<a href="gimmick.html">gimmick.html</a>.</p>
 
     <address>
-This document was converted from <em><?scm:d *escm-input-file*?></em>
+This document was converted from <em><?scm:d escm_input_file?></em>
 on <?scm:d *date*?>.
-The backend interpreter is <?scm:d *escm-interpreter*?>.
+The backend interpreter is <?scm:d escm_interpreter?>.
 Please send bug reports or comments
 to
 <a href="mailto:escm-devel@lists.sourceforge.net">the mailing list</a>
