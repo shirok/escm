@@ -35,32 +35,6 @@
 #include "escm.h"
 #include "misc.h"
 
-static char * const default_backend[] = { ESCM_BACKEND_ARGV, NULL };
-
-/* Will be moved elesewhere. */
-static char **
-tokenize_cmd(const char *cmd)
-{
-  char *p;
-  char *str;
-  int i, n = 0;
-  char **argv = NULL;
-
-  i = 1 + strlen(cmd);
-  str = XMALLOC(char, i);
-  strcpy(str, cmd);
-  p = strtok(str, " \t");
-  for (i = 0; /**/; i++, p = strtok(NULL, " \t")) {
-    if (i == n) {
-      n += 4;
-      argv = XREALLOC(char *, argv, n);
-    }
-    argv[i] = p;
-    if (p == NULL) break;
-  }
-  return argv;
-}
-
 #ifdef ENABLE_CGI
 /* Will be moved elesewhere. */
 static char * env_to_bind[] = {
@@ -81,7 +55,7 @@ static char * env_to_bind[] = {
 
 #ifdef ENABLE_POLYGLOT
 /* defined in lang.c */
-struct escm_lang * parse_lang(const char *name, const char **interp);
+struct escm_lang * parse_lang(const char *name);
 #endif /* ENABLE_POLYGLOT */
 
 /* proc_file_name(lang, name, outp) - process a file. The inpuf file
@@ -102,25 +76,26 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   escm_preproc(lang, inp, outp);
   fclose(inp);
 }
-
-/* struct opt_data - structure to store options.
+/* main function
  */
-struct opt_data {
-  const char *interp;   /* -i "interp arg ..." */
-  const char *outfile;  /* -o file */
-  const char *langname; /* -l lang */
-  const char *footer;   /* -f file */
-  char **expr;          /* -e expr */
-  int n_expr;
-  int process;          /* -E */
-  int header;           /* -H */
-};
-/* parse_opts(argc, argv, &opts) - process options
- */
-static void
-parse_opts(int argc, char **argv, struct opt_data *opt)
+int
+main(int argc, char **argv)
 {
-  int c;
+  int i, c, ret;
+  FILE *outp = stdout;
+  int header_flag = TRUE;
+  int process_flag = TRUE;
+  char *footer_file = NULL;
+  char *output_file = NULL;
+#ifdef ENABLE_POLYGLOT
+  char *lang_name = NULL;
+#endif /* ENABLE_POLYGLOT */
+  char *interp = NULL;
+  char **expr = NULL;
+  int n_expr = 0;
+#ifdef ENABLE_CGI
+  const char *path_translated = NULL;
+#endif /* ENABLE_CGI */
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
@@ -137,7 +112,39 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
     { NULL, 0, NULL, 0, }
   };
 #endif /* defined(HAVE_GETOPT_LONG) */
+  struct escm_lang *lang;
 
+  /* the default language (scheme perhaps) */
+  lang = &deflang;
+
+  /* Check the environment. */
+#ifdef ENABLE_CGI
+  escm_cgi = getenv("GATEWAY_INTERFACE");
+#endif /* ENABLE_CGI */
+
+  /* Set the program name. */
+  escm_prog = argv[0];
+
+#ifdef ENABLE_CGI
+  /* redirect stderr to stdout if it is invoked as CGI. */
+  if (escm_cgi) {
+    escm_redirect(fileno(stderr), fileno(stdout));
+    path_translated = getenv("PATH_TRANSLATED");
+  }
+#endif /* ENABLE_CGI */
+
+  /* expand meta-arguments if necessary */
+#ifdef ENABLE_CGI
+  if (argc == 1 && path_translated) {
+    ret = meta_args_replace(&argc, &argv, path_translated, 1);
+  } else {
+#endif /* ENABLE_CGI */
+    ret = meta_args(&argc, &argv);
+#ifdef ENABLE_CGI
+  }
+#endif /* ENABLE_CGI */
+
+  /* process options */
   for (;;) {
     c = getopt_long(argc, argv, "EHe:f:i:l:o:", long_opt, &long_idx);
     if (c == -1) break;
@@ -167,7 +174,7 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
 #endif /* ENABLE_POLYGLOT */
 	printf(_("\nReport bugs to <%s>\n"), PACKAGE_BUGREPORT);
       } else {
-	char *interp = getenv("ESCM_BACKEND");
+	interp = getenv("ESCM_BACKEND");
 	if (!interp) interp = ESCM_BACKEND;
 	printf(_("%s - experimental version of escm\n"), PACKAGE_STRING);
 	printf(_("The default interpreter is '%s'\n"), interp);
@@ -176,31 +183,31 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
       /* not reached */
 #endif /* defined(HAVE_GETOPT_LONG) */
     case 'E':
-      opt->process = FALSE;
+      process_flag = FALSE;
       break;
 #ifdef ENABLE_CGI
     case 'H':
-      opt->header = FALSE;
+      header_flag = FALSE;
       break;
 #endif /* ENABLE_CGI */
     case 'e':
-      opt->n_expr++;
-      opt->expr = XREALLOC(char *, opt->expr, opt->n_expr);
-      opt->expr[opt->n_expr - 1] = optarg;
+      n_expr++;
+      expr = XREALLOC(char *, expr, n_expr);
+      expr[n_expr - 1] = optarg;
       break;
     case 'f':
-      opt->footer = optarg;
+      footer_file = optarg;
       break;
     case 'i':
-      opt->interp = optarg;
+      interp = optarg;
       break;
 #ifdef ENABLE_POLYGLOT
     case 'l':
-      opt->langname = optarg;
+      lang_name = optarg;
       break;
 #endif /* ENABLE_POLYGLOT */
     case 'o':
-      opt->outfile = optarg;
+      output_file = optarg;
       break;
     default:
 #if defined(HAVE_GETOPT_LONG)
@@ -213,102 +220,38 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
       /* not reached */
     }
   }
-}
-
-/* main function
- */
-int
-main(int argc, char **argv)
-{
-  int i, ret;
-  FILE *outp = stdout;
-  struct opt_data  opts = {
-    NULL, /* interpreter */
-    NULL, /* outfile */
-    NULL, /* langname */
-    NULL, /* footer */
-    NULL, /* expr */
-    0, /* n_expr */
-    TRUE, /* process */
-    TRUE, /* header */
-  };
-  struct escm_lang *lang;
-#ifdef ENABLE_CGI
-  const char *path_translated = NULL;
-#endif /* ENABLE_CGI */
-  lang = &deflang;
-
-  /* Check the environment. */
-#ifdef ENABLE_CGI
-  escm_cgi = getenv("GATEWAY_INTERFACE");
-#endif /* ENABLE_CGI */
-
-  /* Get the program name. */
-  escm_prog = argv[0];
-
-#ifdef ENABLE_CGI
-  /* redirect stderr to stdout if it is invoked as CGI. */
-  if (escm_cgi) {
-    escm_redirect(fileno(stderr), fileno(stdout));
-    path_translated = getenv("PATH_TRANSLATED");
-  }
-#endif /* ENABLE_CGI */
-
-  /* expand meta-arguments if necessary */
-#ifdef ENABLE_CGI
-  if (argc == 1 && path_translated) {
-    ret = meta_args_replace(&argc, &argv, path_translated, 1);
-  } else {
-#endif /* ENABLE_CGI */
-    ret = meta_args(&argc, &argv);
-#ifdef ENABLE_CGI
-  }
-#endif /* ENABLE_CGI */
-
-  /* process options */
-  parse_opts(argc, argv, &opts);
 
 #ifdef ENABLE_CGI
   /* write out a content header. */
-  if (opts.header && escm_cgi) {
-    if (opts.process) escm_html_header(lang, outp);
+  if (header_flag && escm_cgi) {
+    if (process_flag) escm_html_header(lang, outp);
     else escm_text_header(lang, outp);
   }
 #endif /* ENABLE_CGI */
 
   /* specify the output file if necessary. */
-  if (opts.outfile) {
-    if (freopen(opts.outfile, "w", stdout) == NULL)
-      escm_error(_("can't open - %s"), opts.outfile);
+  if (output_file) {
+    if (freopen(output_file, "w", stdout) == NULL)
+      escm_error(_("can't open - %s"), output_file);
   }
 
 #ifdef ENABLE_POLYGLOT
   /* select the language if necessary. */
-  if (opts.langname) {
-    const char *interp;
-    lang = parse_lang(opts.langname, &interp);
-    if (!opts.interp) opts.interp = interp;
+  if (lang_name) {
+    lang = parse_lang(lang_name);
   } else {
-    opts.langname = getenv("ESCM_DEFAULT");
-    if (opts.langname) {
-      const char *interp;
-      lang = parse_lang(opts.langname, &interp);
-      if (!opts.interp) {
-	opts.interp = getenv("ESCM_BACKEND");
-	if (!opts.interp) opts.interp = interp;
-      }
-    } else {
-      if (!opts.interp) opts.interp = getenv("ESCM_BACKEND");
-    }
+    lang_name = getenv("ESCM_DEFAULT");
+    if (lang_name) lang = parse_lang(lang_name);
+    if (!interp) interp = getenv("ESCM_BACKEND");
   }
 #else /* not ENABLE_POLYGLOT */
-  if (!opts.interp) opts.interp = getenv("ESCM_BACKEND");
+  if (!interp) interp = getenv("ESCM_BACKEND");
 #endif /* ENABLE_POLYGLOT */
 
   /* invoke the interpreter. */
-  if (opts.process) {
-    if (opts.interp) outp = escm_popen(tokenize_cmd(opts.interp));
-    else outp = escm_popen(default_backend);
+  if (process_flag) {
+    if (interp) outp = escm_popen(tokenize_cmd(interp));
+    else outp = escm_popen(lang->backend);
     /* outp will never be NULL. See fork.c */
   }
 
@@ -316,10 +259,10 @@ main(int argc, char **argv)
   escm_init(lang, outp);
   escm_bind(lang, "*escm-version*", PACKAGE " " VERSION, outp);
   escm_bind(lang, "*escm-input-file*", NULL, outp);
-  escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
-  if (opts.process) {
+  escm_bind(lang, "*escm-output-file*", output_file, outp);
+  if (process_flag) {
     escm_bind(lang, "*escm-interpreter*",
-	      opts.interp ? opts.interp : ESCM_BACKEND, outp);
+	      interp ? interp : ESCM_BACKEND, outp);
 #ifdef ENABLE_CGI
     escm_bind(lang, "GATEWAY_INTERFACE", escm_cgi, outp);
     /* set useful global variables if the language is scheme. */
@@ -338,13 +281,13 @@ main(int argc, char **argv)
   }
 
   /* evaluate the expressions specified in options */
-  for (i = 0; i < opts.n_expr; i++) {
-    fputs(opts.expr[i], outp);
+  for (i = 0; i < n_expr; i++) {
+    fputs(expr[i], outp);
     fputc('\n', outp);
   }
 
   /* content header if -E */
-  if (opts.header && !opts.process)
+  if (header_flag && !process_flag)
     escm_literal(lang, "Content-type: text/html\\r\\n\\r\\n", outp);
 
   /* process files */
@@ -357,14 +300,14 @@ main(int argc, char **argv)
       proc_file_name(lang, argv[i], outp);
     }
   }
-  if (opts.footer)
-    proc_file_name(lang, opts.footer, outp);
+  if (footer_file)
+    proc_file_name(lang, footer_file, outp);
 
   /* finalization */
   escm_finish(lang, outp);
 
   /* close the pipe. */
-  if (opts.process && escm_pclose(outp) != 0)
+  if (process_flag && escm_pclose(outp) != 0)
     escm_error("the backend exited unsuccessfully");
   return 0;
 }
