@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>2aescm - convert an escm file into the XML format</TITLE>
+<LINK REV="made" HREF="mailto:root@gohan11.freebsd.org">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>2aescm - convert an escm file into the XML format</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>2aescm [-p <EM>PATH</EM>] [-o <EM>OUTFILE</EM>] <EM>INFILE</EM></P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>2aescm</STRONG> converts the original escm format
+with <CODE>&lt;?</CODE> and <CODE>!&gt;</CODE>
+into the XML instruction format
+with <CODE>&lt;scm</CODE> and <CODE>?&gt;</CODE>.
+<CODE>#?</CODE> syntax, used to specify the backend interpreter,
+is translated by an extended meta-argument functionaly.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dp_PATH">-p PATH</A></STRONG><BR>
+<DD>
+Specify the path of <STRONG>aescm</STRONG>.
+The default is the one installed with this program.
+<P></P>
+<DT><STRONG><A NAME="item_%2Do_OUTFILE">-o OUTFILE</A></STRONG><BR>
+<DD>
+Specify the output file.
+Without this option, the output is sent to stdout.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+  Shiro Kawai  -- the original and stable escm from which
+                  this program was derived
+  TAGA Yoshitaka, tagga@tsuda.ac.jp</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><STRONG>aescm</STRONG>.</P>
+<hr />
+<div>
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=68657&amp;type=1" width="88" height="31" border="0"" alt="SourceForge.net Logo" /></a>
+</div>
+</BODY>
+
+</HTML>

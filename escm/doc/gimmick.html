@@ -1,0 +1,178 @@
+<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
+<!-- $Id$ -->
+<!DOCTYPE html
+     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+  <head>
+    <title>Polyglot Feature</title>
+    <meta http-equiv="Content-Type" content="text/html" />
+    <link href="aescm.css" type="text/css" rel="stylesheet" />
+    <?xml-stylesheet type="text/css" href="aescm.css"?>
+  </head>
+  
+  <body>
+    <h1>Polyglot Feature</h1>
+    <address>TAGA Yoshitaka
+&lt;<a href="mailto:tagga@tsuda.ac.jp">tagga@tsuda.ac.jp</a>&gt;</address>
+    <p>
+<em>Aescm</em>
+is designed to be interpreter independent.
+This does not mean Scheme interpreter independent.
+You can embed code of most interpreter languages.
+But you can use this feature only when you has run <em>configure</em>
+script with <code>--with-polyglot</code> option.</p>
+
+    <p>
+Languages you can embed must satisfy the following conditions:
+</p>
+    <ol>
+      <li>Strings are bracketted between two <em>&quot;</em>s.
+In them, <em>\\</em> is treated as <em>\</em>,
+<em>\&quot;</em> as <em>&quot;</em>,
+and <em>\n</em> as <em>newline</em>.
+It does not have the upper limit of the length of strings.</li>
+      <li>It has a procedure to write out objects without adding
+<em>newline</em>.</li>
+      <li>It has a way to print out the external expressions
+of any objects other than strings.</li>
+      <li>Commands are processed in order.</li>
+    </ol>
+
+    <p>
+Information on your interpreter language is read
+from a simple configuratioon file, about a dozen of lines at most.
+This distribution comes with the configuration files for
+Awk, C Shell, Octave, Perl, Python, Rugy, Schem, Shell, and Tcl.
+They are stored in <code>$(pkgdatadir)/lang</code>
+(maybe in <code>/usr/local/share/aescm/lang/</code>).
+</p>
+
+    <h2>File format</h2>
+    <p>Here is the most comlicated and longest configuration file.
+This is for <em>Awk</em>.
+
+    <blockquote>
+      <pre>
+# awk - configurations for the Awk language
+awk -f /dev/stdin
+# initialization
+BEGIN {
+# assign
+@VAR@ = @VAL@;
+# string
+printf &quot;@STR@&quot;;
+# display
+printf (@EXP@);
+# finalization
+ exit;
+}
+</pre>
+    </blockquote>
+
+    <blockquote>
+      <pre>
+;; scm - configurations for the Scheme language
+gosh -b
+;; nil
+#f
+;; bind
+(define @VAR@ @VAL@)
+;; assign
+(set! @VAR@ @VAL@)
+;; string
+(display "@STR@")
+;; display
+(display @EXP@)
+;; newline
+(newline)
+</pre>
+    </blockquote>
+
+
+    <h3>File Size</h3>
+    <p>The size of configuration files must be less than
+511 Bytes.</p>
+    <h3>Leading Character and Namespace</h3>
+    <p>
+The first character of a configuration file is the leading character.
+A line beginning with this character is used to separate records.
+It will be convenient if it is the comment character
+of your favorite interpreter language.</p>
+    <p>
+You must specify the namespace and the subnamespace for display mode
+in the second line as
+<q>&lt;?<em>namesapace</em> ...&gt;</q>.
+</p>
+    <h3>Other Records</h3>
+    <p>The first line of a record starts with the leading character.
+The first line's second field is the keyword for the record.
+Following lines are data themselves.</p>
+    <p>These are the keywords:</p>
+    <ul>
+      <li><a href="#initialization">initialization</a></li>
+      <li><a href="#nil">nil</a></li>
+      <li><a href="#bind">bind</a></li>
+      <li><a href="#assign">assign</a></li>
+      <li><a href="#string">string</a></li>
+      <li><a href="#expression">expression</a></li>
+      <li><a href="#newline">newline</a></li>
+      <li><a href="#finalization">finalization</a></li>
+    </ul>
+
+    <h4 id="command">command</h4>
+    <p>
+The interpreter and its arguments.
+See <a href="interpreter.html">the document of Scheme interpreters</a>
+to decide the arguments.
+But in most cases, your interpreter will need no arguments,
+for it may be wise enough to switch to a batch mode
+if stdin is a pipe.</p>
+
+    <h4 id="initialization">intialization</h4>
+    <p>
+The initialization code.
+This may has no lines.</p>
+
+    <h4 id="nil">nil</h4>
+    <p>The external representation of a value to be used
+to show it is not a string.</p>
+
+    <h4 id="bind">bind</h4>
+    <p>How to bind a variable to a value.
+The left side value is specified by <em>variable-name</em>
+or <em>variable_name</em> depending on the convention of the language.
+The right side value is specifed by <em>value</em>.</p>
+    <p>At least one of this and <a href="#assign">assign</a> record
+is required.</p>
+
+    <h4 id="assign">assign</h4>
+    <p>How to assign a variable to a value.
+The left side value is specified by <em>variable-name</em>
+or <em>variable_name</em> depending on the convention of the language.
+The right side value is specifed by <em>value</em>.</p>
+    <p>At least one of this and <a href="#bind">bind</a> record
+is required.</p>
+
+    <h4 id="string">string</h4>
+    <p>
+How to display a string.
+You must write a form to display a string <em>&quot;string&quot;</em>.</p>
+
+    <h4 id="expression">expression</h4>
+    <p>
+How to display an expression.
+You must write a form to display an expression.
+<em>expression</em> is used as keyword to show where it is placed.</p>
+
+    <h4 id="finalization">finalization</h4>
+    <p>
+The finalization code.
+This may has no lines.</p>
+
+    <hr/>
+    <div>
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=68657&amp;type=1" width="88" height="31" border="0"" alt="SourceForge.net Logo" /></a>
+</div>
+  </body>
+</html>
