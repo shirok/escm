@@ -21,6 +21,7 @@ struct escm_form_three {
 struct escm_lang {
   char *name;            /* the name space */
   int scm_p;
+  char **backend;
   struct escm_form_two literal;
   struct escm_form_two display;
   struct escm_form_three format;

@@ -15,7 +15,11 @@
 char *strncpy(char *dest, const char *src, size_t n);
 char *strncat(char *dest, const char *src, size_t n);
 int strcmp(const char *s1, const char *s2);
+#  if defined(HAVE_STRCHR)
 char *strchr(const char *s, int c);
+#  else /* !defined(HAVE_STRCHR) */
+#    define strchr(s, c) index((s), (c))
+#  endif /* defined(HAVE_STRCHR) */
 #endif /* HAVE_STRING_H and HAVE_STRINGS_H */
 #include <ctype.h>
 
@@ -27,20 +31,6 @@ char *strchr(const char *s, int c);
 #define ESCM_LANGCFG_SIZE 512
 char buffer[ESCM_LANGCFG_SIZE];
 static struct escm_lang mylang;
-
-#if !defined(HAVE_STRCHR)
-char *
-my_strchr(const char *s, int c)
-{
-  char *p = (char *)s;
-  while (*p != c) {
-    if (!*p) return NULL;
-    p++;
-  }
-  return p;
-}
-#define strchr(s, c) my_strchr(s, c)
-#endif /* !defined(HAVE_STRCHR) */
 
 /* read_conf(lang)
  */
@@ -158,18 +148,19 @@ parse_form3(char *data, struct escm_form_three *p)
 }
 
 struct escm_lang *
-parse_lang(const char *name, const char **interp)
+parse_lang(const char *name)
 {
   char *ptr, *rname, *data;
 
   if (!read_conf(name)) escm_error(_("can't open - %s"), name);
-  ptr = get_data2(buffer, &(mylang.name), (char **)interp);
-  if (ptr == NULL || mylang.name == NULL || *interp == NULL)
+  ptr = get_data2(buffer, &(mylang.name), &data);
+
+  if (ptr == NULL || mylang.name == NULL || data == NULL)
     escm_error(_("broken config file - %s"), name);
 
   if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "scheme") == 0)
     mylang.scm_p = 1;
-
+  mylang.backend = tokenize_cmd(data);
   mylang.nil = "\"\"";
 
   while (ptr) {
