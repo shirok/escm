@@ -1,5 +1,5 @@
 ;; scm - configurations for the Scheme language
-gosh -b
+@SCHEME@
 ;; nil
 #f
 ;; bind
