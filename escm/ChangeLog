@@ -1,5 +1,7 @@
 2004-12-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
+	* src/escm.c (escm_error): Common error function.
+
 	* src/fifo.c, src/filter.c, src/cgimain.c (main): Removed
 	variable escm_output.
 

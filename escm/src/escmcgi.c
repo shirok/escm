@@ -11,10 +11,10 @@
 #ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
+#include <limits.h>
 #include "escm.h"
 #include "escmcgi.h"
 
-#define setter bind
 /* escm_header(lang, outp)
  */
 void
@@ -38,51 +38,33 @@ escm_header(const struct escm_lang *lang, FILE *outp)
 int
 escm_query_string(const struct escm_lang *lang, FILE *outp)
 {
-  const char *content_length;
-  const char *method;
   char *p;
-  long llen;
-  int len;
-  int c;
 
-  method = getenv("REQUEST_METHOD");
-  if (method && method[0] == 'P') {
+  p = getenv("REQUEST_METHOD");
+  if (p && p[0] == 'P') {
+    const char *content_length;
+    long llen;
+    int len;
+    int c;
+
     content_length = getenv("CONTENT_LENGTH");
-    if (content_length == NULL) {
-      return FALSE;
-    } else {
-      if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-      fputs("escm_query_string", outp);
-      if (lang->setter.infix) fputs(lang->setter.infix, outp);
-      llen = strtol(content_length, &p, 10);
-      if (*p == '\0') {
-	fputc('"', outp);
-	len = (int) llen;
-	while ((c = getc(stdin)) != EOF && len-- > 0) {
-	  /* better replace the next line with an error check. */
-	  if (c == '"' || c == '\\') fputc('\\', outp);
-	  fputc(c, outp);
-	}
-	fputc('"', outp);
-      } else {
-	fputs(lang->nil, outp);
-      }
-      if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
-      fputc('\n', outp);
-    }
+    if (content_length == NULL) return FALSE;
+    llen = strtol(content_length, &p, 10);
+    if (*p != '\0') return FALSE;
+    if (llen < 0 || llen > INT_MAX) return FALSE;
+    escm_bind_pre(lang, "escm_query_string", outp);
+    fputc('"', outp);
+    len = (int) llen;
+    while ((c = getc(stdin)) != EOF && len-- > 0)
+      escm_putc(c, outp);
+    fputc('"', outp);
+    if (len != 0) return FALSE;
+    escm_bind_post(lang, outp);
   } else {
-    p = getenv("QUERY_STRING");
-    if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-    fputs("escm_query_string", outp);
-    if (lang->setter.infix) fputs(lang->setter.infix, outp);
-    if (p == NULL) fputs(lang->nil, outp);
-    else escm_puts(p, outp);
-    if (lang->setter.suffix) fputs(lang->setter.suffix, outp);
-    fputc('\n', outp);
+    escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
   }
   return TRUE;
 }
-#undef setter
 
 /* escm_skip_shebang(inp) - skip the sharp-bang line.
  */

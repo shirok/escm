@@ -28,15 +28,7 @@
 
 extern struct escm_lang deflang;
 
-/* xerror(message)
- */
-static void
-xerror(const char *mesg)
-{
-  fputs("escm(cgi): ", stderr);
-  fputs(mesg, stderr);
-  exit(EXIT_FAILURE);
-}
+#define XERROR(msg) escm_error(PACKAGE "(cgi)", msg)
 
 /* main function
  */
@@ -65,8 +57,7 @@ main(int argc, char **argv)
 
   if (process_flag) {
     outp = popen(ESCM_BACKEND, "w");
-    if (outp == NULL)
-      xerror("can't invokde the backend " ESCM_BACKEND ".\n");
+    if (outp == NULL) XERROR(NULL);
   } else {
     fputs("Content-type: text/plain\r\n\r\n", outp);
   }
@@ -77,31 +68,27 @@ main(int argc, char **argv)
   } else if (optind + 1 == argc) {
     infile = argv[optind];
   }
-  if (infile == NULL)
-    xerror("don't know which file to open.\n");
+  if (infile == NULL) XERROR("no file specified");
 
   escm_init(&deflang, outp);
   escm_bind(&deflang, "escm_version", PACKAGE " " VERSION "(cgi)", outp);
   escm_bind(&deflang, "escm_input_file", infile, outp);
   escm_bind(&deflang, "escm_interpreter", ESCM_BACKEND, outp);
   if (!escm_query_string(&deflang, outp))
-    xerror("inconsistent environment variables.\n");
+    XERROR("inconsistent environment variables");
   inp = fopen(infile, "r");
-  if (inp == NULL)
-    xerror("can't open the input file.\n");
+  if (inp == NULL) XERROR(NULL);
 
   escm_skip_shebang(inp);
   escm_add_header(&deflang, inp, outp);
 
-  if (!escm_preproc(&deflang, inp, outp))
-    xerror("unterminated instruction.\n");
+  if (!escm_preproc(&deflang, inp, outp)) XERROR("unterminated instruction");
   fclose(inp);
 
   escm_finish(&deflang, outp);
 
   if (process_flag) {
-    if (pclose(outp) == -1)
-      xerror("can't closee the pipe.\n");
+    if (pclose(outp) == -1) XERROR(NULL);
   }
   return 0;
 }

@@ -16,6 +16,14 @@
 #include <ctype.h>
 #include "escm.h"
 
+void
+escm_error(const char *prog, const char *msg)
+{
+  if (msg == NULL) perror(prog);
+  else fprintf(stderr, "%s: %s\n", prog, msg);
+  exit(EXIT_FAILURE);
+}
+
 int escm_array_sep = '\t';
 #define PUTS_IF_TRUE(str, outp) if (str) fputs((str), (outp))
 

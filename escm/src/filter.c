@@ -33,6 +33,8 @@ extern struct escm_lang deflang;
 
 struct escm_lang * parse_lang(const char *name);
 
+#define XERROR(msg) escm_error(argv[0], msg)
+
 /* main function
  */
 int
@@ -97,10 +99,7 @@ main(int argc, char **argv)
       process_flag = FALSE;
       break;
     case 'e':
-      if (n_expr == EOPT_SIZE) {
-	fprintf(stderr, "%s: too many -e options.", argv[0]);
-	exit(EXIT_FAILURE);
-      }
+      if (n_expr == EOPT_SIZE) XERROR("too many -e options.");
       expr[n_expr] = optarg;
       n_expr++;
       break;
@@ -131,17 +130,11 @@ main(int argc, char **argv)
     if (lang_name) lang = parse_lang(lang_name);
     if (!interp) interp = getenv("ESCM_BACKEND");
   }
-  if (lang == NULL) {
-    fprintf(stderr, "%s: invalid language configuration", argv[0]);
-    exit(EXIT_FAILURE);
-  }
+  if (lang == NULL) XERROR("invalid language configuration");
 
   /* invoke the interpreter. */
   if (process_flag) outp = popen(interp, "w");
-  if (outp == NULL) {
-    perror(argv[0]);
-    exit(EXIT_FAILURE);
-  }
+  if (outp == NULL) XERROR(NULL);
 
   /* initialization */
   escm_init(lang, outp);
@@ -165,21 +158,12 @@ main(int argc, char **argv)
   }
 
   if (optind == argc) {
-    if (!escm_preproc(lang, stdin, outp)) {
-      fprintf(stderr, "%s: unterminated instruction: %s\n", argv[0], "stdin");
-      exit(EXIT_FAILURE);
-    }
+    if (!escm_preproc(lang, stdin, outp)) XERROR("unterminated instruction");
   } else {
     for (i = optind; i < argc; i++) {
       inp = fopen(argv[i], "r");
-      if (inp == NULL) {
-	perror(argv[i]);
-	exit(EXIT_FAILURE);
-      }
-      if (!escm_preproc(lang, inp, outp)) {
-	fprintf(stderr, "%s: unterminated instruction: %s\n", argv[0], argv[i]);
-	exit(EXIT_FAILURE);
-      }
+      if (inp == NULL) XERROR(NULL);
+      if (!escm_preproc(lang, inp, outp)) XERROR("unterminated instruction");
       fclose(inp);
     }
   }
@@ -189,10 +173,7 @@ main(int argc, char **argv)
 
   /* close the pipe. */
   if (process_flag) {
-    if (pclose(outp) == -1) {
-      perror(argv[0]);
-      exit(EXIT_FAILURE);
-    }
+    if (pclose(outp) == -1) XERROR(NULL);
   }
   return 0;
 }

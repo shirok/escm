@@ -40,6 +40,8 @@ struct escm_lang {
 
 extern int escm_array_sep;
 
+void escm_error(const char *prog, const char *msg);
+
 void escm_putc(int c, FILE *outp);
 void escm_puts(const char *str, FILE *outp);
 void escm_puts_array(char *const *arr, FILE *outp);
@@ -49,8 +51,10 @@ void escm_finish(const struct escm_lang *lang, FILE *outp);
 
 void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 void escm_bind_array(const struct escm_lang *lang, const char *var, char *const *arr, FILE *outp);
+void escm_bind_pre(const struct escm_lang *lang, const char *var, FILE *outp);
+void escm_bind_post(const struct escm_lang *lang, FILE *outp);
 
-/* converter */
 int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);
+
 
 #endif /* ESCM_H */

@@ -21,20 +21,7 @@
 #define MAXLEN (PATH_MAX * 2)
 #define MAXWAIT 10
 
-void
-my_syserr(void)
-{
-  perror("aescm(fifo)");
-  exit(EXIT_FAILURE);
-}
-void
-my_error(const char *msg)
-{
-  fputs("aescm(fifo): ", stderr);
-  fputs(msg, stderr);
-  fputs("\n", stderr);
-  exit(EXIT_FAILURE);
-}
+#define XERROR(msg) escm_error(PACKAGE "(fifo)")
 
 /* check if the server's input named pipe, FIFO.in for example,
    exists; if it is not the case, invoke the server and wait till
@@ -48,7 +35,7 @@ check_server(const char *server, const char *fifo_in)
     struct timespec req;
 
     ret = snprintf(cmdline, MAXLEN, "%s %s &", server, fifo_in);
-    if (ret >= MAXLEN) my_error("command line too long");
+    if (ret >= MAXLEN) XERROR("command line too long");
     system(cmdline);
     req.tv_sec = 0;
     req.tv_nsec = 100000000; /* 0.1 sec */
@@ -56,7 +43,7 @@ check_server(const char *server, const char *fifo_in)
       if (access(fifo_in, W_OK) == 0) return;
       nanosleep(&req, NULL);
     }
-    my_error("can't invoke server");
+    XERROR("can't invoke server");
   }
 }
 /* make a named pipe FIFO.PID through which the server sends the
@@ -66,9 +53,9 @@ make_fifo_out(char *fifo_out)
 {
   int ret;
   ret = snprintf(fifo_out, PATH_MAX, FIFO_OUT_FMT, getpid());
-  if (ret >= PATH_MAX) my_error("path too long");
+  if (ret >= PATH_MAX) XERROR("path too long");
   ret = mkfifo(fifo_out, 0600);
-  if (ret != 0) my_syserr();
+  if (ret != 0) XERROR(NULL);
 }
 
 /* open and lock FIFO.in */
@@ -83,10 +70,10 @@ open_and_lock(const char *fifo_in, struct flock *lock)
   lock->l_start = 0;
   lock->l_len = 0;
   fd = open(fifo_in, O_WRONLY);
-  if (fd < 0) my_syserr();
+  if (fd < 0) XERROR(NULL);
   fcntl(fd, F_SETLKW, lock);
   fp = fdopen(fd, "w");
-  if (fp == NULL) my_syserr();
+  if (fp == NULL) XERROR(NULL);
   return fp;
 }
 /* unlock and close FIFO.in */
@@ -105,7 +92,7 @@ copy_fifo_out(const char *fifo_out)
   char buf[BUFSIZ];
   FILE *fp;
   fp = fopen(fifo_out, "r");
-  if (fp == NULL) my_syserr();
+  if (fp == NULL) XERROR(NULL);
   while (fgets(buf, BUFSIZ, fp) != NULL) {
     fputs(buf, stdout);
   }
@@ -137,15 +124,15 @@ main(int argc, char *argv[])
   escm_bind(&deflang, "escm_input_file", infile, outp);
   escm_bind(&deflang, "escm_interpreter", SERVER, outp);
   if (!escm_query_string(&deflang, outp))
-    my_error("inconsistent environment variables.\n");
+    XERROR("inconsistent environment variables");
   inp = fopen(infile, "r");
-  if (inp == NULL) my_syserr();
+  if (inp == NULL) XERROR(NULL);
 
   escm_skip_shebang(inp);
   escm_add_header(&deflang, inp, outp);
 
   if (!escm_preproc(&deflang, inp, outp))
-    my_error("unterminated instruction.\n");
+    XERROR("unterminated instruction");
   fclose(inp);
   escm_finish(&deflang, outp);
 
