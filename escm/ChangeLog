@@ -1,4 +1,20 @@
+2003-07-25  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Invoke getopt() in main().
+
+	* src/misc.c: Include <string.h>.
+
+	* configure.ac, doc/Makefile.am: Check pod2man and pod2html.
+
+	* src/escm.h, src/filter.c, src/lang.awk, src/lang.c: Added
+	backend field to struct escm_lang.
+
+	* src/filter.c src/misc.h, src/misc.c (tokenize_cmd): Moved this
+	function from filter.c to misc.c.
+
 2003-07-24  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/lang.c (strchr): Preprocessed as index() if not found.
 
 	* src/filter.c (parse_opts): Accept long options.
 
