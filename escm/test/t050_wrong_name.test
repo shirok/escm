@@ -1,0 +1,26 @@
+# t050_wrong_name.test -*- sh -*-
+
+. $srcdir/Init.sh
+
+# Check the environment, and exit 77 if you skip this test.
+
+# ${PROG} input 1> out 2> err
+# where
+#   input  -- the input file
+#   out    -- stdout
+#   out-ok -- expected stdout
+#   err    -- stderr
+#   err-ok -- expected stderr
+# Files are compared by diff with $DIFF_OPTS options.
+#
+# Generate input, out-ok and err-ok.
+# Then invoke the program as above.
+
+echo  "<?awk print 3;?>" > input
+echo  "<?awk print 3;?>" > out-ok
+
+${PROG} input 1> out 2> err
+
+. $srcdir/Finish.sh
+
+# end
