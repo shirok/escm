@@ -1,0 +1,19 @@
+;; lisp - configurations for the Common Lisp language (GNU CLISP)
+lisp -quiet -batch -eval '(setf *prompt* "")'
+;; init
+(let (*escm-version* *escm-input-file* *escm-output-file*
+*escm-interpreter* *escm-query-string*)
+;; identifier
+*lisp*
+;; nil
+nil
+;; assign
+(setq @VAR@ @VAL@)
+;; string
+(princ "@STR@")
+;; display
+(princ @EXP@)
+;; newline
+(princ #\nl)
+;; finish
+(quit))

@@ -1,0 +1,20 @@
+;; scm - configurations for the Scheme language
+scm -q
+;; init
+(let ()
+;; identifier
+*lisp*
+;; nil
+#f
+;; bind
+(define @VAR@ @VAL@)
+;; assign
+(set! @VAR@ @VAL@)
+;; string
+(display "@STR@")
+;; display
+(display @EXP@)
+;; newline
+(newline)
+;; finish
+(string->symbol ""))

@@ -80,7 +80,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 with_backend = @with_backend@
 
-LANG_FILES = awk csh lisp octave perl python ruby scm sh tcl
+LANG_FILES = awk csh lisp lisp-cmucl perl python ruby scm scm-scm sh tcl
 
 @POLYGLOT_TRUE@langdir = $(pkgdatadir)/lang
 @POLYGLOT_TRUE@lang_DATA = $(LANG_FILES)
