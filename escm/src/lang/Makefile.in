@@ -42,8 +42,7 @@ subdir = src/lang
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/scm.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -66,6 +65,8 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CGIBIN = @CGIBIN@
+CGI_TOOL = @CGI_TOOL@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -76,7 +77,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ESCM_BACKEND = @ESCM_BACKEND@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -127,11 +127,10 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-with_backend = @with_backend@
 
 # Do not forget to add a new config file.
 LANG_FILES = awk csh lisp lisp-cmucl perl python ruby scm-scm sh tcl
-FIFO_FILES = scm-fifo
+# FIFO_FILES = scm-fifo
 langdir = $(pkgdatadir)/lang
 lang_DATA = $(LANG_FILES) scm
 EXTRA_DIST = $(LANG_FILES) $(FIFO_FILES) scm.in

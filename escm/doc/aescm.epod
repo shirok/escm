@@ -31,7 +31,7 @@ B<<?scm:d (string-titlecase PACKAGE)?>> in fact converts
 a document to a program
 and makes it executed by a backend interpreter.
 This mechanism allows us to use
-most favorite languages and most favorite interpreters.
+<?scm:d PACKAGE?> with most script languages.
 
 =head2 OPTIONS
 
@@ -58,10 +58,6 @@ If the file is not in
 you should specify the full path
 or a relative path beginning with C<.>.
 
-=item -o
-
-Specify the output file.
-
 =item --help
 
 Print a short help message.
@@ -72,7 +68,7 @@ Print version information.
 
 =back
 
-=head2 VARIABLES
+=head2 SCRIPT LANGUAGE VARIABLES
 
 =over 2
 
@@ -80,11 +76,6 @@ Print version information.
 
 The name of the file which the tool is currently processing.
 The value is false if the input is stdin.
-
-=item escm_output_file
-
-The name of the output file.
-It is false if the output is stdout.
 
 =item escm_interpreter
 
@@ -158,8 +149,10 @@ The stable version processes only the first one.
 =head2 CGI
 
 CGI features have been removed since B<aescm> version 0.30.
-You can use B<aescm.cgi> in the sharp-bang line of
-CGI scripts or as a handler CGI program.
+Instead,
+you can use B<<?scm:d PACKAGE?>.cgi>
+in the sharp-bang line of CGI scripts
+or as a handler CGI program.
 
 =head1 AUTHOR
 

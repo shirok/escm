@@ -8,6 +8,9 @@ document :
 	cd doc && make document
 
 cgi :
-	cd src && make aescm.cgi
+	cd src && make cgi
+
+cgi-install :
+	cd src && make install-cgiPROGRAMS
 
 # end of Makefile.am

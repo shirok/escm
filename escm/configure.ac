@@ -25,19 +25,25 @@ fi
 AC_SUBST(DEFAULT_LANG)
 AC_DEFINE_UNQUOTED(DEFAULT_LANG, ["$DEFAULT_LANG"], ["the default language"])
 
-AC_ARG_WITH([scheme], AS_HELP_STRING([--with-scheme], [the default scheme program and its arguments (gosh -b)]))
-if test "$with_scheme" = "yes" || test "$with_scheme" = ""; then
+AC_ARG_WITH([scheme], AS_HELP_STRING([--with-scheme], [the default scheme program and its arguments (gosh -b)]),
+[if test "$withval" = "yes" ; then
    SCHEME="gosh -b"
-elif test "$with_default" = "no"; then
+elif test "$withval" = "no" || test "$withval" = ""; then
    SCHEME="guile -s /dev/stdin"
 else
-   SCHEME="$with_scheme"
-fi
+   SCHEME="$withval"
+fi],
+[SCHEME="guile -s /dev/stdin"])
 AC_SUBST(SCHEME)
 
-# Checks for the backend interpreter.
-AC_ARG_WITH([backend], [  --with-backend="interpreter arg ... "   specify the backend interpreter (gosh).])
-AC_ESCM_CHECK_BACKEND([gosh guile])
+AC_ARG_WITH([cgibin], AS_HELP_STRING([--with-cgibin=DIR], [the cgi-bin directory.]),
+[if test "$withval" = "yes" || test "$withval" = ""; then
+  AC_MSG_FAILURE("--with-cgibin=DIR -- requires a directory.")
+fi
+CGIBIN=$withval
+CGI_TOOL=aescm.cgi
+AC_SUBST(CGI_TOOL)
+AC_SUBST(CGIBIN)])
 
 # Checks for libraries.
 # Checks for header files.

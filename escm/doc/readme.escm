@@ -39,57 +39,42 @@ which is a tool for Scheme.</p>
 in fact converts
 a document to a program
 and makes it executed by a backend interpreter.
-This mechanism allows us to use
-most favorite languages and most favorite interpreters.</p>
+This mechanism allows us to use it
+with most script languages.</p>
 
     <p>Since <?scm:d PACKAGE?> 0.30,
 many experimental features have been removed,
 and the tool has been divided into
 a filter tool and a CGI tool.
 By default, only the filter tool is compiled and installed.
-The CGI tool must be installed manually.
-See <a href="cgi.html">cgi.html</a> for information
-on installation and configurations of the CGI tool.
+To compile and install the CGI tool,
+see <a href="cgi.html">cgi.html</a>.
 </p>
 
     <h2>Installation</h2>
-    <p>If you want to use <?scm:d gauche?>
-(Scheme interpreter written by Shiro Kawai,
-the author of the original escm) as default backend
-or <?scm:d guile?> when Gauche is not installed,
-type as usual:</p>
+    <p>You'd better specify your favorite scheme interpreter's name and 
+option arguments with <code>--with-scheme</code> option.
+Some information is found in <a href="interpreter.html">interpreter.html</a>.
+The following example is for <?scm:d gauche?>:
+</p>
+
     <blockquote><pre>
-./configure
+./configure --with-scheme="gosh -b"
 make
 make install
 </pre>
     </blockquote>
 
     <h2>Environment Variables</h2>
-     <p>You can specify the backend interpreter
-by setting it with options
-to environment vairable <code>ESCM_BACKEND</code>.
+     <p>You can overwrite the backend interpreter
+by environment vairable <code>ESCM_BACKEND</code>.
 Command line options for some popular Schme implementations
 are listed in
 doc/<?scm:d (link-url "interpreter.html")?>.
 You can also specify the default scripting languge
 with environment variable <code>ESCM_DEFAULT</code>.</p>
 
-    <h2>CGI</h2>
-    <p>This package comes with a CGI tool named
-<strong><?scm:d PACKAGE?>.cgi</strong>,
-which you should install manually.
-The query string by POST method is bound to
-<code>escm_query_string</code>,
-for you cannot directly get it in a CGI script.
-It is also bound if the method is GET.</p>
-<p>You can use it as a handler CGI program.
-See
-<?scm:d
-(link-url "http://httpd.apache.org/docs-2.0/handler.html"
-           "the handler document of Apache")?> for settings.</p>
-
-    <h2>Language Configuration File</h2>
+    <h2>Language Configuration Files</h2>
 The language configuration files find themselves
 in <code>$(datadir)/aescm/lang</code>
 (e.g. <code>/usr/local/share/aescm/lang</code>).
@@ -108,5 +93,6 @@ to
 or <?scm:d (link-mail PACKAGE_BUGREPORT)?>.
 </address>
     <div>
+<?scm:d (sourceforge-logo)?>
 </div>
 </body></html>

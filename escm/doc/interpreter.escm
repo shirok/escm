@@ -49,8 +49,6 @@ This interpreter is our default backend.</p></dd>
       <dd><blockquote>
 	  <pre><code>guile -s /dev/stdin</code></pre>
 	</blockquote>
-        <p><em>configure script</em> will automatically add these options.
-This interpreter is used as default if <em>Gauche</em> is not found.</p>
       </dd>
       <dt>Ksi 3.4.1</dt>
       <dd><blockquote>
@@ -83,7 +81,7 @@ file for Scheme.  You should use <em>scm-scm</em> instead.</p>
       <dd><blockquote>
 	  <pre><code>stklos</code></pre>
 	</blockquote>
-<p>Previous versions may require <em>-q</em> option
+<p>Some old versions may require <em>-q</em> option
 to be used in a CGI.</p>
 </dd>
       <dt>TinyScheme 1.33</dt>

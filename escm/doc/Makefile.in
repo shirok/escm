@@ -42,8 +42,7 @@ subdir = doc
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.scm.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -69,6 +68,8 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CGIBIN = @CGIBIN@
+CGI_TOOL = @CGI_TOOL@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -79,7 +80,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ESCM_BACKEND = @ESCM_BACKEND@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -130,20 +130,19 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-with_backend = @with_backend@
 ESCM = $(top_builddir)/src/aescm -l $(top_srcdir)/src/lang/scm -i "gosh -b -I."
 POD2MAN = pod2man
 POD2HTML = pod2html
 HTMLDUMP = w3m -dump
-SUFFIXES = .1 .html .epod .escm
+SUFFIXES = .1 .html .epod .pod .escm
 man_MANS = aescm.1
-htmldir = $(prefix)/share/doc/aescm
+htmldir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
 html_DATA = gimmick.html interpreter.html readme.html install.html cgi.html
-EXTRA_DIST = $(man_MANS:.1=.epod) $(man_MANS:.1=.html) $(html_DATA:.html=.escm) $(man_MANS) $(html_DATA)
+EXTRA_DIST = $(man_MANS:.1=.epod) $(man_MANS:.1=.html) $(html_DATA:.html=.escm) $(man_MANS) $(html_DATA) helper.scm config.scm.in
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .1 .html .epod .escm
+.SUFFIXES: .1 .html .epod .pod .escm
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -362,10 +361,14 @@ uninstall-man: uninstall-man1
 
 all : $(htm_DATA) $(man_MANS)
 
-.epod.1 :
+.epod.pod :
 	$(ESCM) $< > $*.pod
-	$(POD2MAN) -c "" -r "" $*.pod > $@
-	$(POD2HTML) $*.pod > $*.html
+
+.pod.1 :
+	$(POD2MAN) -c "" -r "" $< > $@
+
+.pod.html :
+	$(POD2HTML) $< > $*.html
 
 .escm.html :
 	LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *language* 'en)" $< > $@

@@ -1,3 +1,7 @@
+2004-12-24  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/cgimain.c, src/langconf.c: Removed ESCM_BACKEND.
+
 2004-12-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/filter.c (main): Made the default language not configurable.

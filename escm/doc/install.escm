@@ -1,20 +1,9 @@
-<?xml version="1.0"?><!-- -*- mode:pxml -*- -->
-<!-- $Id$ -->
-<!DOCTYPE html
-     PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
-     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
+  "http://www.w3.org/TR/xhtml-basic/DTD/xhtml-basic10.dtd">
 <?scm
   (load "config.scm")
   (load "helper.scm")
-  (define gauche
-    (link-url "http://sourceforge.net/projects/gauche/"
-              "Gauche"))
-  (define guile
-    (link-url "http://www.gnu.org/software/guile/guile.html"
-               "Guile"))
-  (define scm
-    (link-url "http://swissnet.ai.mit.edu/~jaffer/SCM.html"
-               "SCM"))
 ?>
 <html>
   <head>
@@ -22,124 +11,81 @@
   </head>
   <body>
     <h1>Installation</h1>
-    <p>Installation will be done
-as usual
-if the default scripting langauge is Scheme
-and if the backend interpreter is <?scm:d gauche?> or <?scm:d guile?>.</p>
-    <blockquote>
-      <pre><code>
-./configure
+    <p>This version (<?scm:d VERSION?>) consists of
+two programs:
+a filter tool named <strong><?scm:d PACKAGE?></strong>,
+and
+a CGI tool named <strong><?scm:d PACKAGE?>.cgi</strong>.
+By default only the filter tool will be compiled and installed.
+To install the CGI tool, see doc/<a href="cgi.html">cgi.html</a>.</p>
+
+    <p>As this tool uses <code>Autoconf</code> and <code>Automake</code>,
+the installation will be done as usual,
+but you may have to specify <a href="#scheme"><code>--with-scheme</code></a>
+option. If you omit it, <?scm:d guile?> will be used as the default
+backend interpreter.</p>
+
+    <pre><code>./configure --with-scheme="<em>scheme</em> <em>-options</em>
 make
-make install
+make install</code></pre>
+
+    <h2>Default Language</h2>
+    <p>The default language is Scheme
+and its XML namespace is <code>scm</code>.
+But you can change the default interpreter language
+by configuring with <code>--with-default</code> option.</p>
+
+    <p>You must specify this option if your Scheme interpreter is
+<?scm:d scm?>.  The default language configuration file for
+Scheme does not work with this interpreter.
+The configuration file for <strong>scm</strong> is
+<em>scm-scm</em>. So run the configure script as follows:</p>
+    <pre><code>./configure --with-default=scm-scm
 </code></pre>
-    </blockquote>
-    <p>I will describe the pecular settings for this tool.
-Consult the documents of Autotool
-to know other settings,
-for example, to change the target directory.
-I added three configure options.</p>
-    <ul>
-      <li><em>--enable-polyglot</em></li>
-      <li><em>--with-default=LANG</em></li>
-      <li><em>--with-backend=INTERP</em></li>
-    </ul>
 
-    <h2>--enable-polyglot</h2>
-<p>
-The default configuration file is converted to a C source file
-and embedded when you compile this tool.
-To specify a computer language with <em>-l</em> option
-and make it read its configuration file,
-add <em>--enable-polyglot</em> option.
-To change the default language
-and/or the backend interpreter,
-see <a href="monoglot">below</a>.</p>
+    <p>The default language  can be overridden
+by environment variable <code>ESCM_DEFAULT</code>
+and its default interpreter by <code>ESCM_BACKEND</code>.</p>
 
-    <blockquote>
-      <pre>./configure --enable-polyglot</pre>
-    </blockquote>
-
-    <p>The language configuration files are to be
-installed to $(pkgdatadir)/lang,
-i.e. $(prefix)/share/aescm/lang.</p>
-
-    <h2 id="monoglot">--with-default, --with-backend</h2>
-
-    <p>To specify the default language configuration file,
-use <em>--with-default</em> option,
-and to specify the default backend interpreter,
-use <em>--with-backend</em> option.
-Some interpreters need different configuration files
-form the default ones for their language.
-The configuration files are in src/lang/
-The information on the interpreter is overridden
-by <em>--with-backend</em> option.
-</p>
-    <p>See below for more information on some implementations of
-Common Lisp and Scheme.</p>
-
-    <h3>Common Lisp</h3>
-    <p>The XML name space for Common Lisp is <em>lisp</em>.</p>
-    <p>CMUCL requires a different configuration file,
-for we have to send initialization code
-and specify complicated option arguments.</p>
-    <dl>
-      <dt>CLISP</dt>
-      <dd><blockquote>
-	  <pre>./configure --with-default=lisp</pre>
-	</blockquote>
-</dd>
-      <dt>CMUCL</dt>
-      <dd><blockquote>
-	  <pre>./configure --with-default=lisp-cmucl</pre>
-	</blockquote>
-</dd>
-    </dl>
-
-    <h3>Scheme</h3>
-    <p>Scheme is our default language.
-Its XML name space is <em>scm</em>.
-<?scm:d scm?> requires a different configuration file,
-for we have to send initialization code.</p>
-    <dl>
-      <dt>Gauche</dt>
-      <dd><blockquote>
-	  <pre>./configure</pre>
-	</blockquote>
-</dd>
-      <dt>Guile</dt>
-      <dd>
-<p>If Gauche is not installed, type:</p>
-<blockquote>
-	  <pre>./configure</pre>
-	</blockquote>
-<p>If Gauche is installed, type:</p>
-
-<blockquote>
-	  <pre>./configure --with-backend=guile</pre>
-	</blockquote>
-</dd>
-      <dt>SCM</dt>
-      <dd><blockquote>
-	  <pre>./configure --with-default=scm-scm</pre>
-	</blockquote>
-</dd>
-      <dt>Other Implementations</dt>
-      <dd>
-
-<p>You have to specify the backend interpreter and its
-command line arguments.
-The command line arguments for some implementations are listed
+    <h2 id="scheme">Scheme Interpreter</h2>
+    <p>Most other Scheme interpreters than <?scm:d scm?>
+work with the default language configuration file,
+but you may have to specify the program name and its option arguments
+with <code>--with-scheme</code> option.
+You will find Information on some interpreters
 in doc/<a href="interpreter.html">interpreter.html</a>.
-If your favorite interpreter is not in the list,
-consult doc/<a href="gimmick.html">gimmick.html</a> to find out
-its argument.</p>
-<p>This example is for Scsh:</p>
+The default interpreter is <?scm:d guile?>,
+for it seems to be installed most Unix or Linux boxes
+due to dependecy of some GNU programes.
+</p>
 
-<blockquote>
-	  <pre>./configure --with-backend="scsh -s /dev/stdin"</pre>
-	</blockquote>
-</dd>
-    </dl>
+    <p>To use <?scm:d gauche?>,
+a Scheme interpreter written by Kawai san
+who is the author of <?scm:d escm?>,
+as the default backend interpreter:</p>
+
+    <pre><code>./configure --with-scheme="gosh -b"</code></pre>
+
+    <p>or simply:</p>
+
+    <pre><code>./configure --with-scheme"</code></pre>
+
+    <h2>Language Configuration Files</h2>
+    <p>The language configuration files, which are in <code>src/lang</code>
+directory, will be installed in <code>$(pkgdatadir)/lang</code>,
+so in <code>$(datadir)/<?scm:d PACKAGE?></code>.
+To change <code>$(pkgdatadir)</code> to elsewhere,
+specify it in an argument of <code>make</code>, for example:</p>
+
+    <pre><code>make pkgdatadir=/opt/escm</code></pre>
+    <div><?scm:d (sourceforge-logo)?></div>
   </body>
 </html>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-default-dtd-file:"~/share/xml/xhtml-basic/xhtml-basic10.dtd"
+coding:utf-8
+sgml-declaration:"~/share/xml/xhtml-basic/xml1.dcl"
+End:
+-->

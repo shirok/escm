@@ -1,9 +1,9 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
-Version 0.31 (2004-12-*)
+Version 0.31 (2004-12-26)
 * Removed variable escm_output and option -o.
-* Added a CGI tool using a simple server with FIFOs.
 * Removed assign field from configuration files.
 * varaible escm_input_file are bound to a string concatenationg file names.
+* Documents are in $(datadir)/doc/aescm-VERSION.
 
 Version 0.30 (2004-12-04)
 * Separated a CGI tool from the filter tool.

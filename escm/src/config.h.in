@@ -3,9 +3,6 @@
 /* "the default language" */
 #undef DEFAULT_LANG
 
-/* Command line to invoke the backend interpreter. */
-#undef ESCM_BACKEND
-
 /* Define to 1 if you have the `getopt_long' function. */
 #undef HAVE_GETOPT_LONG
 
