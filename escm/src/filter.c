@@ -83,10 +83,10 @@ main(int argc, char **argv)
   char *interp = NULL;
   char **expr = NULL;
   int n_expr = 0;
+#define OPTSTR "EHce:f:h:i:l:o:"
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
-#define OPTSTR "EHce:f:h:i:l:o:"
   const struct option long_opt[] = {
     { "no-eval", 0, NULL, 'E' },
     { "no-header", 0, NULL, 'H', },
@@ -194,7 +194,11 @@ main(int argc, char **argv)
 #if defined(HAVE_GETOPT_LONG)
       printf(_("Try `%s --help' for more information.\n"), escm_prog);
 #else /* !defined(HAVE_GETOPT_LONG) */
+# ifdef ENABLE_POLYGLOT
       fprintf(stderr, "Usage: %s [-EHc] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
+# else
+      fprintf(stderr, "Usage: %s [-EHc] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-o OUTPUT] FILE ...\n", escm_prog);
+# endif /* ENABLE_POLYGLOT */
       fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
 #endif /* defined(HAVE_GETOPT_LONG) */
       exit(EXIT_FAILURE);
