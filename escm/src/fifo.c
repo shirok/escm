@@ -135,7 +135,6 @@ main(int argc, char *argv[])
   fprintf(outp, deflang.init, fifo_out);
   escm_bind(&deflang, "escm_version", PACKAGE " " VERSION "(cgi)", outp);
   escm_bind(&deflang, "escm_input_file", infile, outp);
-  escm_bind(&deflang, "escm_output_file", NULL, outp);
   escm_bind(&deflang, "escm_interpreter", SERVER, outp);
   if (!escm_query_string(&deflang, outp))
     my_error("inconsistent environment variables.\n");

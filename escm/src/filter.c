@@ -42,13 +42,12 @@ main(int argc, char **argv)
   FILE *inp;
   FILE *outp = stdout;
   int process_flag = TRUE;
-  char *output_file = NULL;
   char *lang_name = NULL;
   char *interp = ESCM_BACKEND;
   int n_expr = 0;
   char *expr[EOPT_SIZE];
 
-#define OPTSTR "Ee:i:l:o:"
+#define OPTSTR "Ee:i:l:"
 #if defined(HAVE_GETOPT_LONG)
   int long_idx;
   int help_flag = FALSE;
@@ -111,26 +110,15 @@ main(int argc, char **argv)
     case 'l':
       lang_name = optarg;
       break;
-    case 'o':
-      output_file = optarg;
-      break;
     default:
 #if defined(HAVE_GETOPT_LONG)
       printf("Try `%s --help' for more information.\n", argv[0]);
 #else /* !defined(HAVE_GETOPT_LONG) */
-      fprintf(stderr, "Usage: %s [-E] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", argv[0]);
+      fprintf(stderr, "Usage: %s [-E] [-e EXPR] [-i \"PROG ARG ...\"]\n       [-l LANG] FILE ...\n", argv[0]);
       fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
 #endif /* defined(HAVE_GETOPT_LONG) */
       exit(EXIT_FAILURE);
       /* not reached */
-    }
-  }
-
-  /* specify the output file if necessary. */
-  if (output_file) {
-    if (freopen(output_file, "w", stdout) == NULL) {
-      perror(argv[0]);
-      exit(EXIT_FAILURE);
     }
   }
 
@@ -158,8 +146,12 @@ main(int argc, char **argv)
   /* initialization */
   escm_init(lang, outp);
   escm_bind(lang, "escm_version", PACKAGE " " VERSION, outp);
-  escm_bind(lang, "escm_input_file", NULL, outp);
-  escm_bind(lang, "escm_output_file", output_file, outp);
+  if (optind == argc) {
+    escm_bind(lang, "escm_input_file", NULL, outp);
+  } else {
+    escm_bind_array(lang, "escm_input_file", argv + optind, outp);
+  }
+
   if (process_flag) {
     escm_bind(lang, "escm_interpreter", interp, outp);
   } else {
@@ -179,7 +171,6 @@ main(int argc, char **argv)
     }
   } else {
     for (i = optind; i < argc; i++) {
-      escm_assign(lang, "escm_input_file", argv[i], outp);
       inp = fopen(argv[i], "r");
       if (inp == NULL) {
 	perror(argv[i]);

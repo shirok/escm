@@ -83,7 +83,6 @@ main(int argc, char **argv)
   escm_init(&deflang, outp);
   escm_bind(&deflang, "escm_version", PACKAGE " " VERSION "(cgi)", outp);
   escm_bind(&deflang, "escm_input_file", infile, outp);
-  escm_bind(&deflang, "escm_output_file", NULL, outp);
   escm_bind(&deflang, "escm_interpreter", ESCM_BACKEND, outp);
   if (!escm_query_string(&deflang, outp))
     xerror("inconsistent environment variables.\n");

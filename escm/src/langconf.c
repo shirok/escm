@@ -115,8 +115,6 @@ main(int argc, const char** argv)
   put_two("display", lang->display, stdout);
   /* bind */
   put_three("bind", lang->bind, stdout);
-  /* assign */
-  put_three("assign", lang->assign, stdout);
   /* nil */
   fputs("  ", stdout);
   put_string_or_null(lang->nil, stdout);

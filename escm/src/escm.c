@@ -16,53 +16,106 @@
 #include <ctype.h>
 #include "escm.h"
 
-/* escm_puts(str, outp) - escape str and put it.
+int escm_array_sep = '\t';
+#define PUTS_IF_TRUE(str, outp) if (str) fputs((str), (outp))
+
+/* escm_putc(c, outp) - output a character, but escape it if necessary.
+ */
+void
+escm_putc(int c, FILE* outp)
+{
+  int d = 0;
+  switch (c) {
+  case '\r': d = 'r'; break;
+  case '\n': d = 'n'; break;
+  case '\f': d = 'f'; break;
+  case '\t': d = 't'; break;
+  case '\\': d = '\\'; break;
+  case '"':  d = '"'; break;
+  }
+  if (d) {
+    fputc('\\', outp);
+    fputc(d, outp);
+  } else {
+    fputc(c, outp);
+  }
+}
+/* escm_puts_in(str, outp) - escape a string and output it without
+ * quotation marks.
+ */
+void
+escm_puts_in(const char *str, FILE* outp)
+{
+  const char *p = str;
+  while (*p) {
+    escm_putc(*p, outp);
+    p++;
+  }
+}
+/* escm_puts(str, outp) - escape str and output it with quotation marks.
  */
 void
 escm_puts(const char *str, FILE *outp)
 {
-  const char *p = str;
   fputc('"', outp);
-  while (*p) {
-    if (*p == '"' || *p == '\\') {
-      fputc('\\', outp);
-      fputc(*p, outp);
-    } else if (*p == '\n') {
-      fputc('\\', outp);
-      fputc('n', outp);
-    } else {
-      fputc(*p, outp);
+  escm_puts_in(str, outp);
+  fputc('"', outp);
+}
+/* escm_puts_array(arr, outp) - output a string concatenating
+ * all elements of ARR[] with SEP.
+ */
+void
+escm_puts_array(char *const *arr, FILE *outp)
+{
+  int i;
+  fputc('"', outp);
+  if (arr[0]) {
+    escm_puts_in(arr[0], outp);
+    for (i = 1; arr[i]; i++) {
+      escm_putc(escm_array_sep, outp);
+      escm_puts_in(arr[i], outp);
     }
-    p++;
   }
   fputc('"', outp);
 }
+/* escm_bind_pre(lang, var, outp) - the first part of escm_bind()
+ */
+void
+escm_bind_pre(const struct escm_lang *lang, const char *var, FILE *outp)
+{
+  PUTS_IF_TRUE(lang->bind.prefix, outp);
+  fputs(var, outp);
+  PUTS_IF_TRUE(lang->bind.infix, outp);
+}
+/* escm_bind_post(lang, outp) - the last part of escm_bind()
+ */
+void
+escm_bind_post(const struct escm_lang *lang, FILE *outp)
+{
+  PUTS_IF_TRUE(lang->bind.suffix, outp);
+  fputc('\n', outp);
+}
+
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void
 escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
-  if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
-  fputs(var, outp);
-  if (lang->bind.infix) fputs(lang->bind.infix, outp);
+  escm_bind_pre(lang, var, outp);
   if (val == NULL) fputs(lang->nil, outp);
   else escm_puts(val, outp);
-  if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
-  fputc('\n', outp);
+  escm_bind_post(lang, outp);
 }
-/* escm_assign(lang, var, val, outp) - assign var to val in lang
+/* escm_bind_array(lang, var, arr, outp) - bind var to arr in lang
  */
 void
-escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
+escm_bind_array(const struct escm_lang *lang, const char *var, char *const *arr, FILE *outp)
 {
-  if (lang->assign.prefix) fputs(lang->assign.prefix, outp);
-  fputs(var, outp);
-  if (lang->assign.infix) fputs(lang->assign.infix, outp);
-  if (val == NULL) fputs(lang->nil, outp);
-  else escm_puts(val, outp);
-  if (lang->assign.suffix) fputs(lang->assign.suffix, outp);
-  fputc('\n', outp);
+  escm_bind_pre(lang, var, outp);
+  escm_puts_array(arr, outp);
+  escm_bind_post(lang, outp);
 }
+
 /* escm_init(&lang, outp) - initialize the backend interpreter.
  */
 void

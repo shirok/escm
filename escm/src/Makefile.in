@@ -174,7 +174,7 @@ SUBDIRS = lang
 
 # Program
 BUILT_SOURCES = deflang.c
-CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT)
+CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT) fescm.cgi$(EXEEXT)
 langconf_SOURCES = langconf.c escm.c escm.h lang.c
 aescm_SOURCES = escm.c escm.h filter.c lang.c $(BUILT_SOURCES)
 aescm_cgi_SOURCES = cgimain.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)

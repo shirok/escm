@@ -167,9 +167,6 @@ parse_lang(const char *name)
     case HASH_KEY('b', 'i'): /* bind */
       if (!parse_form3(data, &(mylang.bind))) return NULL;
       break;
-    case HASH_KEY('a', 's'): /* assign */
-      if (!parse_form3(data, &(mylang.assign))) return NULL;
-      break;
     case HASH_KEY('i', 'n'): /* init */
       mylang.init = data;
       break;
@@ -195,9 +192,8 @@ parse_lang(const char *name)
       return NULL;
     }
   }
-  if (!mylang.assign.infix) return NULL;
+  if (!mylang.bind.infix) return NULL;
   if (!mylang.literal.prefix || !mylang.literal.suffix) return NULL;
-  if (!mylang.bind.infix) mylang.bind = mylang.assign;
   return &mylang;
 }
 /* end of lang.c */
