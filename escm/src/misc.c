@@ -14,18 +14,9 @@
 #  define EXIT_SUCCESS 0
 #  define EXIT_FAILURE 1
 void exit(int status);
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t size);
 #endif /* HAVE_STDLIB_H */
 
-#if defined(HAVE_STRING_H)
-#  include <string.h>
-#elif defined(HAVE_STRINGS_H)
-#  include <string.sh>
-#endif /* defined(HAVE_STRING_H) && defined(HAVE_STRINGS_H) */
-
 #include <stdarg.h>
-#include <errno.h>
 
 #include "escm.h"
 #include "misc.h"
@@ -78,58 +69,4 @@ void escm_error(const char *fmt, ...)
     exit(EXIT_FAILURE);
   }
 }
-
-/*========================================================
- * memory allocation functions with error handling
- *=======================================================*/
-/* escm_malloc(size) - malloc() 
- */
-void *
-escm_malloc(size_t size)
-{
-  void *ret;
-
-  ret = malloc(size);
-  if (ret == NULL) escm_error("memory exhausted");
-  return ret;
-}
-/* escm_realloc(ptr, size) - realloc()
- */
-void *
-escm_realloc(void *ptr, size_t size)
-{
-  void *ret;
-
-  if (ptr == NULL) ret = malloc(size);
-  else ret = realloc(ptr, size);
-  if (ret == NULL) escm_error("memory exhausted");
-  return ret;
-}
-
-/*=======================================================
- * argv = tokenize_cmd(cmdline)
- *=======================================================*/
-char **
-tokenize_cmd(const char *cmd)
-{
-  char *p;
-  char *str;
-  int i, n = 0;
-  char **argv = NULL;
-
-  i = 1 + strlen(cmd);
-  str = XMALLOC(char, i);
-  strcpy(str, cmd);
-  p = strtok(str, " \t");
-  for (i = 0; /**/; i++, p = strtok(NULL, " \t")) {
-    if (i == n) {
-      n += 4;
-      argv = XREALLOC(char *, argv, n);
-    }
-    argv[i] = p;
-    if (p == NULL) break;
-  }
-  return argv;
-}
-
 /* end of misc.c */

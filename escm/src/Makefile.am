@@ -13,7 +13,8 @@ deflang.c : lang.awk lang/@DEFAULT_LANG@
 
 bin_PROGRAMS = aescm 2aescm
 aescm_SOURCES  = escm.c escm.h misc.c misc.h fork.c $(BUILT_SOURCES)
-aescm_SOURCES += filter.c meta_arg.c meta_arg.h
+aescm_SOURCES += filter.c
+aescm_SOURCES += cmdline.c meta_arg.c meta_arg.h
 aescm_SOURCES += lang.awk
 
 2aescm_SOURCES = classic.c

@@ -21,26 +21,25 @@ extern const char *escm_file;
 extern int escm_lineno;
 extern struct escm_lang deflang;
 
-/* escm.c */
-void escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
-void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
-
 /* misc.c */
 void escm_html_header(const struct escm_lang *lang, FILE *outp);
 void escm_text_header(const struct escm_lang *lang, FILE *outp);
 void escm_error(const char *fmt, ...);
-char ** tokenize_cmd(const char *cmd);
 
 /* fork.c */
 FILE *escm_popen(char * const argv[]);
 int escm_pclose(FILE *fp);
 void escm_redirect(int from, int to);
 
-/* memory allocation */
-void *escm_malloc(size_t size);
-void *escm_realloc(void *ptr, size_t size);
-#define XMALLOC(type, n) ((type *) escm_malloc((n) * (sizeof(type))))
-#define XREALLOC(type, p, n) ((type *) escm_realloc((p), (n) * (sizeof(type))))
+/* cmdline.c */
+char ** tokenize_cmd(const char *cmd);
+void * xmalloc(size_t size);
+void * xrealloc(void *ptr, size_t size);
+#define XMALLOC(type, n) ((type *) xmalloc((n) * (sizeof(type))))
+#define XREALLOC(type, p, n) ((type *) xrealloc((p), (n) * (sizeof(type))))
+#define XERROR escm_error
+#define escm_malloc xmalloc
+#define escm_realloc xrealloc
 
 char *escm_cgi;
 #endif /* not MISC_H */
