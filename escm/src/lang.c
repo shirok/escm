@@ -152,11 +152,11 @@ parse_lang(const char *name)
 {
   char *ptr, *rname, *data;
 
-  if (!read_conf(name)) escm_error(_("can't open - %s"), name);
+  if (!read_conf(name)) return NULL;
   ptr = get_data2(buffer, &(mylang.name), &data);
 
   if (ptr == NULL || mylang.name == NULL || data == NULL)
-    escm_error(_("broken config file - %s"), name);
+    return NULL;
 
   if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "lisp") == 0)
     mylang.scm_p = 1;
@@ -165,15 +165,13 @@ parse_lang(const char *name)
 
   while (ptr) {
     ptr = get_data2(ptr, &rname, &data);
-    if (rname == NULL) escm_error(_("broken config file - %s"), name);
+    if (rname == NULL) return NULL;
     switch (HASH_KEY(rname[0], rname[1])) {
     case HASH_KEY('b', 'i'): /* bind */
-      if (!parse_form3(data, &(mylang.bind)))
-	escm_error(_("broken config file - %s"), name);
+      if (!parse_form3(data, &(mylang.bind))) return NULL;
       break;
     case HASH_KEY('a', 's'): /* assign */
-      if (!parse_form3(data, &(mylang.assign)))
-	escm_error(_("broken config file - %s"), name);
+      if (!parse_form3(data, &(mylang.assign))) return NULL;
       break;
     case HASH_KEY('i', 'n'): /* init */
       mylang.init = data;
@@ -188,21 +186,17 @@ parse_lang(const char *name)
       mylang.finish = data;
       break;
     case HASH_KEY('d', 'i'): /* display */
-      if (data && !parse_form2(data, &(mylang.display)))
-	escm_error(_("broken config file - %s"), name);
+      if (data && !parse_form2(data, &(mylang.display))) return NULL;
       break;
     case HASH_KEY('s', 't'): /* string */
-      if (!parse_form2(data, &(mylang.literal)))
-	escm_error(_("broken config file - %s"), name);
+      if (!parse_form2(data, &(mylang.literal))) return NULL;
       break;
     default:
-      escm_error(_("broken config file - %s"), name);
+      return NULL;
     }
   }
-  if (!mylang.assign.infix)
-    escm_error(_("broken config file - %s"), name);
-  if (!mylang.literal.prefix || !mylang.literal.suffix)
-    escm_error(_("broken config file - %s"), name);
+  if (!mylang.assign.infix) return NULL;
+  if (!mylang.literal.prefix || !mylang.literal.suffix) return NULL;
   if (!mylang.bind.infix) mylang.bind = mylang.assign;
   return &mylang;
 }

@@ -221,6 +221,7 @@ main(int argc, char **argv)
     if (lang_name) lang = parse_lang(lang_name);
     if (!interp) interp = getenv("ESCM_BACKEND");
   }
+  if (lang == NULL) escm_error(_("invalid language configuration"));
 #else /* not ENABLE_POLYGLOT */
   if (!interp) interp = getenv("ESCM_BACKEND");
 #endif /* ENABLE_POLYGLOT */
