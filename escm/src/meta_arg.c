@@ -233,102 +233,57 @@ next_token(char *ptr, size_t *psize)
   return ptr;
 }
 
-
 int
-meta_args_replace(int *pargc, char ***pargv, const char *filename)
+meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
 {
   char **argv, **new_argv;
   char *buf, *ptr;
-  int argc, ret, i;
+  int argc, ret, i, j;
   FILE *fp;
   size_t size = BUFSIZ;
 
   argc = *pargc;
   argv = *pargv;
 
-  if (argc != 1) return META_ARGS_NOT;
-
-  fp = fopen(filename, "r");
+  fp = fopen(script, "r");
   if (fp == NULL) return META_ARGS_ERRNO_ERROR;
   ret = skip_shebang_line(fp);
-  if (ret == META_ARGS_NOT) {
-    fclose(fp);
-    argc = 2;
-    new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
-    if (new_argv == NULL) return META_ARGS_ERRNO_ERROR;
-    new_argv[0] = argv[0];
-    new_argv[1] = (char *)filename;
-    new_argv[2] = NULL;
-    *pargc = argc;
-    *pargv = new_argv;
-    return ret;
-  } else if (ret != META_ARGS_OK) {
-    fclose(fp);
-    return ret;
+  if (ret == META_ARGS_OK) {
+    buf = (char *)xmalloc(BUFSIZ);
+    if (buf == NULL) return META_ARGS_ERRNO_ERROR;
+    ret = parse_as_command_line(&buf, &size, fp);
   }
-  buf = (char *)xmalloc(BUFSIZ);
-  if (buf == NULL) return META_ARGS_ERRNO_ERROR;
-  ret = parse_as_command_line(&buf, &size, fp);
   fclose(fp);
-  if (ret < 0) return META_ARGS_SYNTAX_ERROR;
-  argc = ret + 2;
+  if (ret == META_ARGS_SYNTAX_ERROR) return META_ARGS_SYNTAX_ERROR;
+  else if (ret == META_ARGS_NOT) ret = 0;
+  argc += 2 + ret - from;
   new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
   if (new_argv == NULL) return META_ARGS_ERRNO_ERROR;
   new_argv[0] = argv[0];
-  ptr = buf;
-  for (i = 1; i <= ret; i++) {
-    new_argv[i] = ptr;
-    ptr = next_token(ptr, &size);
+  if (ret > 0) {
+    ptr = buf;
+    for (i = 1; i <= ret; i++) {
+      new_argv[i] = ptr;
+      ptr = next_token(ptr, &size);
+    }
+  } else {
+    i = 1;
   }
-  new_argv[argc - 1] = (char*)filename;
-  new_argv[argc] = NULL;
+  new_argv[i++] = (char *)script;
+  for (j = from; i <= argc; i++, j++) {
+    new_argv[i] = argv[j];
+  }
   *pargc = argc;
   *pargv = new_argv;
   return ret;
 }
-
 int
 meta_args(int *pargc, char ***pargv)
 {
-  char **argv, **new_argv;
-  char *buf, *ptr;
-  int argc, ret, i;
-  FILE *fp;
-  size_t size = BUFSIZ;
-
-  argc = *pargc;
-  argv = *pargv;
-
-  if (!(argc >= 3 && argv[1][0] == '\\' && argv[1][1] == '\0'))
+  if (!(*pargc >= 3 && (*pargv)[1][0] == '\\' && (*pargv)[1][1] == '\0'))
     return META_ARGS_NOT;
 
-  fp = fopen(argv[2], "r");
-  if (fp == NULL) return META_ARGS_ERRNO_ERROR;
-  ret = skip_shebang_line(fp);
-  if (ret != META_ARGS_OK) {
-    fclose(fp);
-    return ret;
-  }
-  buf = (char *)xmalloc(BUFSIZ);
-  if (buf == NULL) return META_ARGS_ERRNO_ERROR;
-  ret = parse_as_command_line(&buf, &size, fp);
-  fclose(fp);
-  if (ret < 0) return META_ARGS_SYNTAX_ERROR;
-  argc += ret - 1;
-  new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
-  if (new_argv == NULL) return META_ARGS_ERRNO_ERROR;
-  new_argv[0] = argv[0];
-  ptr = buf;
-  for (i = 1; i <= ret; i++) {
-    new_argv[i] = ptr;
-    ptr = next_token(ptr, &size);
-  }
-  for (/**/; i <= argc; i++) {
-    new_argv[i] = argv[i - ret + 1];
-  }
-  *pargc = argc;
-  *pargv = new_argv;
-  return ret;
+  return meta_args_replace(pargc, pargv, (*pargv)[2], 3);
 }
 
 /* meta_skip_shebang(fp) - skip the sharp-bang line and meta-argument

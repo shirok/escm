@@ -116,21 +116,30 @@ It is <code>#f</code> if the output is stdout.</p></dd>
       <dd><p>The Scheme interpreter and its arguments.</p></dd>
       <dt>*escm-version*</dt>
       <dd><p>The name and the version of this project.</p></dd>
-      <dt>*escm-cgi*</dt>
-      <dd><p>A true if it is in a CGI, otherwise the false.</p></dd>
+      <dt>*GATEWAY_INTERFACE*</dt>
+      <dd><p>The value of environment variable <code>GATEWAY_INTERFACE</code>
+or the fale if it is not defined.
+This variable will be used to check whether the script is in a CGI script
+or not.</p></dd>
     </dl>
-    <p>The following variables are defined only when it is in a CGI.</p>
+    <p>The following variables are defined only when
+<code>*GATEWAY_INTERFACE*</code> is a true.</p>
     <dl>
-      <dt>*escm-request-method*</dt>
-      <dd><p>The request method.</p></dd>
-      <dt>*escm-query-string*</dt>
-      <dd><p>The query string.</p></dd>
-      <dt>*escm-http-host*</dt>
+      <dt>*QUERY_STRING*</dt>
+      <dd><p>The query string.
+It is so even if the request method is <code>POST</code>.</p></dd>
+      <dt>*REQUEST_METHOD*</dt>
+      <dd><p>The value of environment variable <code>REQUEST_METHOD</code>.</p></dd>
+      <dt>*HTTP_HOST*</dt>
       <dd><p>The value of environment variable <code>HTTP_HOST</code>.</p></dd>
-      <dt>*escm-http-cookie*</dt>
+      <dt>*HTTP_COOKIE*</dt>
       <dd><p>The value of environment variable <code>HTTP_COOKIE</code>.</p></dd>
-      <dt>*escm-http-accept-language*</dt>
+      <dt>*HTTP_ACCEPT_LANGUAGE*</dt>
       <dd><p>The value of environment variable <code>HTTP_ACCEPT_LANGUAGE</code>.</p></dd>
+      <dt>*HTTP_ACCEPT_CHARSET*</dt>
+      <dd><p>The value of environment variable <code>HTTP_ACCEPT_CHARSET</code>.</p></dd>
+      <dt>*HTTP_REFERER*</dt>
+      <dd><p>The value of environment variable <code>HTTP_REFERER</code>.</p></dd>
     </dl>
 
     <h3 id="environment">Environment</h3>

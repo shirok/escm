@@ -54,4 +54,7 @@ int escm_is_cgi(void);
 /* escm_error(fmt, ...) - print a warning message and exit the program. */
 void escm_error(const char *fmt, ...);
 
+/* fork.c */
+FILE *escm_popen(const char *prog);
+int escm_pclose(FILE *fp);
 #endif /* ESCM_H */

@@ -4,7 +4,7 @@
 
 # Program
 bin_PROGRAMS = aescm
-aescm_SOURCES = filter.c meta_arg.c meta_arg.h escm.c escm.h cgi.c
+aescm_SOURCES = filter.c meta_arg.c meta_arg.h escm.c escm.h cgi.c fork.c
 aescm_LDADD = @GIMMICK_OBJ@
 aescm_DEPENDENCIES = @GIMMICK_OBJ@
 EXTRA_aescm_SOURCES = lang.c

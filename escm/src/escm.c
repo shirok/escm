@@ -13,6 +13,8 @@
 #endif /* HAVE_CONFIG_H */
 #include "escm.h"
 
+#define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
+
 /* the default escm_lang object.
  */
 struct escm_lang lang_scm = {
@@ -29,6 +31,18 @@ struct escm_lang lang_scm = {
   "#f", /* false */
   NULL, /* init */
   NULL, /* finish */
+};
+
+static char * env_to_bind[] = {
+  "GATEWAY_INTERFACE",
+  "HTTP_ACCEPT_LANGUAGE",
+  "HTTP_ACCEPT_CHARSET",
+  "HTTP_COOKIE",
+  "HTTP_HOST",
+  "HTTP_REFERER",
+  /* "QUERY_STRING", */
+  "REMOTE_ADDR",
+  "REQUEST_METHOD",
 };
 
 /* put_string(str, outp) - escape str and put it.
@@ -72,19 +86,6 @@ escm_define(const struct escm_lang *lang, const char *var, const char *val, FILE
   fputs(lang->define_suffix, outp);
   fputc('\n', outp);
 }
-/* define_bool(lang, var, val, outp) - define var to val in lang
- */
-static void
-define_bool(struct escm_lang *lang, const char *var, int val, FILE *outp)
-{
-  fputs(lang->define_prefix, outp);
-  put_variable(lang, var, outp);
-  fputs(lang->define_infix, outp);
-  fputs((val ? lang->true : lang->false), outp);
-  fputs(lang->define_suffix, outp);
-  fputc('\n', outp);
-}
-
 /* escm_init(&lang, outp) - initialize the backend interpreter.
  */
 static void
@@ -98,10 +99,10 @@ cgi_post(struct escm_lang *lang, FILE *outp)
 
   content_length = getenv("CONTENT_LENGTH");
   if (content_length == NULL)
-    escm_define(lang, "escm-query-string", NULL, outp);
+    escm_define(lang, "QUERY_STRING", NULL, outp);
   else {
     fputs(lang->define_prefix, outp);
-    put_variable(lang, "escm-query-string", outp);
+    put_variable(lang, "QUERY_STRING", outp);
     fputs(lang->define_infix, outp);
     llen = strtol(content_length, &p, 10);
     if (*p == '\0') {
@@ -124,17 +125,16 @@ escm_init(struct escm_lang *lang, FILE *outp)
   /* set useful global variables if the language is scheme. */
   escm_define(lang, "escm-version", PACKAGE " " VERSION, outp);
   if (!escm_is_cgi()) {
-    define_bool(lang, "escm-cgi", 0, outp);
+    escm_define(lang, "GATEWAY_INTERFACE", NULL, outp);
   } else {
     const char *method;
-    define_bool(lang, "escm-cgi", 1, outp);
+    int i;
     method = getenv("REQUEST_METHOD");
-    escm_define(lang, "escm-request-method", method, outp);
     if (method[0] == 'P') cgi_post(lang, outp);
-    else escm_define(lang, "escm-query-string", getenv("QUERY_STRING"), outp);
-    escm_define(lang, "escm-http-host", getenv("HTTP_HOST"), outp);
-    escm_define(lang, "escm-http-cookie", getenv("HTTP_COOKIE"), outp);
-    escm_define(lang, "escm-http-accept-language", getenv("HTTP_ACCEPT_LANGUAGE"), outp);
+    else escm_define(lang, "QUERY_STRING", getenv("QUERY_STRING"), outp);
+    for (i = 0; i < SizeOfArray(env_to_bind); i++) {
+      escm_define(lang, env_to_bind[i], getenv(env_to_bind[i]), outp);
+    }
   }
 }
 /* escm_finish(&lang, outp) - finalize the backend interpreter.

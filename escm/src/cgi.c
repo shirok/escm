@@ -62,7 +62,8 @@ void escm_error(const char *fmt, ...)
   if (fmt == NULL) fmt = strerror(errno);
   if (escm_is_cgi()) {
     if (header_type != CGI_HEADER_HTML) {
-      fputs("Content-header: text/plain\r\n\r\n", stdout);
+      fputs("Content-type: text/html\r\n\r\n", stdout);
+      fputs("<html><body>", stdout);
     }
     fputs("<p>", stdout);
     vfprintf(stdout, fmt, ap);

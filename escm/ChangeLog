@@ -1,3 +1,11 @@
+2003-06-26  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/meta_arg.c: Change interface.
+	* src/cgi.c: Fix the content header.
+	* src/fork.c: Added to replace popen and pclose to handle the error
+	which occurs when the backend interpreter is not found.
+	* src/escm.c: bind more environment variables.
+	
 2003-06-24  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* configure.ac, src/Makefile.am: do not use libtool.

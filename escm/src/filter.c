@@ -195,7 +195,7 @@ main(int argc, char **argv)
 
   /* expand meta-arguments if necessary */
   if (argc == 1 && path_translated) {
-    ret = meta_args_replace(&argc, &argv, path_translated);
+    ret = meta_args_replace(&argc, &argv, path_translated, 1);
   } else {
     ret = meta_args(&argc, &argv);
   }
@@ -220,7 +220,7 @@ main(int argc, char **argv)
   /* invoke the interpreter. */
   if (!opts.interpreter) opts.interpreter = scm_interp;
   if (opts.process) {
-    outp = popen(opts.interpreter, "w");
+    outp = escm_popen(opts.interpreter);
     if (outp == NULL)
       escm_error("Can't invoke the interpreter.");
   }
@@ -255,7 +255,7 @@ main(int argc, char **argv)
   escm_finish(lang, outp);
 
   /* close the pipe. */
-  if (opts.process && pclose(outp) == -1)
+  if (opts.process && escm_pclose(outp) == -1)
     escm_error(NULL);
 
   return 0;
