@@ -27,10 +27,10 @@ EOF
 
 cat <<EOF > out-ok
 input
-out
+
 EOF
 
-${PROG} -l ${srcdir}/../src/lang/awk -o out input 2> err
+${PROG} -l ${srcdir}/../src/lang/awk input 1> out 2> err
 
 . $srcdir/Finish.sh
 
