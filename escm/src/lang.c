@@ -166,7 +166,7 @@ parse_lang(const char *name)
 
   while (ptr) {
     ptr = get_data2(ptr, &rname, &data);
-    if (rname == NULL) return NULL;
+    if (rname == NULL) break;
     switch (HASH_KEY(rname[0], rname[1])) {
     case HASH_KEY('b', 'i'): /* bind */
       if (!parse_form3(data, &(mylang.bind))) return NULL;

@@ -8,4 +8,4 @@ $@VAR@ = @VAL@
 print "@STR@"
 # display
 print (@EXP@)
-# end
+#
