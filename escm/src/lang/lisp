@@ -1,7 +1,5 @@
 ;; lisp - configurations for the Common Lisp language (GNU CLISP)
 clisp -q /dev/stdin
-;; identifier
-*lisp*
 ;; nil
 nil
 ;; bind

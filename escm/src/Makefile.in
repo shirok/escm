@@ -40,8 +40,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-noinst_PROGRAMS = langconf$(EXEEXT) aescm.cgi$(EXEEXT)
+noinst_PROGRAMS = langconf$(EXEEXT)
 bin_PROGRAMS = aescm$(EXEEXT)
+EXTRA_PROGRAMS = aescm.cgi$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -178,8 +179,6 @@ aescm_SOURCES = escm.c escm.h filter.c $(BUILT_SOURCES)
 aescm_LDADD = @POLYGLOT_OBJ@
 aescm_DEPENDENCIES = @POLYGLOT_OBJ@
 EXTRA_aescm_SOURCES = lang.c
-
-# CGI
 aescm_cgi_SOURCES = cgimain.c escm.c escm.h $(BUILT_SOURCES)
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

@@ -2,8 +2,6 @@
 scm -q
 ;; init
 (let ()
-;; identifier
-*lisp*
 ;; nil
 #f
 ;; bind

@@ -25,17 +25,9 @@ struct escm_form_three {
   char *suffix;  
 };
 
-enum ESCM_ID_TYPE {
-  ESCM_ID_LISP,
-  ESCM_ID_LOWER,
-  ESCM_ID_UPPER,
-  ESCM_ID_TITLE,
-};
-
 /* language information structure */
 struct escm_lang {
   char *name;            /* the name space */
-  enum ESCM_ID_TYPE id_type;
   char *backend;
   struct escm_form_two literal;
   struct escm_form_two display;

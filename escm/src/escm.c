@@ -37,112 +37,13 @@ put_string(const char *str, FILE *outp)
   }
   fputc('"', outp);
 }
-/* foo_bar => *foo-bar* */
-static void
-put_lisp_variable(const char *var, FILE *outp)
-{
-  const char* p;
-  fputc('*', outp);
-  for (p = var; *p; p++) {
-    if (*p == '_' || isspace(*p)) {
-      fputc('-', outp);
-    } else {
-      fputc(*p, outp);
-    }
-  }
-  fputc('*', outp);
-}
-/* foo_bar => foo_bar */
-static void
-put_lower_variable(const char *var, FILE *outp)
-{
-  const char* p;
-  p = var;
-  if (! isalpha(*p)) {
-    fputc('_', outp);
-  } else {
-    fputc(tolower(*p), outp);
-  }
-  for (p = var + 1; *p; p++) {
-    if (! isalnum(*p)) {
-      fputc('_', outp);
-    } else {
-      fputc(tolower(*p), outp);
-    }
-  }
-}
-/* foo_bar => FOO_BAR */
-static void
-put_upper_variable(const char *var, FILE *outp)
-{
-  const char* p;
-  p = var;
-  if (! isalpha(*p)) {
-    fputc('_', outp);
-  } else {
-    fputc(toupper(*p), outp);
-  }
-  for (p = var + 1; *p; p++) {
-    if (! isalnum(*p)) {
-      fputc('_', outp);
-    } else {
-      fputc(toupper(*p), outp);
-    }
-  }
-}
-/* foo_bar => FooBar */
-static void
-put_title_variable(const char *var, FILE *outp)
-{
-  const char* p;
-  int flag = FALSE;
-  p = var;
-  if (! isalpha(*p)) {
-    fputc('_', outp);
-  } else {
-    if (flag) {
-      fputc(tolower(*p), outp);
-    } else {
-      fputc(toupper(*p), outp);
-      flag = FALSE;
-    }
-  }
-  for (p = var + 1; *p; p++) {
-    if (! isalpha(*p)) {
-      flag = FALSE;
-    } else {
-      if (flag) {
-	fputc(tolower(*p), outp);
-      } else {
-	fputc(toupper(*p), outp);
-	flag = FALSE;
-      }
-    }
-  }
-}
-
-/* put_variable(lang, var, outp) - put var as a variable name.
- */
-static void
-put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
-{
-  if (lang->id_type == ESCM_ID_LISP) {
-    put_lisp_variable(var, outp);
-  } else if (lang->id_type == ESCM_ID_LOWER) {
-    put_lower_variable(var, outp);
-  } else if (lang->id_type == ESCM_ID_UPPER) {
-    put_upper_variable(var, outp);
-  } else {
-    put_title_variable(var, outp);
-  }
-}
 /* escm_bind(lang, var, val, outp) - bind var to val in lang
  */
 void
 escm_bind(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
   if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
-  put_variable(lang, var, outp);
+  fputs(var, outp);
   if (lang->bind.infix) fputs(lang->bind.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
   else put_string(val, outp);
@@ -155,7 +56,7 @@ void
 escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp)
 {
   if (lang->assign.prefix) fputs(lang->assign.prefix, outp);
-  put_variable(lang, var, outp);
+  fputs(var, outp);
   if (lang->assign.infix) fputs(lang->assign.infix, outp);
   if (val == NULL) fputs(lang->nil, outp);
   else put_string(val, outp);
@@ -223,7 +124,7 @@ escm_query_string(const struct escm_lang *lang, FILE *outp)
       return FALSE;
     } else {
       if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-      put_variable(lang, "escm_query_string", outp);
+      fputs("escm_query_string", outp);
       if (lang->setter.infix) fputs(lang->setter.infix, outp);
       llen = strtol(content_length, &p, 10);
       if (*p == '\0') {
@@ -244,7 +145,7 @@ escm_query_string(const struct escm_lang *lang, FILE *outp)
   } else {
     p = getenv("QUERY_STRING");
     if (lang->setter.prefix) fputs(lang->setter.prefix, outp);
-    put_variable(lang, "escm_query_string", outp);
+    fputs("escm_query_string", outp);
     if (lang->setter.infix) fputs(lang->setter.infix, outp);
     if (p == NULL) fputs(lang->nil, outp);
     else put_string(p, outp);

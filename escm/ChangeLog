@@ -1,3 +1,10 @@
+2004-10-25  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.h: Removed id_type member from escm_lang structure.
+
+	* src/Makefile.am (EXTRA_PROGRAMS): Moved aescm.cgi under this
+	directive.
+
 2004-10-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/cgimain.c: Separated CGI features.

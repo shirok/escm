@@ -17,8 +17,8 @@
 # Then invoke the program as above.
 
 cat <<EOF > input
-<?scm:d *escm-input-file*?>
-<?scm:d *escm-output-file*?>
+<?scm:d escm_input_file?>
+<?scm:d escm_output_file?>
 EOF
 
 cat <<EOF > out-ok

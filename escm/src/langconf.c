@@ -105,17 +105,6 @@ main(int argc, const char** argv)
   fputs("  ", stdout);
   put_string(lang->name, stdout);
   fputs(", /* name */\n", stdout);
-  /* id_type */
-  fputs("  ", stdout);
-  if (lang->id_type == ESCM_ID_LISP) {
-    fputs("ESCM_ID_LISP, /* id_type */\n", stdout);
-  } else if (lang->id_type == ESCM_ID_UPPER) {
-    fputs("ESCM_ID_UPPER, /* id_type */\n", stdout);
-  } else if (lang->id_type == ESCM_ID_TITLE) {
-    fputs("ESCM_ID_TITLE, /* id_type */\n", stdout);
-  } else {
-    fputs("ESCM_ID_LOWER, /* id_type */\n", stdout);
-  }
   /* backend */
   fputs("  ", stdout);
   put_string(lang->backend, stdout);
