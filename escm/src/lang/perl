@@ -6,5 +6,3 @@ $@VAR@ = @VAL@;
 print "@STR@";
 # display
 print (@EXP@);
-# format
-printf "%@FMT@", (@EXP@);

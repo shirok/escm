@@ -8,5 +8,3 @@ set @VAR@ @VAL@
 puts -nonewline "@STR@"
 # display
 puts -nonewline @EXP@
-# format
-puts -nonewline [format "%@FMT@" @EXP@]

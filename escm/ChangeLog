@@ -1,5 +1,7 @@
 2004-02-03  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
+	* src/escm.h: Removed code on formatted output.
+
 	* Removed code on i18n.
 	
 2003-07-28  TAGA Yoshitaka  <tagga@tsuda.ac.jp>

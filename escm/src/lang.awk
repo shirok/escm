@@ -5,7 +5,7 @@
 BEGIN {
   leading = "";
   key = "";
-  split("name command init nil bind assign string display format finish", data);
+  split("name command init nil bind assign string display finish", data);
   for (x in data) {
     data[data[x]] = "";
     delete data[x];
@@ -92,17 +92,6 @@ END {
   }
   print "  ", escape_string(tmp[1]), ",";
   print "  ", escape_string(tmp[2]), ",";
-  print " },";
-
-  print " { /* format */";
-  n = split(data["format"], tmp, sep);
-  if (n != 0 && n != 3) {
-    print "format record broken";
-    exit 1;
-  }
-  print "  ", escape_string(tmp[1]), ",";
-  print "  ", escape_string(tmp[2]), ",";
-  print "  ", escape_string(tmp[3]), ",";
   print " },";
 
   if (split(data["bind"], tmp, sep) != 3) {

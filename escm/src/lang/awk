@@ -8,8 +8,6 @@ BEGIN {
 printf "@STR@";
 # display
 printf (@EXP@);
-# format
-printf("%@FMT@", (@EXP@));
 # finish
  exit;
 }

@@ -24,7 +24,6 @@ struct escm_lang {
   char **backend;
   struct escm_form_two literal;
   struct escm_form_two display;
-  struct escm_form_three format;
   struct escm_form_three bind;
   struct escm_form_three assign;
   char *nil;

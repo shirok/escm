@@ -188,10 +188,6 @@ parse_lang(const char *name)
       if (data && !parse_form2(data, &(mylang.display)))
 	escm_error(_("broken config file - %s"), name);
       break;
-    case HASH_KEY('f', 'o'): /* format */
-      if (data && !parse_form3(data, &(mylang.format)))
-	escm_error(_("broken config file - %s"), name);
-      break;
     case HASH_KEY('s', 't'): /* string */
       if (!parse_form2(data, &(mylang.literal)))
 	escm_error(_("broken config file - %s"), name);

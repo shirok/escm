@@ -107,7 +107,7 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
 /* escm_preproc(&lang, inp, outp) - the preprocessor.
  */
 #define push_char(c) {\
- if (stackptr == 31) goto empty;\
+ if (stackptr == 63) goto empty;\
  stack[stackptr++] = c;\
 }
 void
@@ -118,7 +118,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     LITERAL,
     CODE,
     DISPLAY,
-    FORMAT,
   } state = LITERAL;
   int c;
   const char *p;
@@ -168,28 +167,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  if (c == '\n') escm_lineno++;
 	  continue;
 	}
-	if (c != ':') goto empty;
-	push_char(':');
-	i = stackptr;
-	for (;;) {
-	  c = getc(inp);
-	  if (c == '\"') goto empty;
-	  else if (isspace(c)) break;
-	  push_char(c);
-	}
-	if (!lang->format.infix) goto empty;
-	state = FORMAT;
-	fputs(lang->literal.suffix, outp);
-	fputc('\n', outp);
-	fputs(lang->format.prefix, outp);
-	tag_keep_lineno = escm_lineno;
-	if (c == '\n') escm_lineno++;
-	for (/**/; i < stackptr; i++) {
-	  fputc(stack[i], outp);
-	}
-	stackptr = 0;
-	fputs(lang->format.infix, outp);
-	continue;
       empty:
 	for (i = 0; i < stackptr; i++)
 	  fputc(stack[i], outp);
@@ -228,7 +205,6 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 	  if (c == EOF) break;
 	  else if (c == '>') {
 	    if (state == DISPLAY) fputs(lang->display.suffix, outp);
-	    else if (state == FORMAT) fputs(lang->format.suffix, outp);
 	    fputc('\n', outp);
 	    fputs(lang->literal.prefix, outp);
 	    state = LITERAL;

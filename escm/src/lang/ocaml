@@ -1,8 +1,0 @@
-(* ocaml - configuration file for the O'Caml language *)
-ocaml /dev/stdin
-(* assign *)
-let @VAR@ = @VAL@;;
-(* string *)
-print_string "@STR@";;
-(* format *)
-Printf.printf "%@FMT@" (@EXP@);;

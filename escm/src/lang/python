@@ -8,5 +8,3 @@ import sys
 sys.stdout.write("@STR@")
 # display
 sys.stdout.write("%s" % (@EXP@))
-# format
-sys.stdout.write("%@FMT@" % (@EXP@))
