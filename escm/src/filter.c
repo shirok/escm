@@ -272,14 +272,6 @@ main(int argc, char **argv)
   escm_bind(lang, "escm_output_file", output_file, outp);
   if (process_flag) {
     escm_bind(lang, "escm_interpreter", backend_argv[0], outp);
-    if (gateway_interface) {
-      const char *method;
-      method = getenv("REQUEST_METHOD");
-      if (method[0] == 'P') escm_bind_query_string(lang, outp);
-      else escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
-    } else {
-      escm_bind(lang, "escm_query_string", NULL, outp);
-    }
   } else {
     escm_bind(lang, "escm_interpreter", NULL, outp);
   }
@@ -289,6 +281,8 @@ main(int argc, char **argv)
     fputs(expr[i], outp);
     fputc('\n', outp);
   }
+  /* Where should I put this function? */
+  if (gateway_interface) escm_bind_query_string(lang, outp);
 
   /* process files */
   if (path_translated) {

@@ -218,33 +218,39 @@ void
 escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
 {
   const char *content_length;
+  const char *method;
   char *p;
   long llen;
   int len;
   int c;
 
-  content_length = getenv("CONTENT_LENGTH");
-  if (content_length == NULL)
-    XERROR("inconsistent environment");
-  else {
-    if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
-    put_variable(lang, "escm_query_string", outp);
-    if (lang->bind.infix) fputs(lang->bind.infix, outp);
-    llen = strtol(content_length, &p, 10);
-    if (*p == '\0') {
-      fputc('"', outp);
-      len = (int) llen;
-      while ((c = getc(stdin)) != EOF && len-- > 0) {
-	/* better replace the next line with an error check. */
-	if (c == '"' || c == '\\') fputc('\\', outp);
-	fputc(c, outp);
+  method = getenv("REQUEST_METHOD");
+  if (method[0] == 'P') {
+    content_length = getenv("CONTENT_LENGTH");
+    if (content_length == NULL)
+      XERROR("inconsistent environment");
+    else {
+      if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
+      put_variable(lang, "escm_query_string", outp);
+      if (lang->bind.infix) fputs(lang->bind.infix, outp);
+      llen = strtol(content_length, &p, 10);
+      if (*p == '\0') {
+	fputc('"', outp);
+	len = (int) llen;
+	while ((c = getc(stdin)) != EOF && len-- > 0) {
+	  /* better replace the next line with an error check. */
+	  if (c == '"' || c == '\\') fputc('\\', outp);
+	  fputc(c, outp);
+	}
+	fputc('"', outp);
+      } else {
+	fputs(lang->nil, outp);
       }
-      fputc('"', outp);
-    } else {
-      fputs(lang->nil, outp);
+      if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
+      fputc('\n', outp);
     }
-    if (lang->bind.suffix) fputs(lang->bind.suffix, outp);
-    fputc('\n', outp);
+  } else {
+    escm_bind(lang, "escm_query_string", getenv("QUERY_STRING"), outp);
   }
 }
 /* escm_preproc(lang, inp, outp)
