@@ -108,7 +108,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFAULT_LANG = @DEFAULT_LANG@
-DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
+DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" @DEFS@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@

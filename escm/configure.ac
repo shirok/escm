@@ -1,7 +1,7 @@
 # configure.ac
 # $Id$
 
-AC_INIT([aescm], [0.30], [tagga@tsuda.ac.jp])
+AC_INIT([aescm], [0.31], [tagga@tsuda.ac.jp])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([src/config.h])
 
@@ -38,28 +38,6 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([strchr strtol getopt_long])
-
-# polyglot
-AC_OBJEXT
-AC_ARG_ENABLE([polyglot],
-   [  --enable-polyglot -- enable polyglot support.])
-if test x$enable_polyglot = xyes; then
-  POLYGLOT_OBJ=lang.$OBJEXT
-  ENABLE_POLYGLOT=1
-  AC_SUBST(POLYGLOT_OBJ)
-  AC_SUBST(ENABLE_POLYGLOT)
-  AC_DEFINE_UNQUOTED(ENABLE_POLYGLOT, [1], [enable polyglot support.])
-fi
-AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
-
-# CGI
-AC_ARG_ENABLE([cgi], [  --enable-cgi -- enable CGI support.])
-if test x$enable_cgi = xyes; then
-   enable_cgi=1
-else
-   enable_cgi=
-fi
-AC_DEFINE_UNQUOTED(ENABLE_CGI, [$enable_cgi], [enable CGI support.])
 
 AC_CONFIG_FILES([Makefile test/Makefile
 			  doc/Makefile doc/config.scm

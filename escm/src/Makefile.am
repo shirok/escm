@@ -17,7 +17,7 @@ deflang.c : langconf$(EXEEXT) $(srcdir)/lang/@DEFAULT_LANG@
 bin_PROGRAMS = aescm
 aescm_SOURCES  = escm.c escm.h filter.c lang.c $(BUILT_SOURCES)
 
-DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" -DESCM_PATH=\"$(bindir)/$(PACKAGE)\" @DEFS@
+DEFS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\" @DEFS@
 
 
 # CGI

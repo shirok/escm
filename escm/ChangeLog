@@ -1,3 +1,11 @@
+2004-12-06  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escmcgi.c (escm_query_string, escm_header): Cut out from escm.c
+
+	* src/filter.c (main): Removde --enable-polyglot option.
+
+	* src/escm.c (escm_puts): Renamed from put_string().
+
 2004-10-25  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escm.h: Removed id_type member from escm_lang structure.
