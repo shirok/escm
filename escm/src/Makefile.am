@@ -9,7 +9,7 @@ aescm_LDADD = @GIMMICK_OBJ@
 aescm_DEPENDENCIES = @GIMMICK_OBJ@
 EXTRA_aescm_SOURCES = lang.c
 if GIMMICK
-AM_CFLAGS = -DESCM_LANG_DIR=\"$(datadir)/lang\"
+AM_CFLAGS = -DESCM_LANG_DIR=\"$(pkgdatadir)/lang/\"
 endif
 EXTRA_DIST = lang/
 

@@ -4,13 +4,15 @@
  * $Id$
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  ***********************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif /* HAVE_CONFIG_H */
+
+#include <stdio.h>
+#include <ctype.h>
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
 #include "escm.h"
 
 #define SizeOfArray(arr) (sizeof(arr) / (sizeof(arr[0])))
@@ -23,8 +25,8 @@ struct escm_lang lang_scm = {
   "\")", /* literal_suffix */
   "(display ", /* display_prefix */
   ")", /* display_suffix */
-  "(define *", /* define_prefix */
-  "* ", /* define_infix */
+  "(define ", /* define_prefix */
+  " ", /* define_infix */
   ")", /* define_suffix */
   1, /* use_hyphen */
   "#t", /* true */
@@ -66,10 +68,10 @@ put_variable(const struct escm_lang *lang, const char *var, FILE *outp)
 {
   const char *p;
   for (p = var; *p; p++) {
-    if (*p == '-' && !lang->use_hyphen) {
-      fputc('_', outp);
-    } else {
+    if (isalnum(*p) || lang->use_hyphen || *p == '_') {
       fputc(*p, outp);
+    } else if (*p == '-') {
+      fputc('_', outp);
     }
   }
 }
@@ -123,7 +125,7 @@ escm_init(struct escm_lang *lang, FILE *outp)
 {
   if (lang->init) fputs(lang->init, outp);
   /* set useful global variables if the language is scheme. */
-  escm_define(lang, "escm-version", PACKAGE " " VERSION, outp);
+  escm_define(lang, "*escm-version*", PACKAGE " " VERSION, outp);
   if (!escm_is_cgi()) {
     escm_define(lang, "GATEWAY_INTERFACE", NULL, outp);
   } else {
@@ -167,7 +169,7 @@ escm_preproc(struct escm_lang *lang, FILE *inp, FILE *outp)
 	if (c != '?') {
 	  fputc('<', outp);
 	  if (c == EOF) break;
-	  fputc(c, outp);
+	  ungetc(c, inp);
 	  continue;
 	}
 	p = lang->name;

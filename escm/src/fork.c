@@ -3,17 +3,27 @@
  *
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
  */
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif /* HAVE_CONFIG_H */
+#include <stdio.h>
+#include <errno.h>
+#include <signal.h>
+#ifdef HAVE_STRING_H
+# include <string.h>
+#endif /* HAVE_STRING_H */
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif /* HAVE_SYS_WAIT_H */
 #include "escm.h"
+
+static char *scm_argv[] = { ESCM_SCM_ARGV, NULL };
 
 FILE *
 escm_popen(const char * prog)
@@ -38,19 +48,25 @@ escm_popen(const char * prog)
   } else { /* child process */
     /* AD HOC VERSION */
     char str[128];
-    char *argv[16];
+    char *my_argv[16];
     char *p;
     int i;
+    char **argv;
 
-    strncpy(str, prog, 127);
-    str[127] = '\0';
-    p = strtok(str, " \t");
-    if (p == NULL) escm_error("Invalid program name: %s", prog);
-    for (i = 0; i < 16; i++, p = strtok(NULL, " \t")) {
-      argv[i] = p;
-      if (p == NULL) break;
+    if (prog) {
+      argv = my_argv;
+      strncpy(str, prog, 127);
+      str[127] = '\0';
+      p = strtok(str, " \t");
+      if (p == NULL) escm_error("Invalid program name: %s", prog);
+      for (i = 0; i < 16; i++, p = strtok(NULL, " \t")) {
+	argv[i] = p;
+	if (p == NULL) break;
+      }
+      if (i == 16) escm_error("Too many arguments: %s", prog);
+    } else {
+      argv = scm_argv;
     }
-    if (i == 16) escm_error("Too many arguments: %s", prog);
 
     close(fd[1]); /* write */
     /* connect fd[0] to the child process's stdin */
@@ -58,7 +74,7 @@ escm_popen(const char * prog)
       escm_error("can't redirect stdin");
     /* invoke the interpreter */
     execvp(argv[0], argv);
-    /* never reached if successful */
+    /* never reached if successful. */
     escm_error("can't invoke %s", argv[0]);
     return NULL; /* dummy */
   }
@@ -73,6 +89,7 @@ escm_pclose(FILE *pipe)
   fclose(pipe);
   /* wait till the child process exits. */
   wait(&status);
-  return 0;
+  if (WIFEXITED(status)) return WEXITSTATUS(status);
+  else return -1;
 }
 /* end of fork.c */

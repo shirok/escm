@@ -8,9 +8,11 @@
 #endif /* HAVE_CONFIG_H */
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
-#include <stdlib.h>
+# include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
-#include <string.h>
+#ifdef HAVE_STRING_H
+# include <string.h>
+#endif /* HAVE_STRING_H */
 
 #include "escm.h"
 

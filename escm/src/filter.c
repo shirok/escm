@@ -18,12 +18,6 @@
 #include "meta_arg.h"
 #include "escm.h"
 
-#ifdef ESCM_SCM
-const char *scm_interp = ESCM_SCM;
-#else
-const char *scm_interp = "gosh -b"
-#endif /* ESCM_SCM */
-
 #ifdef ESCM_LANG_DIR
 /* defined in lang.c */
 struct escm_lang * parse_lang(const char *name, const char **interp);
@@ -58,8 +52,8 @@ Report bugs to <" PACKAGE_BUGREPORT ">.\n");
 static void
 version(void)
 {
-  printf(PACKAGE_STRING " - experimental version of escm\n");
-  printf("The default interpreter is '%s'\n", scm_interp);
+  fputs(PACKAGE_STRING " - experimental version of escm\n", stdout);
+  fputs("The default interpreter is '" ESCM_SCM "'\n", stdout);
 }
 
 /* proc_file_fp(lang, inp, outp) - process a file. The inpuf file
@@ -84,7 +78,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   inp = fopen(file, "r");
   if (inp == NULL) escm_error(NULL);
 
-  escm_define(lang, "escm-input-file", file, outp);
+  escm_define(lang, "*escm-input-file*", file, outp);
 
   ret = meta_skip_shebang(inp);
   if (ret == META_ARGS_SYNTAX_ERROR)
@@ -218,7 +212,6 @@ main(int argc, char **argv)
 #endif /* ESCM_LANG_DIR */
 
   /* invoke the interpreter. */
-  if (!opts.interpreter) opts.interpreter = scm_interp;
   if (opts.process) {
     outp = escm_popen(opts.interpreter);
     if (outp == NULL)
@@ -227,9 +220,10 @@ main(int argc, char **argv)
 
   /* initialization */
   escm_init(lang, outp);
-  escm_define(lang, "escm-interpreter", opts.interpreter, outp);
-  escm_define(lang, "escm-output-file", opts.outfile, outp);
-  escm_define(lang, "escm-input-file", NULL, outp);
+  escm_define(lang, "*escm-interpreter*",
+	      opts.interpreter ? opts.interpreter : ESCM_SCM, outp);
+  escm_define(lang, "*escm-output-file*", opts.outfile, outp);
+  escm_define(lang, "*escm-input-file*", NULL, outp);
 
   /* evaluate the expressions specified in options */
   for (i = 0; i < opts.n_expr; i++) {
@@ -255,7 +249,7 @@ main(int argc, char **argv)
   escm_finish(lang, outp);
 
   /* close the pipe. */
-  if (opts.process && escm_pclose(outp) == -1)
+  if (opts.process && escm_pclose(outp) != 0)
     escm_error(NULL);
 
   return 0;

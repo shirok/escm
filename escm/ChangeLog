@@ -1,3 +1,20 @@
+2003-06-29  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* doc/gimmick.escm, doc/interpreter.escm: Updated.
+	* src/fork.c, src/filter.c: Check the exit status of the child
+	process.
+	
+2003-06-28  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.c, src/filter.c, src/lang/scm, doc/filter.escm: Change
+	the conversion rule of variable names.
+	* acinclude.m4, src/filter.c, src/fork.c: The command line of the
+	default interpreter is tokenized in configure.
+	* src/escm.c, src/Makefile.am: bugfixes.
+	* doc/Makefile.am, doc/aescm.epod: Rewrite part of documentation
+	in POD format.
+	* doc/filter.escm, doc/handler.escm, doc/library.escm: Removed.
+	
 2003-06-26  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/meta_arg.c: Change interface.

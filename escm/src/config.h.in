@@ -3,6 +3,9 @@
 /* Command line to invoke the scheme interpreter. */
 #undef ESCM_SCM
 
+/* argv for a Scheme interpreter */
+#undef ESCM_SCM_ARGV
+
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 #undef HAVE_DOPRNT
 

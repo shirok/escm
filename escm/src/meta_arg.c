@@ -71,7 +71,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
-#include <stdlib.h>
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
 #include "meta_arg.h"
 
 #ifndef FALSE

@@ -10,8 +10,6 @@
         (load (string-append *pwd* "/helper.scm"))?>
   </head>
   <body>
-    <?scm (header)?>
-
     <h1>Scheme Interpreters</h1>
     <address>TAGA Yoshitaka
 &lt;<?scm:d (mail-link PACKAGE_BUGREPORT)?>&gt;</address>
@@ -31,7 +29,7 @@ Still you may have to specify option arguments either when you run
 </code></pre>
     </blockquote>
 
-    <p>or invoke script files such as:</p>
+    <p>or when you invoke script files such as:</p>
 
     <blockquote>
       <pre><code>
@@ -125,18 +123,28 @@ With <code>-s /dev/stdin</code>, we always have <q>#&lt;unspecified&gt;.</q>
       <dd><blockquote>
 	  <pre><code>sizzle -s /dev/stdin</code></pre>
 	</blockquote></dd>
-      <dt>Stklos 0.53</dt>
+      <dt>Stklos 0.55</dt>
       <dd><blockquote>
-	  <pre><code>stklos -q</code></pre>
+	  <pre><code>stklos</code></pre>
 	</blockquote>
-<p>You can remove <code>-q</code> if you don't use <strong>escm</strong>
-in CGI scripts. Without <code>-q</code>,
-<strong>stklos</strong> aborts when it refers to an environment
-variable.</p>
+<p>Previous versions may require <em>-q</em> option
+to be used in a CGI.</p>
+</dd>
+      <dt>TinyScheme 1.33</dt>
+      <dd><blockquote>
+	  <pre>scheme /dev/stdin</pre>
+	</blockquote>
+<p>The path to the initialization file may cause a problem.
+Edit the source and specify its absolute path.</p>
 </dd>
       <dt>UMB scheme 3.2</dt>
       <dd><p>It does not seem to have a batch mode.
 I have found out no way to suppress the banner and prompts.</p></dd>
     </dl>
+<hr />
+    <div>
+<a href="http://sourceforge.net">
+<img src="http://sourceforge.net/sflogo.php?group_id=68657&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>
+</div>
   </body>
 </html>

@@ -8,7 +8,7 @@ gosh -b
 ;; false
 #f
 ;; define
-(define *variable-name* value)
+(define variable-name value)
 ;; string
 (display "string")
 ;; expression

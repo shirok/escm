@@ -3,10 +3,10 @@
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "DTD/xhtml11-flat.dtd">
+<?scm (load (string-append *pwd* "/config-h.scm"))
+      (load (string-append *pwd* "/helper.scm"))?>
 <html>
   <head>
-  <?scm (load (string-append *pwd* "/config-h.scm"))
-        (load (string-append *pwd* "/helper.scm"))?>
     <title>README for <?scm:d PACKAGE?></title>
   </head>
   <body>
@@ -15,7 +15,8 @@ for <em><?scm:d PACKAGE?> <?scm:d VERSION?></em>
 (README or doc/readme.html).</p>
     <p><em><?scm:d (string-titlecase PACKAGE)?></em> is an experimental version
 of <em>escm</em>.
-The stable version is still <em>escm 1.1</em>.</p>
+The stable version is still
+<a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm 1.1</a>.</p>
 
     <p>Seemingly <em><?scm:d PACKAGE?></em> is a filter program
 to processes embedded Scheme code in documents
@@ -25,15 +26,10 @@ it evaluated by a backend Scheme interpreter.
 Scheme code between <em>&lt;?scm</em> and <em>?&gt;</em> is evaluated
 and replaced with what is written to stdout while the evaluation.
 Code between <em>&lt;?scm:d</em> and <em>?&gt;</em> is evaluated
-and replaced with the result.
-See doc/<a href="filter.html">filter.html</a> for detail.</p>
+and replaced with the result.</p>
     <p><em><?scm:d (string-titlecase PACKAGE)?></em> is designed
 to be interpreter independent,
-and works with most Scheme implementations.
-See doc/<a href="interpreter.html">interpreter.html</a>
-for detail.</p>
-    <p>Its internal is described in
-doc/<a href="library.html">library.html</a>.</p>
+and works with most Scheme implementations.</p>
 
     <h2>INSTALL</h2>
     <p>Find out good option arguments for your favorite scheme interprter
@@ -53,12 +49,16 @@ make install
 
     <p>You can enable to embed other interpreter languages than <em>Scheme</em>
 by specifying <em>--enable-gimmick</em> option.
+The distribution comes with the configuration files
+for Awk, Csh, Perl, Python, Ruby, Sh, and Tcl.
 See doc/<a href="gimmick.html">gimmick.html</a>
 for detail.</p>
 
     <p>You can also use this program as an action handler of Apache.
 You should intall it manually if you want to.
-See doc/<a href="handler.html">handler.html</a> for detail.</p>
+Consult
+the example in the <a href="aescm.html#action handler">man page.</a></p>
+
 
     <h2>BUGS</h2>
     <p>This is an experimental version and not thoroughly tested.
@@ -73,4 +73,9 @@ or email (<?scm:d (mail-link PACKAGE_BUGREPORT)?>).</p>
     <p>
 This file was converted from <em><?scm:d *escm-input-file*?></em>
 on <?scm:d *date*?>. The backend is <em><?scm:d *escm-interpreter*?></em>.</p>
-  </body>
+    <hr/>
+    <div>
+<a href="http://sourceforge.net">
+<img src="http://sourceforge.net/sflogo.php?group_id=68657&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" /></a>
+</div>
+</body></html>

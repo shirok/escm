@@ -40,5 +40,9 @@ if test x$? != x0 || test "$escm_ret" != "string"; then
 else
    AC_MSG_RESULT([good (display and literal).])
 fi
+scm_args=`echo $scm_prog | sed -e "s/  */\", \"/g"`
+AC_DEFINE_UNQUOTED(ESCM_SCM_ARGV, ["$scm_args"], [argv for a Scheme interpreter])
 ])
+
+
 dnl end of acinclude.m4

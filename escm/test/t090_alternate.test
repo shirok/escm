@@ -21,6 +21,8 @@ cat <<EOF > input
 B<?scm:d 'b?>
 <?scm 'c?>C
 1<?scm:d 'd?>2
+<<?scm 'e?>>
+<<?scm:d 'f?>>
 literal
 
 EOF
@@ -30,6 +32,8 @@ cat <<EOF > out-ok
 Bb
 C
 1d2
+<>
+<f>
 literal
 
 EOF

@@ -6,6 +6,8 @@ ESCM = $(top_builddir)/src/aescm
 
 SUFFIXES = .escm .html
 
+man_MANS = aescm.1
+
 $(ESCM) :
 	cd $(top_builddir)/src/ && make
 
@@ -15,13 +17,24 @@ config-h.scm : $(top_builddir)/src/config.h $(ESCM)
 %.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
 	-LANG=C && $(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
 
-EXTRA_DIST = config-h.awk helper.scm @ESCM_DOC_FILES@
 
-CLEANFILES = config-h.scm @HTML_DOC_FILES@
+aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm
+	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
+
+aescm.1 : aescm.pod
+	pod2man -c "" -r "" $< > $@
+
+aescm.html : aescm.pod
+	pod2html $< > $@
+
+EXTRA_DIST = config-h.awk helper.scm @ESCM_DOC_FILES@ aescm.epod
+
+CLEANFILES = config-h.scm @HTML_DOC_FILES@ aescm.pod aescm.1 aescm.html
 
 noinst_DATA = $(CLEANFILES)
 
-TESTS =
+clean-local:
+	-rm *~
 
 # end of doc/Makefile.am
 
