@@ -54,8 +54,10 @@ void escm_bind(const struct escm_lang *lang, const char *var, const char *val, F
 void escm_assign(const struct escm_lang *lang, const char *var, const char *val, FILE *outp);
 
 /* CGI */
-void escm_header(const struct escm_lang *lang, FILE *inp, FILE *outp);
-int escm_bind_query_string(const struct escm_lang *lang, FILE *outp);
+#ifdef ENABLE_CGI
+void escm_header(const struct escm_lang *lang, FILE *outp);
+int escm_query_string(const struct escm_lang *lang, FILE *outp);
+#endif /* ENABLE_CGI */
 
 /* converter */
 int escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp);

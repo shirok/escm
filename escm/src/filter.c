@@ -167,6 +167,10 @@ main(int argc, char **argv)
 
   /* invoke the interpreter. */
   if (process_flag) outp = popen(interp, "w");
+  if (outp == NULL) {
+    perror(argv[0]);
+    exit(EXIT_FAILURE);
+  }
 
   /* initialization */
   escm_init(lang, outp);
