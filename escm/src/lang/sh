@@ -6,3 +6,4 @@ sh
 echo -n -e "@STR@"
 # display
 echo -n -e @EXP@
+# end

@@ -6,3 +6,4 @@ set @VAR@=@VAL@
 echo -n "@STR@"
 # display
 echo -n @EXP@
+# end

@@ -8,3 +8,4 @@ octave -q
 puts("@STR@");
 # display - the object will be a number.
 printf("%g", @EXP@);
+# end

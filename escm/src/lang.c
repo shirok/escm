@@ -204,6 +204,9 @@ parse_lang(const char *name)
     case HASH_KEY('s', 't'): /* string */
       if (!parse_form2(data, &(mylang.literal))) return NULL;
       break;
+    case HASH_KEY('e', 'n'): /* end */
+      ptr = NULL;
+      break;
     default:
       return NULL;
     }
