@@ -36,6 +36,7 @@ void escm_html_header(const struct escm_lang *lang, FILE *outp);
 void escm_text_header(const struct escm_lang *lang, FILE *outp);
 #endif /* ENABLE_CGI */
 void escm_error(const char *fmt, ...);
+char ** tokenize_cmd(const char *cmd);
 
 /* fork.c */
 FILE *escm_popen(char * const argv[]);
