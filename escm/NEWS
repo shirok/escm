@@ -1,4 +1,6 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
+Version 0.26 (2004-02-29)
+* Skip the sharp-bang line of the first argument file.
 Version 0.25 (2004-02-23)
 * Removed useless features.
 * Support Common Lisp.
