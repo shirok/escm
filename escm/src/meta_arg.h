@@ -7,7 +7,6 @@
 int meta_args(int *pargc, char ***pargv);
 int meta_args_replace(int *pargc, char ***pargv, const char *filename, int from);
 int meta_skip_shebang(FILE *fp);
-const char *meta_progname(const char *argv0);
 
 /* values to be returned */
 #define META_ARGS_OK 0

@@ -76,7 +76,7 @@ static void
 usage(void)
 {
   printf(gettext("Usage: %s [OPTION] ... FILE ...\n"), escm_prog);
-  fputs(gettext("Process embedded scheme code in documents.\n"), stdout);
+  fputs(gettext("Process embedded scheme code in documents.\n\n"), stdout);
   fputs(gettext("  -E                  convert documents into code\n"), stdout);
   fputs(gettext("  -H                  print no content header even in a CGI\n"), stdout);
   fputs(gettext("  -e EXPR             evaluate an expression\n"), stdout);
@@ -85,7 +85,7 @@ usage(void)
   fputs(gettext("  -l LANG             choose the interpreter language\n"), stdout);
   fputs(gettext("  -o FILENAME         specify the output file\n"), stdout);
   fputs(gettext("  -h                  print this message and exit\n"), stdout);
-  fputs(gettext("  -v                  print version information and exit\n"), stdout);
+  fputs(gettext("  -v                  print version information and exit"), stdout);
 #ifndef ENABLE_CGI
   printf(gettext("\nOption %s is discarded."), "-H");
 #endif /* ENABLE_CGI */
@@ -221,7 +221,7 @@ main(int argc, char **argv)
 #endif /* ENABLE_CGI */
 
   /* Get the program name. */
-  escm_prog = meta_progname(argv[0]);
+  escm_prog = argv[0];
 
 #ifdef ENABLE_CGI
   /* redirect stderr to stdout if it is invoked as CGI. */

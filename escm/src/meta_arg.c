@@ -124,21 +124,6 @@ static int xlineno = 0;
 }
 #endif /* xerror2 */
 
-/* meta_progname(argv[0]) - return the program name.
- */
-const char *
-meta_progname(const char *argv0)
-{
-  const char *p = argv0;
-  while (*p)
-    p++;
-  while (argv0 < p && *p != '/')
-    p--;
-  if (p == argv0 || !p[1]) return argv0;
-  else return p + 1;
-}
-
-
 #define ADD_CHAR(c) {\
   if (buf) {\
      if (size == i) {\
@@ -320,7 +305,7 @@ meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
   argc = *pargc;
   argv = *pargv;
 
-  if (!xprog) xprog = meta_progname(argv[0]);
+  if (!xprog) xprog = argv[0];
 
   fp = fopen(script, "r");
   if (fp == NULL) xerror2(gettext("can't open - %s"), script);
