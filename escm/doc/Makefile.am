@@ -24,10 +24,10 @@ aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm
 	$(ESCM) -e "(load \"$(top_srcdir)/doc/helper.scm\")" -o $@ $<
 
 aescm.1 : aescm.pod
-	pod2man -c "" -r "" $< > $@
+	$(POD2MAN) -c "" -r "" $< > $@
 
 aescm.html : aescm.pod
-	pod2html $< > $@
+	$(POD2HTML) $< > $@
 
 EXTRA_DIST = config-h.awk helper.scm $(ESCM_DOC_FILES) aescm.epod
 

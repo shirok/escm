@@ -15,6 +15,8 @@ AC_PROG_AWK
 # AC_PROG_RANLIB
 # AC_PROG_LIBTOOL
 AC_CHECK_PROGS(LYNX, [lynx links w3m])
+AC_CHECK_PROGS(POD2MAN, [pod2man])
+AC_CHECK_PROGS(POD2HTML, [pod2html])
 
 # The default interpreter language
 AC_ARG_WITH([default], [  --with-default=lang   specify the default language (scm).])
