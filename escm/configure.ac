@@ -18,6 +18,10 @@ AC_CHECK_PROGS(LYNX, [lynx links w3m])
 AC_CHECK_PROGS(POD2MAN, [pod2man])
 AC_CHECK_PROGS(POD2HTML, [pod2html])
 
+# i18n
+AM_GNU_GETTEXT([external])
+AM_ICONV
+
 # The default interpreter language
 AC_ARG_WITH([default], [  --with-default=lang   specify the default language (scm).])
 if test x$with_default == xyes || test x$with_default == x; then
@@ -51,7 +55,7 @@ AC_CHECK_FUNCS([atexit dup2 strerror strchr strtol getopt_long])
 # polyglot
 AC_OBJEXT
 AC_ARG_ENABLE([polyglot],
-   [  --enable-polyglot -- enable polyglot support (no).])
+   [  --enable-polyglot -- enable polyglot support.])
 if test x$enable_polyglot = xyes; then
   POLYGLOT_OBJ=lang.$OBJEXT
   AC_SUBST(POLYGLOT_OBJ)
@@ -61,8 +65,11 @@ AM_CONDITIONAL(POLYGLOT, test "$enable_polyglot" = "yes")
 
 # CGI program
 AC_ARG_ENABLE([cgi],
-   [  --enable-cgi -- use as a CGI program (yes).])
+   [  --disable-cgi -- not to use as a CGI program.])
 AC_ESCM_CHECK_CGI
 
-AC_CONFIG_FILES([Makefile doc/Makefile src/Makefile test/Makefile src/lang/Makefile])
+AC_CONFIG_FILES([Makefile test/Makefile
+			  doc/Makefile
+			  src/Makefile src/lang/Makefile
+			  po/Makefile.in m4/Makefile ])
 AC_OUTPUT

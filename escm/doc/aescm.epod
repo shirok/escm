@@ -1,4 +1,4 @@
-<?scm (load "./config-h.scm")?>
+<?scm (load (string-append *pwd* "/config-h.scm"))?>
 
 =head1 NAME
 
@@ -12,23 +12,13 @@ B<<?scm:d PACKAGE?>> I<[OPTION]> ... I<FILE> ...
 
 B<<?scm:d (string-titlecase PACKAGE)?>> is a filter program
 to preprocess embedded Scheme code in documents.
-Conforming to the XML specification about Processing Instructions,
 Scheme code between C<E<lt>?scm> and C<?E<gt>> is evaluated
 and replaced with what is written to
 C<(current-output-port)> while the evaluation.
 An expression between C<E<lt>?scm:d> and C<?E<gt>> is evaluated
-and replaced with the result.
-At least a blank, that is a whitespace, a tab or a newline, is required
-after the C<E<lt>?scm> or C<E<lt>?scm:d>.
-
-The first line of each input file is to be skipped
-if it begins with C<#>,
-for it may be the sharp-bang line of a script.
-What seem to be meta-argument lines are also skipped.
-But if the input is stdin, the first line is always processed.
-The arguments and the meta-arguments in the script file or
-the file specified by C<PATH_TRANSLATED> are parsed,
-but those of the other files, if any, are simply ignored.
+and replaced with its result.
+The sharp-bang line and the meta-argument lines (if any)
+of a script are skipped.
 
 The body of B<<?scm:d PACKAGE?>> is a simple converter
 from a text to Scheme code,
@@ -42,66 +32,73 @@ If it is the case,
 a content header for HTML will be added
 and error messages are to be sent to stdout.
 
-=head2 OPTIONS
+=head1 OPTIONS
 
 =over 2
 
-=item -E
+=item -E, --no-eval
 
 Preprocess files and convert them into a Scheme program.
 
-=item -H
+=item -H, --no-header
 
 Print no content header even in a CGI script.
 
-=item -e EXPR
+=item -c, --classic
+
+Suppress the content header and send error messages to stdout.
+
+=item -e, --eval=EXPR
 
 Evaluate an expression before processing files.
-You can specify this option as many as you want.
+This option can be used as many times as you want.
 
-=item -f FILENAME
+=item -f, --footer=FILENAME
 
-Specify the footer file.  This file will be processed
-in the last place.
+Specify the footer file.
 
-=item -i 'PROG ARG ...'
+=item -h, --header=FILENAME
+
+Specify the header file.
+
+=item -i, --interp='PROG ARG ...'
 
 Specify the interpreter with its arguments.
 
-=item -l LANG
+=item -l, --language LANG
 
 Specify the interpreter language to be used.
 This option is valid
 if the tool has been configured with
 C<--enable-polyglot> option.
 
-=item -o FILENAME
+=item -o, --output=FILENAME
 
 Specify the output file.
 
-=item -h
+=item --help
 
 Print a short help message.
 
-=item -v
+=item --version
 
 Print version information.
 
 =back
 
-=head2 SCHEME VARIABLES
+=head1 SCHEME VARIABLES
 
 =over 2
 
 =item E<42>escm-input-fileE<42>
 
 The name of the file which the tool is currently processing.
-The value is the false if the input is stdin.
+The value is false if the input is stdin.
 
 =item E<42>escm-output-fileE<42>
 
 The name of the output file.
-It is the false if the output is stdout.
+It is false if the output is stdout.
 
 =item E<42>escm-interpreterE<42>
 
@@ -114,14 +111,14 @@ The name and the version of this project.
 =item GATEWAY_INTERFACE
 
 The value of environment variable B<GATEWAY_INTERFACE>
-or the false if it is not defined.
+or false if it is not defined.
 This variable will be used to check whether the script is a CGI or not.
 
 =back
 
 The following variables are defined only when
 B<GATEWAY_INTERFACE> is a true.
-They are the false
+They are false
 if their corresponding environment variables are not defined.
 
 =over 2
@@ -133,31 +130,17 @@ It is so even if the request method is B<POST>.
 
 =item REQUEST_METHOD
 
-The value of environment variable B<REQUEST_METHOD>.
-
 =item HTTP_HOST
-
-The value of environment variable B<HTTP_HOST>.
 
 =item HTTP_COOKIE
 
-The value of environment variable B<HTTP_COOKIE>.
-
 =item HTTP_ACCEPT_LANGUAGE
-
-The value of environment variable B<HTTP_ACCEPT_LANGUAGE>.
 
 =item HTTP_ACCEPT_CHARSET
 
-The value of environment variable B<HTTP_ACCEPT_CHARSET>.
-
 =item HTTP_REFERER
 
-The value of environment variable B<HTTP_REFERER>.
-
 =item HTTP_USER_AGENT
-
-The value of environment variable B<HTTP_USER_AGENT>.
 
 =back
 
@@ -175,6 +158,14 @@ the tool is invoked in a CGI or not.
 The file to be processed
 when the tool is invoked as a handler CGI program.
 
+=item ESCM_DEFAULT
+
+The default interpreter language.
+
+=item ESCM_BACKEND
+
+The default backend interpreter.
+
 =back
 
 =head1 EXAMPLE
@@ -185,12 +176,6 @@ This man page itself was converted by B<<?scm:d PACKAGE?>> as:
 
   <?scm:d PACKAGE?> -e "(define *pwd* \"`pwd`\")" aescm.epod > aescm.pod
   pod2man -c "" -r "" aescm.pod > aescm.1
-
-In C<aescm.epod>,
-C<config-h.scm> was loaded
-which had been converted from C<src/config.h> by an Awk script.
-The current working directory was bound to a Scheme variable,
-for files to be loaded may have to be specified by their full paths.
 
 =head2 CGI Interpreter
 
@@ -226,8 +211,6 @@ Then add these lines to your C<.htaccess>.
 
 Access to a file suffixed with C<.schtml> will be processed by this tool
 and embedded Scheme code will be evaluated.
-The file permission is the same as that of other static documents
-and you need not to add the sharp-bang line.
 
 =head2 Other Interpreter Languages
 
@@ -238,9 +221,6 @@ You can also embed code of most interpreter languages,
 e.g. Awk, Csh, Octave, Perl, Python, Ruby, Sh, Tcl.
 But you can use this feature
 only when you have run C<configure> script with C<--enable-polyglot> option.
-
-Try C<aescm -h> and
-check whether a description of C<-l> option appears.
 
 This short example for Awk
 will show you a list of the environment variables.
@@ -264,9 +244,9 @@ will show you a list of the environment variables.
 
 =item *
 B<<?scm:d (string-titlecase PACKAGE)?>>
-is an experimental version
+is developers' version
 of B<escm>.
-The stable version is B<escm 1.1>.
+The stable version is still B<escm 1.1>.
 
 =item *
 A document written in a multibyte character set
@@ -286,18 +266,10 @@ The experimental version has adopted the XML syntax for a preprocessor
 as B<eguile> did
 and eliminated the archaic one
 (C<E<lt>?>, C<E<lt>?=> and C<!E<gt>>).
-The syntax for script languages (C<E<lt>%> and C<%E<gt>>)
-which can be used in previous experimental versions,
-had been also eliminated.
 
 =head2 Options
 
 =over 2
-
-=item -c
-Deleted.
-It is automatically judged
-whether it is invoked in a CGI  or not.
 
 =item -H
 Added.
@@ -327,7 +299,7 @@ by C<E<quot>> will be treated as we expected.
 
 =head1 AUTHOR
 
-  Shiro Kawai  -- the original and stable B<escm>
+  Shiro Kawai  -- the original and stable escm
   TAGA Yoshitaka, tagga@tsuda.ac.jp
 
 =head1 SEE ALSO
@@ -337,7 +309,8 @@ B<eguile> (L<http://woozle.org/~neale/src/eguile/>),
 B<brl> (L<http://brl.sourceforge.net/>),
 B<scsh> (L<http://scsh.sourceforge.net/>),
 B<guile>,
-B<gosh>.
+B<gosh>,
+B<2aescm>.
 
 =begin html
 <hr />

@@ -4,39 +4,40 @@
 
 ESCM = ../src/aescm
 
-SUFFIXES = .escm .html
+SUFFIXES = .escm .html .epod .pod
 
-man_MANS = aescm.1
+man_MANS = aescm.1 2aescm.1
 
-ESCM_DOC_FILES = readme.escm gimmick.escm interpreter.escm
-HTML_DOC_FILES = readme.html gimmick.html interpreter.html
+HTML_FILES = readme.html gimmick.html interpreter.html
 
 $(ESCM) :
 	cd ../src/ && make
 
-config-h.scm : ../src/config.h $(ESCM)
+config-h.scm : ../src/config.h
 	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
 
-%.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
-	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(load \"$(top_srcdir)/doc/helper.scm\")" -o $@ $<
+%.html : %.escm config-h.scm
+	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"$(top_srcdir)/doc/helper.scm\"))" -o $@ $<
 
-aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm
-	$(ESCM) -e "(load \"$(top_srcdir)/doc/helper.scm\")" -o $@ $<
+%.pod : %.epod config-h.scm
+	$(ESCM) -e "(define *pwd* \"`pwd`\")" -e "(load (string-append *pwd* \"/\" \"$(top_srcdir)/doc/helper.scm\"))" -o $@ $<
 
-aescm.1 : aescm.pod
-	$(POD2MAN) -c "" -r "" $< > $@
+%.1 : %.pod
+	-$(POD2HTML) $< > $*.html
+	-$(POD2MAN) -c "" -r "" $< > $@
 
-aescm.html : aescm.pod
-	$(POD2HTML) $< > $@
+EXTRA_DIST = config-h.awk helper.scm
+EXTRA_DIST += readme.escm gimmick.escm interpreter.escm
+EXTRA_DIST += aescm.epod 2aescm.epod
 
-EXTRA_DIST = config-h.awk helper.scm $(ESCM_DOC_FILES) aescm.epod
+CLEANFILES = config-h.scm
 
-CLEANFILES = config-h.scm $(HTML_DOC_FILES) aescm.pod aescm.1 aescm.html
-
-noinst_DATA = $(CLEANFILES)
+noinst_DATA = $(HTML_FILES)
 
 clean-local:
 	-rm *~
+	-rm *.html
+	-rm *.1
 
 # end of doc/Makefile.am
 

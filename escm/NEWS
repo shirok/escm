@@ -1,12 +1,17 @@
 NEWS file for aescm (Alternative Embedded SCheMe)
-Version 0.21 (2003-07-??)
-* Configure option --with-default-language was renamed to --with-default.
-* Configure option --enable-handler was renamed to --enable-cgi
+Version 0.21 (2003-07-29)
+* FEATURE FREEZE
+* Added 2aescm to convert the original escm format to the XML format.
+* Internationalized.
+* Accept long options.
 * The default language can be specified by ESCM_DEFAULT environement variable.
 * The default backend can be specified by ESCM_BACKEND environement variable.
 * Added a language information file for O'Caml.
 * Added subsubnamespaces (eg. <?ocaml:d:g x?> for `printf "%g" x') to be used as a format string.
-* Accept long options.
+* Added --classic option for backward compatibility.
+* Added --header option.
+* Configure option --with-default-language was renamed to --with-default.
+* Configure option --enable-handler was renamed to --enable-cgi
 
 Version 0.20 (2003-07-14)
 * The default language need not be Scheme.

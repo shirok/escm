@@ -3,7 +3,7 @@
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "DTD/xhtml11-flat.dtd">
-<?scm (load "./config-h.scm")?>
+<?scm (load (string-append *pwd* "/config-h.scm"))?>
 <html>
   <head>
     <title>README for <?scm:d PACKAGE?></title>
@@ -12,7 +12,7 @@
     <p>This is <em>README</em> file
 for <em><?scm:d PACKAGE?> <?scm:d VERSION?></em>
 (README or doc/readme.html).</p>
-    <p><em><?scm:d (string-titlecase PACKAGE)?></em> is an experimental version
+    <p><em><?scm:d (string-titlecase PACKAGE)?></em> is developers' version
 of <em>escm</em>.
 The stable version is still
 <a href="http://www.shiro.dreamhost.com/scheme/vault/escm.html">escm 1.1</a>.</p>
@@ -69,16 +69,6 @@ The tool will be automatically installed in <em>cgi-bin</em> directory.
 You may have to add a suffix.
 Consult
 <a href="aescm.html#handler cgi program">the example in the man page.</a></p>
-
-
-    <h2>BUGS</h2>
-    <p>This is an experimental version and not thoroughly tested.
-So it must be buggy.</p>
-    <p>If you have found bugs, please inform of them
-via the bug track system
-in sourceforge's
-<a href="http://www.sourceforge.net/projects/escm">escm project page</a>
-or email (<?scm:d (link-mail PACKAGE_BUGREPORT)?>).</p>
 
     <hr/>
     <p>
