@@ -1,3 +1,16 @@
+2004-12-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/fifo.c, src/filter.c, src/cgimain.c (main): Removed
+	variable escm_output.
+
+	* src/escm.h, src/lang.c (parse_lang), src/langconf.c: Removed
+	assign field from escm_lang structure.
+
+	* src/escm.c (escm_assign): Removed.
+
+	* src/escm.c (escm_puts): Use escm_puts_in() inside.
+	(escm_puts_array, escm_bind_array): Added these functions.
+
 2004-12-14  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/fifo.c: Added but it does not work yet.

@@ -2,7 +2,7 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-all :
+all : $(htm_DATA) $(man_MANS)
 
 ESCM = $(top_builddir)/src/aescm -i "gosh -b -I."
 POD2MAN = pod2man
@@ -34,7 +34,9 @@ clean-local:
 	-rm *~
 	-rm *.tmp
 	-rm *.pod
-	-rm *.html
+
+distclean-am :
+	-rm $(man_MANS) $(html_DATA)
 
 # end of doc/Makefile.am
 

@@ -308,8 +308,6 @@ clean-am: clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic
-
 dvi: dvi-am
 
 dvi-am:
@@ -361,7 +359,7 @@ uninstall-man: uninstall-man1
 	uninstall-info-am uninstall-man uninstall-man1
 
 
-all :
+all : $(htm_DATA) $(man_MANS)
 
 .epod.1 :
 	$(ESCM) $< > $*.pod
@@ -379,7 +377,9 @@ clean-local:
 	-rm *~
 	-rm *.tmp
 	-rm *.pod
-	-rm *.html
+
+distclean-am :
+	-rm $(man_MANS) $(html_DATA)
 
 # end of doc/Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
