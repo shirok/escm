@@ -1,3 +1,11 @@
+2003-07-18  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/escm.h, src/filter.c, src/fork.c (escm_popen): The command
+	line of a backend interpreter is tokenized in main().
+
+	* src/filter.c: Fixed priorities among options and environment
+	variables.
+
 2003-07-17  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escm.h, src/lang.awk, src/lang.c, src/escm.c, src/lang/*:

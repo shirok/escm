@@ -12,9 +12,6 @@
 #endif /* HAVE_STDLIB_H */
 #include <errno.h>
 #include <signal.h>
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif /* HAVE_STRING_H */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
@@ -26,8 +23,6 @@
 #endif /* HAVE_SYS_WAIT_H */
 #include "escm.h"
 
-static char *def_argv[] = { ESCM_BACKEND_ARGV, NULL };
-
 static void
 sigterm(void)
 {
@@ -35,7 +30,7 @@ sigterm(void)
 }
 
 FILE *
-escm_popen(const char * prog)
+escm_popen(char * const argv[])
 {
   int fd[2];
   pid_t pid;
@@ -55,30 +50,7 @@ escm_popen(const char * prog)
     }
     return pipe;
   } else { /* child process */
-    char **argv = NULL;
-
     atexit(sigterm);
-    if (prog) {
-      char *p;
-      char *str;
-      int i, n = 0;
-
-      str = (char *)malloc(1 + strlen(prog));
-      if (!str) escm_error(NULL);
-      strcpy(str, prog);
-      p = strtok(str, " \t");
-      for (i = 0; /**/; i++, p = strtok(NULL, " \t")) {
-	if (i == n) {
-	  n += 4;
-	  argv = (char **)realloc(argv, sizeof(char*) * n);
-	  if (!argv) escm_error(NULL);
-	}
-	argv[i] = p;
-	if (p == NULL) break;
-      }
-    } else {
-      argv = def_argv;
-    }
 
     close(fd[1]); /* write */
     /* connect fd[0] to the child process's stdin */

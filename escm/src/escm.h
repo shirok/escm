@@ -84,6 +84,6 @@ void escm_text_header(const struct escm_lang *lang, FILE *outp);
 void escm_error(const char *fmt, ...);
 
 /* fork.c */
-FILE *escm_popen(const char *prog);
+FILE *escm_popen(char * const argv[]);
 int escm_pclose(FILE *fp);
 #endif /* ESCM_H */

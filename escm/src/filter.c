@@ -21,6 +21,32 @@
 #include "meta_arg.h"
 #include "escm.h"
 
+static char * const default_backend[] = { ESCM_BACKEND_ARGV, NULL };
+
+static char **
+tokenize_cmd(const char *cmd)
+{
+  char *p;
+  char *str;
+  int i, n = 0;
+  char **argv = NULL;
+
+  str = (char *)malloc(1 + strlen(cmd));
+  if (!str) escm_error(NULL);
+  strcpy(str, cmd);
+  p = strtok(str, " \t");
+  for (i = 0; /**/; i++, p = strtok(NULL, " \t")) {
+    if (i == n) {
+      n += 4;
+      argv = (char **)realloc(argv, sizeof(char*) * n);
+      if (!argv) escm_error(NULL);
+    }
+    argv[i] = p;
+    if (p == NULL) break;
+  }
+  return argv;
+}
+
 #ifdef ENABLE_CGI
 /* Will be moved elesewhere. */
 static char * env_to_bind[] = {
@@ -49,17 +75,17 @@ struct escm_lang * parse_lang(const char *name, const char **interp);
 static void
 usage(void)
 {
-  printf(gettext("Usage: %s [OPTION] ... FILE ...
-Process embedded scheme code in documents.
-  -E                  only preprocess files
-  -H                  print no content header even in a CGI script
-  -e EXPR             evaluate an expression
-  -f FILENAME         specify the footer file
-  -i 'PROG ARG ... '  explicitly specify the interpreter
-  -l LANG             specify another interpreter language than scheme
-  -o FILENAME         specify the output file
-  -h                  print this message
-  -v                  print version information"), escm_prog);
+  printf(gettext("Usage: %s [OPTION] ... FILE ...\n"), escm_prog);
+  fputs(gettext("Process embedded scheme code in documents.\n"), stdout);
+  fputs(gettext("  -E                  convert documents into code\n"), stdout);
+  fputs(gettext("  -H                  print no content header even in a CGI\n"), stdout);
+  fputs(gettext("  -e EXPR             evaluate an expression\n"), stdout);
+  fputs(gettext("  -f FILENAME         specify the footer file\n"), stdout);
+  fputs(gettext("  -i 'PROG ARG ... '  invoke an interpreter as backend\n"), stdout);
+  fputs(gettext("  -l LANG             choose the interpreter language\n"), stdout);
+  fputs(gettext("  -o FILENAME         specify the output file\n"), stdout);
+  fputs(gettext("  -h                  print this message and exit\n"), stdout);
+  fputs(gettext("  -v                  print version information and exit\n"), stdout);
 #ifndef ENABLE_CGI
   printf(gettext("\nOption %s is discarded."), "-H");
 #endif /* ENABLE_CGI */
@@ -74,8 +100,10 @@ Process embedded scheme code in documents.
 static void
 version(void)
 {
-  fputs(PACKAGE_STRING " - experimental version of escm\n", stdout);
-  fputs("The default interpreter is '" ESCM_BACKEND "'\n", stdout);
+  char *interp = getenv("ESCM_BACKEND");
+  if (!interp) interp = ESCM_BACKEND;
+  printf(gettext("%s - experimental version of escm\n"), PACKAGE_STRING);
+  printf(gettext("The default interpreter is '%s'\n"), interp);
 }
 
 /* proc_file_name(lang, name, outp) - process a file. The inpuf file
@@ -100,16 +128,15 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
 /* struct opt_data - structure to store options.
  */
 struct opt_data {
-  const char *interpreter;
-  const char *outfile;
-  const char *langname;
-  const char *footer;
-  char **expr;
+  const char *interp;   /* -i "interp arg ..." */
+  const char *outfile;  /* -o file */
+  const char *langname; /* -l lang */
+  const char *footer;   /* -f file */
+  char **expr;          /* -e expr */
   int n_expr;
-  int process;
-  int header;
+  int process;          /* -E */
+  int header;           /* -H */
 };
-
 /* parse_opts(argc, argv, &opts) - process options
  */
 static void
@@ -139,7 +166,7 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
       opt->footer = optarg;
       break;
     case 'i':
-      opt->interpreter = optarg;
+      opt->interp = optarg;
       break;
 #ifdef ENABLE_POLYGLOT
     case 'l':
@@ -192,12 +219,8 @@ main(int argc, char **argv)
 #ifdef ENABLE_CGI
   escm_cgi = getenv("GATEWAY_INTERFACE");
 #endif /* ENABLE_CGI */
-  opts.interpreter = getenv("ESCM_BACKEND");
-#ifdef ENABLE_POLYGLOT
-  opts.langname = getenv("ESCM_DEFAULT");
-#endif /* ENABLE_POLYGLOT */
 
-  /* for error messages */
+  /* Get the program name. */
   escm_prog = meta_progname(argv[0]);
 
 #ifdef ENABLE_CGI
@@ -238,12 +261,31 @@ main(int argc, char **argv)
 
 #ifdef ENABLE_POLYGLOT
   /* select the language if necessary. */
-  if (opts.langname) lang = parse_lang(opts.langname, &(opts.interpreter));
+  if (opts.langname) {
+    const char *interp;
+    lang = parse_lang(opts.langname, &interp);
+    if (!opts.interp) opts.interp = interp;
+  } else {
+    opts.langname = getenv("ESCM_DEFAULT");
+    if (opts.langname) {
+      const char *interp;
+      lang = parse_lang(opts.langname, &interp);
+      if (!opts.interp) {
+	opts.interp = getenv("ESCM_BACKEND");
+	if (!opts.interp) opts.interp = interp;
+      }
+    } else {
+      if (!opts.interp) opts.interp = getenv("ESCM_BACKEND");
+    }
+  }
+#else /* not ENABLE_POLYGLOT */
+  if (!opts.interp) opts.interp = getenv("ESCM_BACKEND");
 #endif /* ENABLE_POLYGLOT */
 
   /* invoke the interpreter. */
   if (opts.process) {
-    outp = escm_popen(opts.interpreter);
+    if (opts.interp) outp = escm_popen(tokenize_cmd(opts.interp));
+    else outp = escm_popen(default_backend);
     /* outp will never be NULL. See fork.c */
   }
 
@@ -254,7 +296,7 @@ main(int argc, char **argv)
   escm_bind(lang, "*escm-output-file*", opts.outfile, outp);
   if (opts.process) {
     escm_bind(lang, "*escm-interpreter*",
-	      opts.interpreter ? opts.interpreter : ESCM_BACKEND, outp);
+	      opts.interp ? opts.interp : ESCM_BACKEND, outp);
 #ifdef ENABLE_CGI
     escm_bind(lang, "GATEWAY_INTERFACE", escm_cgi, outp);
     /* set useful global variables if the language is scheme. */
