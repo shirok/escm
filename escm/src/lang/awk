@@ -2,7 +2,7 @@
 awk -f /dev/stdin
 # init
 BEGIN {
-# assign
+# bind
 @VAR@ = @VAL@;
 # string
 printf "@STR@";

@@ -1,6 +1,6 @@
 # csh - configurations for the C Shell language
 csh
-# assign
+# bind
 set @VAR@=@VAL@
 # string
 echo -n "@STR@"

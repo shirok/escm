@@ -4,8 +4,6 @@ clisp -q /dev/stdin
 nil
 ;; bind
 (defvar @VAR@ @VAL@)
-;; assign
-(setq @VAR@ @VAL@)
 ;; string
 (princ "@STR@")
 ;; display

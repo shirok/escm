@@ -1,6 +1,6 @@
 # sh - configurations for the Shell language
 sh
-# assign
+# bind
 @VAR@=@VAL@
 # string
 echo -n -e "@STR@"

@@ -1,6 +1,6 @@
 # perl - configurations for the Perl language
 perl
-# assign
+# bind
 $@VAR@ = @VAL@;
 # string
 print "@STR@";

@@ -2,7 +2,7 @@
 tclsh
 # nil
 0
-# assign
+# bind
 set @VAR@ @VAL@
 # string
 puts -nonewline "@STR@"

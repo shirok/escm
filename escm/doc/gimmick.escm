@@ -37,7 +37,7 @@ newline;</li>
       <li>it has a procedure to send a newline or
 <q>\n</q> means a newline in a string;</li>
       <li>the variable is placed before the value
-in an assignment or binding statement;</li>
+in a binding statement;</li>
       <li>commands are processed in order.</li>
     </ol>
 
@@ -96,7 +96,7 @@ They are stored in <code>$(pkgdatadir)/lang</code>
 awk -f /dev/stdin
 # init
 BEGIN {
-# assign
+# bind
 @VAR@ = @VAL@;
 # string
 printf "@STR@";
@@ -117,8 +117,6 @@ gosh -b
 #f
 ;; bind
 (define @VAR@ @VAL@)
-;; assign
-(set! @VAR@ @VAL@)
 ;; string
 (display "@STR@")
 ;; display
@@ -148,7 +146,6 @@ The following lines are data.</p>
       <li><a href="#identifier">identifier</a></li>
       <li><a href="#nil">nil</a></li>
       <li><a href="#bind">bind</a></li>
-      <li><a href="#assign">assign</a></li>
       <li><a href="#string">string</a></li>
       <li><a href="#expression">expression</a></li>
       <li><a href="#newline">newline</a></li>
@@ -182,13 +179,6 @@ an empty string <em>&quot;&quot;</em> is used.</p>
 
     <h4 id="bind">bind</h4>
     <p>Code to bind a variable <em>@VAR@</em> to a value <em>@VAL@</em>.
-This record is optional.
-If it is omitted, <em>@VAR@</em> is assigned to <em>@VAL@</em>.
-</p>
-
-    <h4 id="assign">assign</h4>
-    <p>
-Code to assign a value <em>@VAL@</em> to a variable <em>@VAR@</em>.
 This record is obligatory.
 </p>
 

@@ -6,8 +6,6 @@ scm -q
 #f
 ;; bind
 (define @VAR@ @VAL@)
-;; assign
-(set! @VAR@ @VAL@)
 ;; string
 (display "@STR@")
 ;; display

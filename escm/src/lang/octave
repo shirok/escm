@@ -2,7 +2,7 @@
 octave -q
 # nil
 0
-# assign
+# bind
 @VAR@ = @VAL@;
 # string
 puts("@STR@");

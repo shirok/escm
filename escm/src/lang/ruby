@@ -2,7 +2,7 @@
 ruby
 # nil
 false
-# assign
+# bind
 $@VAR@ = @VAL@
 # string
 print "@STR@"

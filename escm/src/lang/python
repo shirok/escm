@@ -2,7 +2,7 @@
 python
 # init
 import sys
-# assign
+# bind
 @VAR@ = @VAL@
 # string
 sys.stdout.write("@STR@")
