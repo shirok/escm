@@ -4,7 +4,7 @@
 
 EXTRA_DIST = Init.sh Finish.sh Template.test $(TESTS)
 
-TESTS_ENVIRONMENT = THIS_PROG="$(top_builddir)/src/$(PACKAGE)"
+TESTS_ENVIRONMENT = THIS_PROG="$(top_builddir)/src/$(PACKAGE)" ESCM_DEFAULT="$(top_srcdir)/src/lang/scm"
 
 # Do not forget to add new tests.
 TESTS = t010_nothing.test t020_something.test

@@ -29,8 +29,6 @@
 
 #define EOPT_SIZE 16 /* enough? */
 
-extern struct escm_lang deflang;
-
 struct escm_lang * parse_lang(const char *name);
 
 #define XERROR(msg) escm_error(argv[0], msg)
@@ -45,7 +43,7 @@ main(int argc, char **argv)
   FILE *outp = stdout;
   int process_flag = TRUE;
   char *lang_name = NULL;
-  char *interp = ESCM_BACKEND;
+  char *interp = NULL;
   int n_expr = 0;
   char *expr[EOPT_SIZE];
 
@@ -63,10 +61,7 @@ main(int argc, char **argv)
     { NULL, 0, NULL, 0, }
   };
 #endif /* defined(HAVE_GETOPT_LONG) */
-  struct escm_lang *lang;
-
-  /* the default language (scheme perhaps) */
-  lang = &deflang;
+  struct escm_lang *lang = NULL;
 
   /* process options */
   for (;;) {
@@ -90,7 +85,6 @@ main(int argc, char **argv)
 	printf("\nReport bugs to <%s>\n", PACKAGE_BUGREPORT);
       } else {
 	printf("%s - developers' version of escm\n", PACKAGE_STRING);
-	printf("The default interpreter is '%s'\n", deflang.backend);
       }
       exit(EXIT_SUCCESS);
       /* not reached */
@@ -124,13 +118,14 @@ main(int argc, char **argv)
   /* select the language if necessary. */
   if (lang_name) {
     lang = parse_lang(lang_name);
-    interp = lang->backend;
   } else {
     lang_name = getenv("ESCM_DEFAULT");
-    if (lang_name) lang = parse_lang(lang_name);
+    if (!lang_name) lang_name = "scm"; /* the default language */
+    lang = parse_lang(lang_name);
     if (!interp) interp = getenv("ESCM_BACKEND");
   }
   if (lang == NULL) XERROR("invalid language configuration");
+  if (!interp) interp = lang->backend;
 
   /* invoke the interpreter. */
   if (process_flag) outp = popen(interp, "w");

@@ -310,7 +310,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE DEFAULT_LANG with_backend ESCM_BACKEND CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE DEFAULT_LANG SCHEME with_backend ESCM_BACKEND CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -855,6 +855,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-default=lang   specify the default language (scm).
+  --with-scheme           the default scheme program and its arguments (gosh
+                          -b)
   --with-backend="interpreter arg ... "   specify the backend interpreter (gosh).
 
 Some influential environment variables:
@@ -3012,6 +3014,26 @@ else
 fi
 
 
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_LANG "$DEFAULT_LANG"
+_ACEOF
+
+
+
+# Check whether --with-scheme or --without-scheme was given.
+if test "${with_scheme+set}" = set; then
+  withval="$with_scheme"
+
+fi;
+if test "$with_scheme" = "yes" || test "$with_scheme" = ""; then
+   SCHEME="gosh -b"
+elif test "$with_default" = "no"; then
+   SCHEME="guile -s /dev/stdin"
+else
+   SCHEME="$with_scheme"
+fi
+
+
 # Checks for the backend interpreter.
 
 # Check whether --with-backend or --without-backend was given.
@@ -4033,7 +4055,7 @@ fi
 done
 
 
-                                                            ac_config_files="$ac_config_files Makefile test/Makefile doc/Makefile doc/config.scm src/Makefile src/lang/Makefile"
+                                                                      ac_config_files="$ac_config_files Makefile test/Makefile doc/Makefile doc/config.scm src/Makefile src/lang/Makefile src/lang/scm"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4590,6 +4612,7 @@ do
   "doc/config.scm" ) CONFIG_FILES="$CONFIG_FILES doc/config.scm" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/lang/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/lang/Makefile" ;;
+  "src/lang/scm" ) CONFIG_FILES="$CONFIG_FILES src/lang/scm" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -4714,6 +4737,7 @@ s,@CCDEPMODE@,$CCDEPMODE,;t t
 s,@am__fastdepCC_TRUE@,$am__fastdepCC_TRUE,;t t
 s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
 s,@DEFAULT_LANG@,$DEFAULT_LANG,;t t
+s,@SCHEME@,$SCHEME,;t t
 s,@with_backend@,$with_backend,;t t
 s,@ESCM_BACKEND@,$ESCM_BACKEND,;t t
 s,@CPP@,$CPP,;t t

@@ -90,6 +90,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+SCHEME = @SCHEME@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -123,7 +124,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 with_backend = @with_backend@
 EXTRA_DIST = Init.sh Finish.sh Template.test $(TESTS)
-TESTS_ENVIRONMENT = THIS_PROG="$(top_builddir)/src/$(PACKAGE)"
+TESTS_ENVIRONMENT = THIS_PROG="$(top_builddir)/src/$(PACKAGE)" ESCM_DEFAULT="$(top_srcdir)/src/lang/scm"
 
 # Do not forget to add new tests.
 TESTS = t010_nothing.test t020_something.test t030_write.test t040_display.test t050_wrong_name.test t060_wrong_subname.test t070_blocks.test t080_displays.test t090_alternate.test t100_span.test t110_string.test t120_awk.test t130_preset.test t140_prst_awk.test t150_comment.test 

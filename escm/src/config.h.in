@@ -1,5 +1,8 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* "the default language" */
+#undef DEFAULT_LANG
+
 /* Command line to invoke the backend interpreter. */
 #undef ESCM_BACKEND
 

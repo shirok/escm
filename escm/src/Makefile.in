@@ -57,17 +57,16 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__objects_1 = deflang.$(OBJEXT)
-am_aescm_OBJECTS = escm.$(OBJEXT) filter.$(OBJEXT) lang.$(OBJEXT) \
-	$(am__objects_1)
+am_aescm_OBJECTS = filter.$(OBJEXT) escm.$(OBJEXT) lang.$(OBJEXT)
 aescm_OBJECTS = $(am_aescm_OBJECTS)
 aescm_LDADD = $(LDADD)
+am__objects_1 = deflang.$(OBJEXT)
+am__objects_2 = escmcgi.$(OBJEXT) $(am__objects_1)
 am_aescm_cgi_OBJECTS = cgimain.$(OBJEXT) escm.$(OBJEXT) \
-	escmcgi.$(OBJEXT) $(am__objects_1)
+	$(am__objects_2)
 aescm_cgi_OBJECTS = $(am_aescm_cgi_OBJECTS)
 aescm_cgi_LDADD = $(LDADD)
-am_fescm_cgi_OBJECTS = fifo.$(OBJEXT) escm.$(OBJEXT) escmcgi.$(OBJEXT) \
-	$(am__objects_1)
+am_fescm_cgi_OBJECTS = fifo.$(OBJEXT) escm.$(OBJEXT) $(am__objects_2)
 fescm_cgi_OBJECTS = $(am_fescm_cgi_OBJECTS)
 fescm_cgi_LDADD = $(LDADD)
 am_langconf_OBJECTS = langconf.$(OBJEXT) escm.$(OBJEXT) lang.$(OBJEXT)
@@ -138,6 +137,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+SCHEME = @SCHEME@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -174,11 +174,12 @@ SUBDIRS = lang
 
 # Program
 BUILT_SOURCES = deflang.c
-CLEANFILES = deflang.c langconf$(EXEEXT) aescm.cgi$(EXEEXT) fescm.cgi$(EXEEXT)
+CLEANFILES = $(BUILT_SOURCES) langconf$(EXEEXT) aescm.cgi$(EXEEXT) fescm.cgi$(EXEEXT)
 langconf_SOURCES = langconf.c escm.c escm.h lang.c
-aescm_SOURCES = escm.c escm.h filter.c lang.c $(BUILT_SOURCES)
-aescm_cgi_SOURCES = cgimain.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
-fescm_cgi_SOURCES = fifo.c escm.c escm.h escmcgi.c escmcgi.h $(BUILT_SOURCES)
+aescm_SOURCES = filter.c escm.c escm.h lang.c
+CGI_SOURCES = escmcgi.c escmcgi.h $(BUILT_SOURCES)
+aescm_cgi_SOURCES = cgimain.c escm.c escm.h $(CGI_SOURCES)
+fescm_cgi_SOURCES = fifo.c escm.c escm.h $(CGI_SOURCES)
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -1,3 +1,7 @@
+2004-12-16  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (main): Made the default language not configurable.
+
 2004-12-15  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
 	* src/escm.c (escm_error): Common error function.

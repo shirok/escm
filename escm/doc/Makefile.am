@@ -4,7 +4,7 @@
 
 all : $(htm_DATA) $(man_MANS)
 
-ESCM = $(top_builddir)/src/aescm -i "gosh -b -I."
+ESCM = $(top_builddir)/src/aescm -l $(top_srcdir)/src/lang/scm -i "gosh -b -I."
 POD2MAN = pod2man
 POD2HTML = pod2html
 HTMLDUMP = w3m -dump
@@ -35,8 +35,8 @@ clean-local:
 	-rm *.tmp
 	-rm *.pod
 
-distclean-am :
-	-rm $(man_MANS) $(html_DATA)
+distclean-am : clean-local
+	-rm $(man_MANS) $(html_DATA) aescm.html
 
 # end of doc/Makefile.am
 

@@ -23,6 +23,17 @@ else
    DEFAULT_LANG=$with_default
 fi
 AC_SUBST(DEFAULT_LANG)
+AC_DEFINE_UNQUOTED(DEFAULT_LANG, ["$DEFAULT_LANG"], ["the default language"])
+
+AC_ARG_WITH([scheme], AS_HELP_STRING([--with-scheme], [the default scheme program and its arguments (gosh -b)]))
+if test "$with_scheme" = "yes" || test "$with_scheme" = ""; then
+   SCHEME="gosh -b"
+elif test "$with_default" = "no"; then
+   SCHEME="guile -s /dev/stdin"
+else
+   SCHEME="$with_scheme"
+fi
+AC_SUBST(SCHEME)
 
 # Checks for the backend interpreter.
 AC_ARG_WITH([backend], [  --with-backend="interpreter arg ... "   specify the backend interpreter (gosh).])
@@ -41,5 +52,5 @@ AC_CHECK_FUNCS([strchr strtol getopt_long])
 
 AC_CONFIG_FILES([Makefile test/Makefile
 			  doc/Makefile doc/config.scm
-			  src/Makefile src/lang/Makefile])
+			  src/Makefile src/lang/Makefile src/lang/scm])
 AC_OUTPUT
