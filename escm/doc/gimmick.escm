@@ -10,8 +10,7 @@
     <link href="aescm.css" type="text/css" rel="stylesheet" />
     <?xml-stylesheet type="text/css" href="aescm.css"?>
   </head>
-  <?scm (load (string-append *pwd* "/config-h.scm"))
-        (load (string-append *pwd* "/helper.scm"))?>
+  <?scm (load "./config-h.scm")?>
   <body>
     <h1>Polyglot Feature</h1>
     <address>TAGA Yoshitaka

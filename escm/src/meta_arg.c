@@ -61,8 +61,7 @@
  * Macros and their behaviors:
  * - xmalloc(size)            malloc(size)
  * - xrealloc(ptr, size)      realloc(ptr, size)
- * - xerror0()                print an error message and exit            
- * - xerror1(msg)
+ * - xerror1(msg)             print an error message and exit
  * - xerror2(fmt, arg)
  */
 
@@ -76,11 +75,15 @@
 #endif /* HAVE_STDLIB_H */
 #include "meta_arg.h"
 
+#if !defined(_)
+#  define _(str) str
+#endif /* !defined(_) */
+
 #ifndef FALSE
-# define FALSE 0
+#  define FALSE 0
 #endif /* FALSE */
 #ifndef TRUE
-# define TRUE !FALSE
+#  define TRUE !FALSE
 #endif /* TRUE */
 
 #ifndef xprog
@@ -93,18 +96,6 @@ static char *xfile = NULL;
 static int xlineno = 0;
 #endif /* xlineno */
 
-#ifndef xmalloc
-# define xmalloc(size) malloc((size))
-#endif /* ndef xmalloc */
-#ifndef xrealloc
-# define xrealloc(ptr, size) realloc((ptr), (size))
-#endif /* ndef xrealloc */
-#ifndef xerror0
-# define xerror0() {\
-  perror(xprog);\
-  exit(EXIT_FAILURE);\
-}
-#endif /* xerror0 */
 #ifndef xerror1
 # define xerror1(str) {\
   fprintf(stderr, "%s: ", xprog);\
@@ -124,12 +115,19 @@ static int xlineno = 0;
 }
 #endif /* xerror2 */
 
+/* The real implementations should check the return value. */
+#ifndef XMALLOC
+#  define XMALLOC(type, n) ((type *)malloc((n) * sizeof(type)))
+#endif /* not XMALLOC */
+#ifndef XREALLOC
+#  define XMALLOC(type, p, n) ((type *)realloc((p), (n) * sizeof(type)))
+#endif /* not XREALLOC */
+
 #define ADD_CHAR(c) {\
   if (buf) {\
      if (size == i) {\
         size += BUFSIZ;\
-        buf = (char *)xrealloc(buf, size);\
-        if (!buf) xerror0();\
+        buf = XREALLOC(char, buf, size);\
      }\
      buf[i++] = (char)c;\
   }\
@@ -151,10 +149,10 @@ skip_shebang_line(FILE *fp)
     return META_ARGS_NOT;
   }
   c = getc(fp);
-  if (c != '!') xerror1(gettext("bad #! line"));
+  if (c != '!') xerror1(_("bad #! line"));
   for (;;) { /* skip blanks if any */
     c = getc(fp);
-    if (c == EOF || c == '\n') xerror1(gettext("bad #! line"));
+    if (c == EOF || c == '\n') xerror1(_("bad #! line"));
     if (c != ' ' && c != '\t') break;
   }
   for (;;) { /* skip argv[0] */
@@ -212,7 +210,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
 	n++;
       } else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(gettext("unexpected eof"));
+	if (c == EOF) xerror1(_("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  break;
@@ -234,7 +232,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       else if (c == '\'') state = SINGLE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(gettext("unexpected eof"));
+	if (c == EOF) xerror1(_("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  continue;
@@ -252,7 +250,7 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
       if (c == '\"') state = INSIDE;
       else if (c == '\\') {
 	c = getc(fp);
-	if (c == EOF) xerror1(gettext("unexpected eof"));
+	if (c == EOF) xerror1(_("unexpected eof"));
 	else if (c == '\n') {
 	  xlineno++;
 	  continue;
@@ -272,8 +270,8 @@ parse_as_command_line(char **pbuf, size_t *psize, FILE *fp)
   }
   if (state == DOUBLE || state == SINGLE) {
     xlineno = keep_lineno;
-    xerror1(gettext("unterminated string"));
-  } else if (state == INSIDE) xerror1(gettext("unexpected eof"));
+    xerror1(_("unterminated string"));
+  } else if (state == INSIDE) xerror1(_("unexpected eof"));
   *pbuf = buf;
   *psize = i;
   return n;
@@ -308,20 +306,18 @@ meta_args_replace(int *pargc, char ***pargv, const char *script, int from)
   if (!xprog) xprog = argv[0];
 
   fp = fopen(script, "r");
-  if (fp == NULL) xerror2(gettext("can't open - %s"), script);
+  if (fp == NULL) xerror2(_("can't open - %s"), script);
 
   xfile = script;
   ret = skip_shebang_line(fp);
   if (ret == META_ARGS_OK) {
-    buf = (char *)xmalloc(BUFSIZ);
-    if (buf == NULL) xerror0();
+    buf = XMALLOC(char, BUFSIZ);
     ret = parse_as_command_line(&buf, &size, fp);
   }
   fclose(fp);
   if (ret == META_ARGS_NOT) ret = 0;
   argc += 2 + ret - from;
-  new_argv = (char **)xmalloc((sizeof(char*)) * (argc + 1));
-  if (new_argv == NULL) xerror0();
+  new_argv = XMALLOC(char *, 1 + argc);
   new_argv[0] = argv[0];
   if (ret > 0) {
     ptr = buf;

@@ -14,6 +14,7 @@
 # include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
 #include "escm.h"
+#include "misc.h"
 
 /* Used to make error messages. */
 const char *escm_prog = NULL;
@@ -110,7 +111,7 @@ escm_bind_query_string(const struct escm_lang *lang, FILE *outp)
 
   content_length = getenv("CONTENT_LENGTH");
   if (content_length == NULL)
-    escm_error(gettext("inconsistent environment"));
+    escm_error(_("inconsistent environment"));
   else {
     if (lang->bind.prefix) fputs(lang->bind.prefix, outp);
     put_variable(lang, "QUERY_STRING", outp);
@@ -157,7 +158,6 @@ escm_finish(const struct escm_lang *lang, FILE *outp)
  if (stackptr == 31) goto empty;\
  stack[stackptr++] = c;\
 }
-#define myfputs(s, fp) { if (s) fputs(s, fp); }
 void
 escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
 {
@@ -295,11 +295,11 @@ escm_preproc(const struct escm_lang *lang, FILE *inp, FILE *outp)
     if (in_string) {
       fputc('\"', outp);
       escm_lineno = str_keep_lineno;
-      escm_error(gettext("unterminated string"));
+      escm_error(_("unterminated string"));
     }
     if (state == DISPLAY) fputs(lang->display.suffix, outp);
     escm_lineno = tag_keep_lineno;
-    escm_error(gettext("unterminated instruction"));
+    escm_error(_("unterminated instruction"));
   }
   fputc('\n', outp);
 }

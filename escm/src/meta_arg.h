@@ -14,7 +14,7 @@ int meta_skip_shebang(FILE *fp);
 
 #ifdef ESCM
 #include "escm.h"
-#define xerror0() escm_error(NULL)
+#include "misc.h"
 #define xerror1 escm_error
 #define xerror2 escm_error
 #define xprog escm_prog

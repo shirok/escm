@@ -8,21 +8,36 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
+#if defined(HAVE_STDLIB_H)
+#  include <stdlib.h>
+#else
+#  define EXIT_SUCCESS 0
+#  define EXIT_FAILURE 1
+#  void exit(int status);
 #endif /* HAVE_STDLIB_H */
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif /* HAVE_STRING_H */
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* HAVE_UNISTD_H */
+
+#if defined(HAVE_STRING_H)
+#  include <string.h>
+#elif defined(HAVE_STRINGS_H)
+#  include <strings.h>
+#endif /* HAVE_STRING_H and HAVE_STRINGS_H */
+
+#if !defined(HAVE_GETOPT_LONG) && defined(HAVE_UNISTD_H)
+#  include <unistd.h>
+#else
+#  include <getopt.h>
+#endif /* !defined(HAVE_GETOPT_LONG) && defined(HAVE_UNISTD_H) */
+#if !defined(HAVE_GETOPT_LONG)
+#  define getopt_long(a, b, c, d, e) getopt(a, b, c)
+#endif /* !defined(HAVE_GETOPT_LONG) */
 
 #include "meta_arg.h"
 #include "escm.h"
+#include "misc.h"
 
 static char * const default_backend[] = { ESCM_BACKEND_ARGV, NULL };
 
+/* Will be moved elesewhere. */
 static char **
 tokenize_cmd(const char *cmd)
 {
@@ -31,15 +46,14 @@ tokenize_cmd(const char *cmd)
   int i, n = 0;
   char **argv = NULL;
 
-  str = (char *)malloc(1 + strlen(cmd));
-  if (!str) escm_error(NULL);
+  i = 1 + strlen(cmd);
+  str = XMALLOC(char, i);
   strcpy(str, cmd);
   p = strtok(str, " \t");
   for (i = 0; /**/; i++, p = strtok(NULL, " \t")) {
     if (i == n) {
       n += 4;
-      argv = (char **)realloc(argv, sizeof(char*) * n);
-      if (!argv) escm_error(NULL);
+      argv = XREALLOC(char *, argv, n);
     }
     argv[i] = p;
     if (p == NULL) break;
@@ -70,42 +84,6 @@ static char * env_to_bind[] = {
 struct escm_lang * parse_lang(const char *name, const char **interp);
 #endif /* ENABLE_POLYGLOT */
 
-/* usage() - print a short help message.
- */
-static void
-usage(void)
-{
-  printf(gettext("Usage: %s [OPTION] ... FILE ...\n"), escm_prog);
-  fputs(gettext("Process embedded scheme code in documents.\n\n"), stdout);
-  fputs(gettext("  -E                  convert documents into code\n"), stdout);
-  fputs(gettext("  -H                  print no content header even in a CGI\n"), stdout);
-  fputs(gettext("  -e EXPR             evaluate an expression\n"), stdout);
-  fputs(gettext("  -f FILENAME         specify the footer file\n"), stdout);
-  fputs(gettext("  -i 'PROG ARG ... '  invoke an interpreter as backend\n"), stdout);
-  fputs(gettext("  -l LANG             choose the interpreter language\n"), stdout);
-  fputs(gettext("  -o FILENAME         specify the output file\n"), stdout);
-  fputs(gettext("  -h                  print this message and exit\n"), stdout);
-  fputs(gettext("  -v                  print version information and exit"), stdout);
-#ifndef ENABLE_CGI
-  printf(gettext("\nOption %s is discarded."), "-H");
-#endif /* ENABLE_CGI */
-#ifndef ENABLE_POLYGLOT
-  printf(gettext("\nOption %s is discarded."), "-l");
-#endif /* ENABLE_POLYGLOT */
-  printf(gettext("\n\nReport bugs to <%s>\n"), PACKAGE_BUGREPORT);
-}
-
-/* version() - print version information.
- */
-static void
-version(void)
-{
-  char *interp = getenv("ESCM_BACKEND");
-  if (!interp) interp = ESCM_BACKEND;
-  printf(gettext("%s - experimental version of escm\n"), PACKAGE_STRING);
-  printf(gettext("The default interpreter is '%s'\n"), interp);
-}
-
 /* proc_file_name(lang, name, outp) - process a file. The inpuf file
  * is specifeid by its name.
  */
@@ -115,7 +93,7 @@ proc_file_name(struct escm_lang *lang, const char *file, FILE *outp)
   FILE *inp;
 
   inp = fopen(file, "r");
-  if (inp == NULL) escm_error(gettext("can't open - %s"), file);
+  if (inp == NULL) escm_error(_("can't open - %s"), file);
 
   escm_file = file;
   escm_assign(lang, "*escm-input-file*", file, outp);
@@ -143,11 +121,60 @@ static void
 parse_opts(int argc, char **argv, struct opt_data *opt)
 {
   int c;
+#if defined(HAVE_GETOPT_LONG)
+  int long_idx;
+  int help_flag = FALSE;
+  const struct option long_opt[] = {
+    { "no-eval", 0, NULL, 'E' },
+    { "no-header", 0, NULL, 'H', },
+    { "eval", 1, NULL, 'e', },
+    { "footer", 1, NULL, 'f', },
+    { "interp", 1, NULL, 'i', },
+    { "language", 1, NULL, 'l', },
+    { "output", 1, NULL, 'o', },
+    { "help", 0, &help_flag, TRUE, },
+    { "version", 0, &help_flag, FALSE, },
+    { NULL, 0, NULL, 0, }
+  };
+#endif /* defined(HAVE_GETOPT_LONG) */
 
   for (;;) {
-    c = getopt(argc, argv, "EHe:f:i:l:o:hv");
+    c = getopt_long(argc, argv, "EHe:f:i:l:o:", long_opt, &long_idx);
     if (c == -1) break;
     switch (c) {
+#if defined(HAVE_GETOPT_LONG)
+    case 0:
+      if (help_flag) {
+	printf(_(
+"Usage: %s [OPTION] ... FILE ...\n"
+"Preprocess embedded scheme code in documents.\n"
+"\n"
+"  -E, --no-eval                convert documents into code\n"
+"  -H, --no-header              print no content header even in a CGI\n"
+"  -e, --eval=EXPR              evaluate an expression\n"
+"  -f, --footer=FILENAME        specify the footer file\n"
+"  -i, --interp='PROG ARG ...'  invoke an interpreter as backend\n"
+"  -l, --language=LANG          choose the interpreter language\n"
+"  -o, --output=FILENAME        specify the output file\n"
+"      --help                   print this message and exit\n"
+"      --version                print version information and exit\n"),
+	       escm_prog);
+#ifndef ENABLE_CGI
+	printf(_("Option %s is discarded.\n"), "-H");
+#endif /* ENABLE_CGI */
+#ifndef ENABLE_POLYGLOT
+	printf(_("Option %s is discarded.\n"), "-l");
+#endif /* ENABLE_POLYGLOT */
+	printf(_("\nReport bugs to <%s>\n"), PACKAGE_BUGREPORT);
+      } else {
+	char *interp = getenv("ESCM_BACKEND");
+	if (!interp) interp = ESCM_BACKEND;
+	printf(_("%s - experimental version of escm\n"), PACKAGE_STRING);
+	printf(_("The default interpreter is '%s'\n"), interp);
+      }
+      exit(EXIT_SUCCESS);
+      /* not reached */
+#endif /* defined(HAVE_GETOPT_LONG) */
     case 'E':
       opt->process = FALSE;
       break;
@@ -158,8 +185,7 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
 #endif /* ENABLE_CGI */
     case 'e':
       opt->n_expr++;
-      opt->expr = (char**)realloc(opt->expr, sizeof(char*) * opt->n_expr);
-      if (opt->expr == NULL) escm_error(NULL);
+      opt->expr = XREALLOC(char *, opt->expr, opt->n_expr);
       opt->expr[opt->n_expr - 1] = optarg;
       break;
     case 'f':
@@ -176,16 +202,13 @@ parse_opts(int argc, char **argv, struct opt_data *opt)
     case 'o':
       opt->outfile = optarg;
       break;
-    case 'v':
-      version();
-      exit(EXIT_SUCCESS);
-      /* not reached */
-    case 'h':
-      usage();
-      exit(EXIT_SUCCESS);
-      /* not reached */
     default:
-      usage();
+#if defined(HAVE_GETOPT_LONG)
+      printf(_("Try `%s --help' for more information.\n"), escm_prog);
+#else /* !defined(HAVE_GETOPT_LONG) */
+      fprintf(stderr, "Usage: %s [-EH] [-e EXPR][-f FOOTER] [-i \"PROG ARG ...\"]\n       [-l LANG] [-o OUTPUT] FILE ...\n", escm_prog);
+      fprintf(stderr, "%s - experimental version of escm\n", PACKAGE_STRING);
+#endif /* defined(HAVE_GETOPT_LONG) */
       exit(EXIT_FAILURE);
       /* not reached */
     }
@@ -226,7 +249,7 @@ main(int argc, char **argv)
 #ifdef ENABLE_CGI
   /* redirect stderr to stdout if it is invoked as CGI. */
   if (escm_cgi) {
-    if (dup2(fileno(stdout), fileno(stderr)) < 0) escm_error(NULL);
+    escm_redirect(fileno(stderr), fileno(stdout));
     path_translated = getenv("PATH_TRANSLATED");
   }
 #endif /* ENABLE_CGI */
@@ -256,7 +279,7 @@ main(int argc, char **argv)
   /* specify the output file if necessary. */
   if (opts.outfile) {
     if (freopen(opts.outfile, "w", stdout) == NULL)
-      escm_error(gettext("can't open - %s"), opts.outfile);
+      escm_error(_("can't open - %s"), opts.outfile);
   }
 
 #ifdef ENABLE_POLYGLOT
@@ -342,8 +365,7 @@ main(int argc, char **argv)
 
   /* close the pipe. */
   if (opts.process && escm_pclose(outp) != 0)
-    escm_error(NULL);
-
+    escm_error("the backend exited unsuccessfully");
   return 0;
 }
 /* end of filter.c */

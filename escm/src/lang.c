@@ -1,21 +1,26 @@
-/*************************************************************
- * lang.c - parser of interpreter language configuration files.
+/* lang.c - parser of interpreter language configuration files.
  * $Id$
  * Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
- *************************************************************/
+ */
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#  include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif /* HAVE_STDLIB_H */
-#ifdef HAVE_STRING_H
-# include <string.h>
-#endif /* HAVE_STRING_H */
+#if defined(HAVE_STRING_H)
+#  include <string.h>
+#elif defined(HAVE_STRINGS_H)
+#  include <strings.h>
+#else /* !defined(HAVE_STRING_H) and !defined(HAVE_STRINGS_H) */
+char *strncpy(char *dest, const char *src, size_t n);
+char *strncat(char *dest, const char *src, size_t n);
+int strcmp(const char *s1, const char *s2);
+char *strchr(const char *s, int c);
+#endif /* HAVE_STRING_H and HAVE_STRINGS_H */
 #include <ctype.h>
 
 #include "escm.h"
+#include "misc.h"
 
 #define HASH_KEY(a, b) ((a) * 128 + (b))
 
@@ -23,12 +28,19 @@
 char buffer[ESCM_LANGCFG_SIZE];
 static struct escm_lang mylang;
 
-#ifndef FALSE
-# define FALSE 0
-#endif /* FALSE */
-#ifndef TRUE
-# define TRUE !FALSE
-#endif /* TRUE */
+#if !defined(HAVE_STRCHR)
+char *
+my_strchr(const char *s, int c)
+{
+  char *p = (char *)s;
+  while (*p != c) {
+    if (!*p) return NULL;
+    p++;
+  }
+  return p;
+}
+#define strchr(s, c) my_strchr(s, c)
+#endif /* !defined(HAVE_STRCHR) */
 
 /* read_conf(lang)
  */
@@ -150,10 +162,10 @@ parse_lang(const char *name, const char **interp)
 {
   char *ptr, *rname, *data;
 
-  if (!read_conf(name)) escm_error(gettext("can't open - %s"), name);
+  if (!read_conf(name)) escm_error(_("can't open - %s"), name);
   ptr = get_data2(buffer, &(mylang.name), (char **)interp);
   if (ptr == NULL || mylang.name == NULL || *interp == NULL)
-    escm_error(gettext("broken config file - %s"), name);
+    escm_error(_("broken config file - %s"), name);
 
   if (strcmp(mylang.name, "scm") == 0 || strcmp(mylang.name, "scheme") == 0)
     mylang.scm_p = 1;
@@ -162,15 +174,15 @@ parse_lang(const char *name, const char **interp)
 
   while (ptr) {
     ptr = get_data2(ptr, &rname, &data);
-    if (rname == NULL) escm_error(gettext("broken config file - %s"), name);
+    if (rname == NULL) escm_error(_("broken config file - %s"), name);
     switch (HASH_KEY(rname[0], rname[1])) {
     case HASH_KEY('b', 'i'): /* bind */
       if (!parse_form3(data, &(mylang.bind)))
-	escm_error(gettext("broken config file - %s"), name);
+	escm_error(_("broken config file - %s"), name);
       break;
     case HASH_KEY('a', 's'): /* assign */
       if (!parse_form3(data, &(mylang.assign)))
-	escm_error(gettext("broken config file - %s"), name);
+	escm_error(_("broken config file - %s"), name);
       break;
     case HASH_KEY('i', 'n'): /* init */
       mylang.init = data;
@@ -183,24 +195,24 @@ parse_lang(const char *name, const char **interp)
       break;
     case HASH_KEY('d', 'i'): /* display */
       if (data && !parse_form2(data, &(mylang.display)))
-	escm_error(gettext("broken config file - %s"), name);
+	escm_error(_("broken config file - %s"), name);
       break;
     case HASH_KEY('f', 'o'): /* format */
       if (data && !parse_form3(data, &(mylang.format)))
-	escm_error(gettext("broken config file - %s"), name);
+	escm_error(_("broken config file - %s"), name);
       break;
     case HASH_KEY('s', 't'): /* string */
       if (!parse_form2(data, &(mylang.literal)))
-	escm_error(gettext("broken config file - %s"), name);
+	escm_error(_("broken config file - %s"), name);
       break;
     default:
-      escm_error(gettext("broken config file - %s"), name);
+      escm_error(_("broken config file - %s"), name);
     }
   }
   if (!mylang.assign.infix)
-    escm_error(gettext("broken config file - %s"), name);
+    escm_error(_("broken config file - %s"), name);
   if (!mylang.literal.prefix || !mylang.literal.suffix)
-    escm_error(gettext("broken config file - %s"), name);
+    escm_error(_("broken config file - %s"), name);
   if (!mylang.bind.infix) mylang.bind = mylang.assign;
   return &mylang;
 }

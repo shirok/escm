@@ -1,6 +1,25 @@
+2003-07-24  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
+
+	* src/filter.c (parse_opts): Accept long options.
+
+	* src/misc.c (strtol): Added a fallback for strtol().
+
+	* src/lang.c (my_strchr): Added a fallback for strchr().
+
+	* src/misc.c (atexit): Added an ad hoc fallback for atexit().
+
 2003-07-23  TAGA Yoshitaka  <tagga@tsuda.ac.jp>
 
-	* test/t120_awk.test, test/t140_prst_awk.test: Check config.h.
+	* src/cgi.c, src/misc.c: Renamed cgi.c to misc.c.
+
+	* configure.ac, Makefile.am, doc/Makefile.am, doc/*.escm,
+	doc/aescm.epod, src/lang/Makefile.am, test/t120_awk.test,
+	test/t140_prst_awk.test: Fixed distcheck target.
+
+	* configure.ac (AM_INIT_AUTOMAKE): Updated automake to version 1.6.
+
+	* test/t120_awk.test, test/t140_prst_awk.test: Check config.h in
+	place of a help message.
 
 	* test/Makefile.am (clean-local): Remove ad-hoc temporary files if
 	any.

@@ -3,8 +3,7 @@
 <!DOCTYPE html
      PUBLIC  "-//W3C//DTD XHTML 1.1//EN"
      "DTD/xhtml11-flat.dtd">
-<?scm (load (string-append *pwd* "/config-h.scm"))
-      (load (string-append *pwd* "/helper.scm"))?>
+<?scm (load "./config-h.scm")?>
 <html>
   <head>
     <title>README for <?scm:d PACKAGE?></title>

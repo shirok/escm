@@ -2,23 +2,26 @@
 # $Id$
 # Author: TAGA Yoshitaka <tagga@tsuda.ac.jp>
 
-ESCM = $(top_builddir)/src/aescm
+ESCM = ../src/aescm
 
 SUFFIXES = .escm .html
 
 man_MANS = aescm.1
 
-$(ESCM) :
-	cd $(top_builddir)/src/ && make
+ESCM_DOC_FILES = readme.escm gimmick.escm interpreter.escm
+HTML_DOC_FILES = readme.html gimmick.html interpreter.html
 
-$(top_builddir)/doc/config-h.scm : $(top_builddir)/src/config.h $(ESCM)
+$(ESCM) :
+	cd ../src/ && make
+
+config-h.scm : ../src/config.h $(ESCM)
 	$(AWK) -f $(top_srcdir)/doc/config-h.awk $< > $@
 
 %.html : %.escm config-h.scm $(top_srcdir)/doc/helper.scm
-	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
+	-LANG=C && $(ESCM) -e "(define *date* \"`date -u`\")" -e "(load \"$(top_srcdir)/doc/helper.scm\")" -o $@ $<
 
-aescm.pod : aescm.epod $(top_builddir)/doc/config-h.scm $(top_srcdir)/doc/helper.scm
-	$(ESCM) -e "(define *date* \"`date`\")" -e "(define *pwd* \"`pwd`\")" -o $@ $<
+aescm.pod : aescm.epod config-h.scm $(top_srcdir)/doc/helper.scm
+	$(ESCM) -e "(load \"$(top_srcdir)/doc/helper.scm\")" -o $@ $<
 
 aescm.1 : aescm.pod
 	pod2man -c "" -r "" $< > $@
@@ -26,9 +29,9 @@ aescm.1 : aescm.pod
 aescm.html : aescm.pod
 	pod2html $< > $@
 
-EXTRA_DIST = config-h.awk helper.scm @ESCM_DOC_FILES@ aescm.epod
+EXTRA_DIST = config-h.awk helper.scm $(ESCM_DOC_FILES) aescm.epod
 
-CLEANFILES = config-h.scm @HTML_DOC_FILES@ aescm.pod aescm.1 aescm.html
+CLEANFILES = config-h.scm $(HTML_DOC_FILES) aescm.pod aescm.1 aescm.html
 
 noinst_DATA = $(CLEANFILES)
 
