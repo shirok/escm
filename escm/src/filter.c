@@ -17,7 +17,6 @@
 
 #include "meta_arg.h"
 #include "escm.h"
-#include "escm_scm.h"
 
 #ifdef ESCM_SCM
 const char *scm_interp = ESCM_SCM;
