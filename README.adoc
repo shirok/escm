@@ -1,0 +1,12 @@
+= escm - Embedded Scheme Processor
+
+This repository is converted from the CVS repo of link:https://practical-scheme.net/vault/escm.html[escm].
+This is made available mainly for historical interest.
+
+We have two modules here:
+
+- link:escm-1[]: The 'original' `escm` - a simple text preprocessor that converts
+  markups in the source into Scheme expression; you can pipe the output to
+  Scheme interpreter (such as link:https://practical-scheme.net/gauche/[Gauche]) to obtain the fully-expanded output.
+- link:escm[]: The enhanced version, `aescm` - it supports not only Scheme but
+  a dozen more languages.
